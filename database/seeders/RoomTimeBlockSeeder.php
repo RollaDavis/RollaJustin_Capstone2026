@@ -12,6 +12,6 @@ class RoomTimeBlockSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        // TODO WRITE SEEDER
     }
 }

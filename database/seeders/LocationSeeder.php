@@ -6,14 +6,14 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use JeroenZwart\CsvSeeder\CsvSeeder;
 
-class InstructorSeeder extends CsvSeeder
+class LocationSeeder extends CsvSeeder
 {
     public function __construct()
     {
-        $this->file = '/database/seeds/csvs/instructors.csv';
+        $this->file = '/database/seeds/csvs/locations.csv';
         $this->delimiter = ',';
-        $this->tablename = 'instructors';
-        $this->mapping = ['id', 'name', 'active'];
+        $this->tablename = 'locations';
+        $this->mapping = ['id', 'name'];
     }
 
     /**
