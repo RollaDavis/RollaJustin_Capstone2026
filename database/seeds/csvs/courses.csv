@@ -1,0 +1,170 @@
+id,name
+1,ABDY-270 Advanced Refinishing
+2,ABDY-275 Waterborne Paint Systems
+3,ABDY-280 Custom Painting
+4,ACTG-101 Accounting Procedures I
+5,AST-114 Automotive Brakes
+6,AST-115 Automotive Brakes Lab
+7,AST-162 Automotive Engine Diagnostics
+8,AST-163 Auto Engine Diagnostics Lab
+9,AST-175 Engine Rebuild Lab
+10,AST-260 Advanced Auto Diagnostics
+11,AST-261 Advanced Auto Diagnostics Lab
+12,AST-270 Auto Transmissions/Transaxles
+13,AST-271 Auto Transmissns/Transxls Lab
+14,AST-285 ASE Exam Prep: Section One
+15,BGEN-105B Introduction to Business
+16,CAPP-120 Introduction to Computers
+17,CSCI-114 Programming with C#
+18,CSCI-116 Python Programming
+19,CSCI-121 Programming with Java II
+20,CSCI-211 Client Side Programming
+21,CSCI-258 Web Application Development
+22,CSCI-299 Thesis/Capstone
+23,CSTN-142 Int - Ext Finish Carpentry
+24,CSTN-250 Construction Estimating
+25,CSTN-280 Const Proj Schedule & Control
+26,CSTN-281 Construction Project Mgmnt II
+27,CSTN-299 Capstone:  Construction
+28,DST-101 Power Trains
+29,DST-117 Intro to Diesel Fuel Systems
+30,DST-155 Adv Hydraulics & Pneumatics
+31,DST-250 Heavy Duty Chassis
+32,DST-258 Applied Diesel Service
+33,DST-277 Adv Fuel Systems & Diesel Eng
+34,ELCT-250 Programmable Logic Controllers
+35,ETEC-284 Digital Electronics
+36,ITS-212 Network Operating Sys-Server A
+37,ITS-224 Introduction to Linux
+38,ITS-245 Computer Forensics
+39,ITS-256 CCNA Security
+40,ITS-257 Intro to Comp Virtualization
+41,ITS-299 Capstone
+42,NTS-104 CCNA 1: Intro to Networks
+43,NTS-204 CCNA 3: Scaling Networks
+44,PPT-135 Instrument & Control Systems
+45,PPT-136 Instrument & Controls Lab
+46,PPT-161 Process Plant HSE II
+47,PPT-208 Equipment and Operations Lab
+48,PPT-210 Equipment and Operations
+49,PPT-211 Advanced Operations
+50,PPT-212 Advanced Operations Lab
+51,PPT-220 Quality Control Practices
+52,PPT-225 Plant Investigation
+53,RD-101 College Reading Strategies
+54,TRID-151 Welding
+55,"TRID-152 Vehicle Htg, Vent & AC"
+56,WLDG-153 Metal Fabrication Basics
+57,WLDG-154 Metal Fabrication Basics Lab
+58,WLDG-156 Semi-Automatic Welding
+59,WLDG-157 Semi-Automatic & SMAW Lab
+60,WLDG-250 Metals Production
+61,WLDG-251 Specialty Weld Processes
+62,WLDG-280 Weld Testing Certification
+63,WLDG-281 Weld Testing Certification Lab
+64,ABDY-150 Refinish Safety
+65,ABDY-160 Automotive Undercoats
+66,ABDY-170 Automotive Topcoats
+67,AST-106 Auto Manual Drive Train/Axles
+68,AST-107 Auto Man Drive Train/Axles Lab
+69,AST-220 Auto Steering and Suspension
+70,AST-221 Auto Steering/Suspension Lab
+71,AST-230 Elec/Elctrncs Sys II
+72,AST-231 Elec/Elctrncs Sys II Lab
+73,CAPP-103 Quickbooks Fundamentals
+74,CSCI-100 Intro to Programming
+75,CSCI-111B Programming with Java I
+76,CSCI-150 Intro to Computer Science
+77,CSCI-214 Server-Side Web Prog & Admin
+78,CSCI-223 Software Development
+79,CSCI-240 Databases and SQL
+80,CSTN-120 Carpentry Bscs & Rough-In Frmg
+81,CSTN-148 Blueprint Codes and Est.
+82,CSTN-160 Constructn Cncpts & Bldg Lab
+83,CSTN-161 Constructn Cncpts & Bldg Lb II
+84,CSTN-271 Construction Project Mgmnt
+85,DST-132 Diesel Engine Overhaul
+86,DST-140 Intro to Hydraulics
+87,DST-141 Intro to Hydraulics Lab
+88,DST-202 Advanced Power Trains
+89,DST-212 Diesel Electric and Electronic
+90,ELCT-241 Electric Motor Controls
+91,ETEC-193 Fund Electrical Technicians II
+92,ITS-210 Network OS - Desktop
+93,ITS-217 Network OS - Server Admin/Apps
+94,ITS-226 Advanced Linux
+95,ITS-233 Introduction to Dev-Ops
+96,ITS-246 Cybersecurity Operations
+97,ITS-280 Computer Repair & Maintenance
+98,NTS-105 CCNA 2: Routing & Switching Es
+99,PPT-101 Fund of Process Technology
+100,PPT-102 Fund of Process Technology Lab
+101,PPT-130 Process Diagrams for Proc Tech
+102,PPT-151 Process Plant HSE I
+103,"PPT-207 Boilers, Access & Basic Oprtns"
+104,TRID-150 Environ/Shop Practices
+105,TRID-170 Engine Theory
+106,TRID-181 Transport Elect Systems Lec
+107,TRID-182 Transport Elect Systems Lab
+108,TRID-185 Intro Industrial Power Systems
+109,TRID-186 Intro Indstrl Pwr Systms Lab
+110,TRID-294 WK: I&E Basic Electronics
+111,WLDG-117 Blueprint Rd & Weld Symbols
+112,WLDG-124 Welding Theory Tech & Safety
+113,WLDG-125 Cut/Shielded Mtl Arc Weld Lab
+114,WLDG-126 Shielded Metal Arc Welding Lab
+115,WLDG-205 Applied Metallurgy
+116,WLDG-212 Pipe Welding & Layout
+117,WLDG-213 Pipe Welding I Lab
+118,WLDG-294 WK: Gas Tungsten Arc Weld Lect
+119,WLDG-294 WK: Gas Tungsten Arc Lab
+120,AHUS-111 Intro to Clinical and Scan Lab
+121,AHXR-101 Patient Care in Radiology
+122,AHXR-108 Intro to Radiologic Physics
+123,AHXR-150 Radiological Technology I
+124,AHXR-151 Radiology I Positioning Lab
+125,AHXR-250 Radiological Technology III
+126,BIOH-201 Human Anatomy & Physiology I
+127,BIOH-202 Human Anatomy & Phys I Lab
+128,BIOH-211 Human Anatomy & Physiology II
+129,BIOH-212 Human Anatomy & Phys II Lab
+130,BIOM-250 Microbiology for Hlth Sciences
+131,BIOM-251 Microbiology Hlth Sciences Lab
+132,CHMY-121 Intro to General Chemistry
+133,CHMY-122 Intro to Gen Chem Lab
+134,COLS-108 The College Experience
+135,COMX-106 Comm in a Dynamic Workplace
+136,COMX-115 Intro to Interpersonal Comm
+137,ECP-201 Paramedic Fundamentals
+138,ECP-202 Paramedic Fundamentals Lab
+139,ECP-230 Trauma
+140,ECP-232 Pulmonary
+141,ECP-233 Trauma/Pulmonary Lab and PHTLS
+142,FIRE-115 Firefighter I Foundations
+143,FIRE-130 Firefighter Ldrshp & Influence
+144,FIRE-131 Fire Apparatus and Hydraulics
+145,FIRE-201 Firefighter Resilience
+146,FIRE-270 Fire Prevention
+147,M-111 Technical Mathematics
+148,M-114 Extended Technical Mathematics
+149,M-121 College Algebra
+150,M-140 College Math for Healthcare
+151,M-143 Finite Mathematics
+152,NASX-105 Intro Native American Studies
+153,NRSG-230 Nursing Pharmacology
+154,NRSG-231 Nursing Pharmacology Lab
+155,NRSG-232 Foundations for Nursing
+156,NRSG-233 Foundations of Nursing Lab
+157,NRSG-234 Adult Nursing I
+158,NRSG-236 Health/Ill Maternity Nsg
+159,NRSG-244 Adult Nursing II
+160,NRSG-246 Hlth/Illness Child/Fmly Nursng
+161,NRSG-254 Mental Health Concepts
+162,NRSG-256 Pathophysiology
+163,NRSG-259 Adult Nursing III
+164,NRSG-260 Adult Nursing III Lab
+165,NRSG-266 Managing Client Care RN
+166,PSYX-100 Intro to Psychology
+167,WRIT-101 College Writing I
+168,WRIT-121 Intro to Technical Writing
+169,WRIT-122 Intro to Business Writing

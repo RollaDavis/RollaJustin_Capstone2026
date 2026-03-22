@@ -12,6 +12,6 @@ class SectionsTimeslotsSeeder extends Seeder
      */
     public function run(): void
     {
-        //
+        // TODO WRITE SEEDER
     }
 }
