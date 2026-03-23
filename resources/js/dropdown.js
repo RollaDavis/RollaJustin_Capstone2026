@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const scheduleValueConfig = {
         instructor: {
             endpoint: '/api/instructors',
+            coursesEndpoint: (id) => `/api/instructors/${id}/courses`,
             loadingMessage: 'Loading instructors...',
             selectMessage: 'Select an instructor',
             emptyMessage: 'No instructors found',
@@ -22,6 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         room: {
             endpoint: '/api/rooms',
+            coursesEndpoint: (id) => `/api/rooms/${id}/courses`,
             loadingMessage: 'Loading rooms...',
             selectMessage: 'Select a room',
             emptyMessage: 'No rooms found',
@@ -30,6 +32,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         program: {
             endpoint: '/api/programs',
+            coursesEndpoint: (id) => `/api/programs/${id}/courses`,
             loadingMessage: 'Loading programs...',
             selectMessage: 'Select a program',
             emptyMessage: 'No programs found',
@@ -84,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
             program: 'Program'
         };
 
-        scheduleByDropdownButton.textContent = labels[normalizedValue] || 'Select view';
+        scheduleByDropdownButton.textContent = labels[normalizedValue] || 'Select an option';
     };
 
     const setScheduleValueSearchLabels = (placeholder = 'Search options', ariaLabel = 'Search options') => {
@@ -96,19 +99,38 @@ document.addEventListener('DOMContentLoaded', () => {
         scheduleValueSearch.setAttribute('aria-label', ariaLabel);
     };
 
-    const fetchInstructorAssignments = async (instructorId, instructorName) => {
+    const publishSelectedCourses = (selectedView, selectedId, selectedName, courses) => {
+        document.dispatchEvent(new CustomEvent('schedule:courses-selected', {
+            detail: {
+                selectedView,
+                selectedId,
+                selectedName,
+                courses
+            }
+        }));
+    };
+
+    const fetchCoursesForSelection = async (selectedView, selectedId, selectedName) => {
+        const selectedConfig = scheduleValueConfig[selectedView];
+
+        if (!selectedConfig?.coursesEndpoint) {
+            return;
+        }
+
         try {
-            const response = await fetch(`/api/instructors/${instructorId}/assignments`);
+            const response = await fetch(selectedConfig.coursesEndpoint(selectedId));
 
             if (!response.ok) {
-                throw new Error(`Failed to load instructor assignments: ${response.status}`);
+                throw new Error(`Failed to load ${selectedView} courses: ${response.status}`);
             }
 
-            const assignments = await response.json();
+            const courses = await response.json();
 
-            console.log(`Assignments for ${instructorName} (ID: ${instructorId})`, assignments);
+            console.log(`Courses for ${selectedView} ${selectedName} (ID: ${selectedId})`, courses);
+            publishSelectedCourses(selectedView, selectedId, selectedName, courses);
         } catch (error) {
-            console.error('Unable to load instructor assignments', error);
+            console.error(`Unable to load courses for ${selectedView}`, error);
+            publishSelectedCourses(selectedView, selectedId, selectedName, []);
         }
     };
 
@@ -167,9 +189,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setDropdownLabel(option.name);
                 closeSecondaryDropdown();
 
-                if (selectedView === 'instructor') {
-                    fetchInstructorAssignments(option.id, option.name);
-                }
+                fetchCoursesForSelection(selectedView, option.id, option.name);
             });
 
             scheduleValueOptions.appendChild(item);
@@ -287,6 +307,7 @@ document.addEventListener('DOMContentLoaded', () => {
             scheduleValueOptionsData = [];
             setScheduleValueSearchLabels();
             resetSecondarySelector('Select an option');
+            publishSelectedCourses('', null, '', []);
         });
 
         const initialView = normalizeScheduleByValue(scheduleBySelect.value);

@@ -1,5 +1,6 @@
 <!doctype html>
 <html lang="{{ str_replace('_', '-', app()->getLocale()) }}">
+
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -7,20 +8,41 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ config('app.name', 'Laravel') }}</title>
+    <title>{{ config('app.name', 'Capstone') }}</title>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
+
     <!-- Scripts -->
     @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/js/dropdown.js'])
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css' rel='stylesheet'>
+    <link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'>
+
+    <style>
+        .fc-theme-standard .fc-col-header-cell-cushion {
+            text-decoration: none !important;
+        }
+
+        .fc-theme-standard .fc-col-header-cell-cushion:hover {
+            text-decoration: none !important;
+            cursor: default;
+        }
+
+        .fc-timegrid-slot:hover {
+            cursor: pointer !important;
+        }
+    </style>
 </head>
-<body>
-    <div id="app">
+
+<body class="min-vh-100">
+    <div id="app" class="min-vh-100 d-flex flex-column">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
             <div class="{{ request()->routeIs('home') ? 'container-fluid px-3' : 'container' }}">
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
+                    data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
+                    aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
@@ -31,45 +53,36 @@
                             @if (request()->routeIs('home'))
                                 <li class="nav-item d-flex align-items-center gap-4 my-2 my-md-0">
                                     <span class="navbar-text fw-semibold fs-6">View Schedule By:</span>
-                                    <input id="scheduleBySelect" type="hidden" value="instructor">
+                                    <input id="scheduleBySelect" type="hidden" value="">
                                     <div class="dropdown">
-                                        <button
-                                            id="scheduleByDropdownButton"
-                                            class="btn btn-outline-secondary dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            data-bs-auto-close="true"
-                                            aria-expanded="false"
-                                        >
-                                            Instructor
+                                        <button id="scheduleByDropdownButton" class="btn btn-outline-secondary dropdown-toggle"
+                                            type="button" data-bs-toggle="dropdown" data-bs-auto-close="true"
+                                            aria-expanded="false">
+                                            Select an option
                                         </button>
                                         <div id="scheduleByOptions" class="dropdown-menu p-1" style="min-width: 12rem;">
-                                            <button type="button" class="dropdown-item" data-schedule-by-value="instructor">Instructor</button>
-                                            <button type="button" class="dropdown-item" data-schedule-by-value="room">Room</button>
-                                            <button type="button" class="dropdown-item" data-schedule-by-value="program">Program</button>
+                                            <button type="button" class="dropdown-item"
+                                                data-schedule-by-value="instructor">Instructor</button>
+                                            <button type="button" class="dropdown-item"
+                                                data-schedule-by-value="room">Room</button>
+                                            <button type="button" class="dropdown-item"
+                                                data-schedule-by-value="program">Program</button>
                                         </div>
                                     </div>
                                     <input id="scheduleValueSelect" type="hidden" value="">
+                                    {{-- another dropdown --}}
                                     <div class="dropdown">
-                                        <button
-                                            id="scheduleValueDropdownButton"
-                                            class="btn btn-outline-secondary dropdown-toggle"
-                                            type="button"
-                                            data-bs-toggle="dropdown"
-                                            data-bs-auto-close="outside"
-                                            aria-expanded="false"
-                                        >
+                                        <button id="scheduleValueDropdownButton"
+                                            class="btn btn-outline-secondary dropdown-toggle" type="button"
+                                            data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                             Select an option
                                         </button>
-                                        <div id="scheduleValueDropdownMenu" class="dropdown-menu p-2" style="min-width: 18rem; max-height: 20rem;">
-                                            <input
-                                                id="scheduleValueSearch"
-                                                type="search"
-                                                class="form-control mb-2"
-                                                placeholder="Search instructors"
-                                                aria-label="Search instructors"
-                                            >
-                                            <div id="scheduleValueOptions" class="d-flex flex-column" style="overflow-y: auto; max-height: 14rem;"></div>
+                                        <div id="scheduleValueDropdownMenu" class="dropdown-menu p-2"
+                                            style="min-width: 18rem; max-height: 20rem;">
+                                            <input id="scheduleValueSearch" type="search" class="form-control mb-2"
+                                                placeholder="Search instructors" aria-label="Search instructors">
+                                            <div id="scheduleValueOptions" class="d-flex flex-column"
+                                                style="overflow-y: auto; max-height: 14rem;"></div>
                                         </div>
                                     </div>
                                 </li>
@@ -94,20 +107,23 @@
                             @endif
                         @else
                             <li class="nav-item dropdown">
-                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
+                                <a id="navbarDropdown" class="nav-link dropdown-toggle" href="#" role="button"
+                                    data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false" v-pre>
                                     {{ Auth::user()->name }}
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
+                                    <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                                                     document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
-
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
                                     </form>
+                                </div>
+                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+
+
                                 </div>
                             </li>
                         @endguest
@@ -116,9 +132,10 @@
             </div>
         </nav>
 
-        <main class="{{ request()->routeIs('home') ? '' : 'py-4' }}">
+        <main class="{{ request()->routeIs('home') ? 'flex-grow-1 d-flex flex-column' : 'py-4' }}">
             @yield('content')
         </main>
     </div>
 </body>
+
 </html>
