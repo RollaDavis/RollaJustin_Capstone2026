@@ -19,18 +19,29 @@
 <body>
     <div id="app">
         <nav class="navbar navbar-expand-md navbar-light bg-white shadow-sm">
-            <div class="container">
-                <a class="navbar-brand" href="{{ url('/') }}">
-                    {{ config('app.name', 'Laravel') }}
-                </a>
+            <div class="{{ request()->routeIs('home') ? 'container-fluid px-3' : 'container' }}">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
                     <span class="navbar-toggler-icon"></span>
                 </button>
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <!-- Left Side Of Navbar -->
-                    <ul class="navbar-nav me-auto">
-
+                    <ul class="navbar-nav me-auto {{ request()->routeIs('home') ? 'ps-0' : '' }}">
+                        @auth
+                            @if (request()->routeIs('home'))
+                                <li class="nav-item d-flex align-items-center gap-4 my-2 my-md-0">
+                                    <span class="navbar-text fw-semibold fs-6">View Schedule By:</span>
+                                    <select class="form-select w-auto" aria-label="Primary view selector">
+                                        <option value="instructor">Instructor</option>
+                                        <option value="room">Room</option>
+                                        <option value="program">Program</option>
+                                    </select>
+                                    <select class="form-select w-auto" aria-label="Secondary view selector">
+                                        <option value=""></option>
+                                    </select>
+                                </li>
+                            @endif
+                        @endauth
                     </ul>
 
                     <!-- Right Side Of Navbar -->
@@ -72,7 +83,7 @@
             </div>
         </nav>
 
-        <main class="py-4">
+        <main class="{{ request()->routeIs('home') ? '' : 'py-4' }}">
             @yield('content')
         </main>
     </div>
