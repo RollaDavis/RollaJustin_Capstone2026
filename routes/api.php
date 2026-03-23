@@ -1,8 +1,10 @@
 <?php
 
+use App\Models\Program;
 use App\Models\Room;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
 use App\Models\Instructor;
 use App\Http\Controllers\API\InstructorController;
 
@@ -21,5 +23,9 @@ Route::get('/instructors', function(Request $request) {
 
 Route::get('/rooms', function(Request $request) {
     return Room::all();
+});
+
+Route::get('/programs', function(Request $request) {
+    return Program::all();
 });
     

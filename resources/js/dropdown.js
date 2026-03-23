@@ -9,7 +9,46 @@ document.addEventListener('DOMContentLoaded', () => {
     const scheduleValueSearch = document.getElementById('scheduleValueSearch');
     const scheduleValueOptions = document.getElementById('scheduleValueOptions');
 
-    let instructorOptions = [];
+    let scheduleValueOptionsData = [];
+
+    const scheduleValueConfig = {
+        instructor: {
+            endpoint: '/api/instructors',
+            loadingMessage: 'Loading instructors...',
+            selectMessage: 'Select an instructor',
+            emptyMessage: 'No instructors found',
+            searchPlaceholder: 'Search instructors',
+            searchAriaLabel: 'Search instructors'
+        },
+        room: {
+            endpoint: '/api/rooms',
+            loadingMessage: 'Loading rooms...',
+            selectMessage: 'Select a room',
+            emptyMessage: 'No rooms found',
+            searchPlaceholder: 'Search rooms',
+            searchAriaLabel: 'Search rooms'
+        },
+        program: {
+            endpoint: '/api/programs',
+            loadingMessage: 'Loading programs...',
+            selectMessage: 'Select a program',
+            emptyMessage: 'No programs found',
+            searchPlaceholder: 'Search programs',
+            searchAriaLabel: 'Search programs'
+        }
+    };
+
+    const normalizeScheduleByValue = (value) => {
+        if (value === 'instructors') {
+            return 'instructor';
+        }
+
+        if (value === 'rooms') {
+            return 'room';
+        }
+
+        return value;
+    };
 
     const setDropdownLabel = (text = 'Select an option') => {
         if (!scheduleValueDropdownButton) {
@@ -37,43 +76,100 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const normalizedValue = normalizeScheduleByValue(value);
+
         const labels = {
             instructor: 'Instructor',
             room: 'Room',
             program: 'Program'
         };
 
-        scheduleByDropdownButton.textContent = labels[value] || 'Select view';
+        scheduleByDropdownButton.textContent = labels[normalizedValue] || 'Select view';
     };
 
-    const renderInstructorOptions = (searchTerm = '') => {
+    const setScheduleValueSearchLabels = (placeholder = 'Search options', ariaLabel = 'Search options') => {
+        if (!scheduleValueSearch) {
+            return;
+        }
+
+        scheduleValueSearch.placeholder = placeholder;
+        scheduleValueSearch.setAttribute('aria-label', ariaLabel);
+    };
+
+    const fetchInstructorAssignments = async (instructorId, instructorName) => {
+        try {
+            const response = await fetch(`/api/instructors/${instructorId}/assignments`);
+
+            if (!response.ok) {
+                throw new Error(`Failed to load instructor assignments: ${response.status}`);
+            }
+
+            const assignments = await response.json();
+
+            console.log(`Assignments for ${instructorName} (ID: ${instructorId})`, assignments);
+        } catch (error) {
+            console.error('Unable to load instructor assignments', error);
+        }
+    };
+
+    const closeSecondaryDropdown = () => {
+        if (!scheduleValueDropdownButton) {
+            return;
+        }
+
+        if (scheduleValueDropdownButton.getAttribute('aria-expanded') === 'true') {
+            scheduleValueDropdownButton.click();
+        }
+    };
+
+    const openSecondaryDropdown = () => {
+        if (!scheduleValueDropdownButton || scheduleValueDropdownButton.disabled) {
+            return;
+        }
+
+        if (scheduleValueDropdownButton.getAttribute('aria-expanded') !== 'true') {
+            scheduleValueDropdownButton.click();
+        }
+    };
+
+    const renderScheduleValueOptions = (searchTerm = '') => {
         if (!scheduleValueOptions) {
             return;
         }
 
+        const selectedView = normalizeScheduleByValue(scheduleBySelect?.value || '');
+        const selectedConfig = scheduleValueConfig[selectedView];
+
         const normalizedSearch = searchTerm.trim().toLowerCase();
-        const filteredOptions = instructorOptions.filter((instructor) => {
-            return instructor.name.toLowerCase().includes(normalizedSearch);
+        const filteredOptions = scheduleValueOptionsData.filter((option) => {
+            return option.name.toLowerCase().includes(normalizedSearch);
         });
 
         scheduleValueOptions.innerHTML = '';
 
         if (filteredOptions.length === 0) {
-            setDropdownMessage('No instructors found');
+            setDropdownMessage(selectedConfig?.emptyMessage || 'No options found');
             return;
         }
 
-        filteredOptions.forEach((instructor) => {
+        filteredOptions.forEach((option) => {
             const item = document.createElement('button');
             item.type = 'button';
             item.className = 'dropdown-item';
-            item.textContent = instructor.name;
+            item.textContent = option.name;
             item.addEventListener('click', () => {
+                const selectedView = normalizeScheduleByValue(scheduleBySelect?.value || '');
+
                 if (scheduleValueSelect) {
-                    scheduleValueSelect.value = String(instructor.id);
+                    scheduleValueSelect.value = String(option.id);
                 }
 
-                setDropdownLabel(instructor.name);
+                setDropdownLabel(option.name);
+                closeSecondaryDropdown();
+
+                if (selectedView === 'instructor') {
+                    fetchInstructorAssignments(option.id, option.name);
+                }
             });
 
             scheduleValueOptions.appendChild(item);
@@ -98,7 +194,7 @@ document.addEventListener('DOMContentLoaded', () => {
         setDropdownMessage(label);
     };
 
-    const enableSecondarySelector = (label = 'Select an instructor') => {
+    const enableSecondarySelector = (label = 'Select an option') => {
         if (scheduleValueSearch) {
             scheduleValueSearch.disabled = false;
         }
@@ -110,35 +206,50 @@ document.addEventListener('DOMContentLoaded', () => {
         setDropdownLabel(label);
     };
 
-    const populateInstructorOptions = async () => {
+    const populateScheduleValueOptions = async (selectedView, autoOpen = false) => {
         if (!scheduleValueSelect || !scheduleValueOptions) {
             return;
         }
 
-        resetSecondarySelector('Loading instructors...');
+        const normalizedView = normalizeScheduleByValue(selectedView);
+        const selectedConfig = scheduleValueConfig[normalizedView];
+
+        if (!selectedConfig) {
+            scheduleValueOptionsData = [];
+            setScheduleValueSearchLabels();
+            resetSecondarySelector('Select an option');
+            return;
+        }
+
+        setScheduleValueSearchLabels(selectedConfig.searchPlaceholder, selectedConfig.searchAriaLabel);
+        resetSecondarySelector(selectedConfig.loadingMessage);
 
         try {
-            const response = await fetch('/api/instructors');
+            const response = await fetch(selectedConfig.endpoint);
 
             if (!response.ok) {
-                throw new Error(`Failed to load instructors: ${response.status}`);
+                throw new Error(`Failed to load ${normalizedView} options: ${response.status}`);
             }
 
-            const instructors = await response.json();
+            const options = await response.json();
 
-            instructorOptions = instructors
-                .filter((instructor) => instructor && instructor.id !== undefined && instructor.name)
-                .map((instructor) => ({
-                    id: instructor.id,
-                    name: String(instructor.name)
+            scheduleValueOptionsData = options
+                .filter((option) => option && option.id !== undefined && option.name)
+                .map((option) => ({
+                    id: option.id,
+                    name: String(option.name)
                 }));
 
-            enableSecondarySelector('Select an instructor');
-            renderInstructorOptions();
+            enableSecondarySelector(selectedConfig.selectMessage);
+            renderScheduleValueOptions();
+
+            if (autoOpen) {
+                openSecondaryDropdown();
+            }
         } catch (error) {
             console.error(error);
-            instructorOptions = [];
-            resetSecondarySelector('Unable to load instructors');
+            scheduleValueOptionsData = [];
+            resetSecondarySelector('Unable to load options');
         }
     };
 
@@ -162,24 +273,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (scheduleBySelect && scheduleValueSelect && scheduleValueDropdownButton && scheduleValueSearch && scheduleValueOptions) {
         scheduleValueSearch.addEventListener('input', () => {
-            renderInstructorOptions(scheduleValueSearch.value);
+            renderScheduleValueOptions(scheduleValueSearch.value);
         });
 
         scheduleBySelect.addEventListener('change', () => {
-            const selectedView = scheduleBySelect.value;
+            const selectedView = normalizeScheduleByValue(scheduleBySelect.value);
 
-            if (selectedView === 'instructor' || selectedView === 'instructors') {
-                populateInstructorOptions();
+            if (scheduleValueConfig[selectedView]) {
+                populateScheduleValueOptions(selectedView, true);
                 return;
             }
 
-            instructorOptions = [];
+            scheduleValueOptionsData = [];
+            setScheduleValueSearchLabels();
             resetSecondarySelector('Select an option');
         });
 
-        if (scheduleBySelect.value === 'instructor' || scheduleBySelect.value === 'instructors') {
-            populateInstructorOptions();
+        const initialView = normalizeScheduleByValue(scheduleBySelect.value);
+
+        if (scheduleValueConfig[initialView]) {
+            populateScheduleValueOptions(initialView);
         } else {
+            scheduleValueOptionsData = [];
+            setScheduleValueSearchLabels();
             resetSecondarySelector('Select an option');
         }
     }

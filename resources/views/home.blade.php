@@ -10,8 +10,8 @@
                 <p class="text-muted fw-semibold mb-0 position-absolute top-50 start-50 translate-middle" style="max-width: 14ch; width: 100%;">No Unscheduled Courses...</p>
             </div>
         </div>
-        <section class="p-3" style="flex: 1 1 auto; min-width: 0; overflow-y: auto;">
-            <div id="calendar"></div>
+        <section class="px-3 pb-3 pt-0" style="flex: 1 1 auto; min-width: 0; overflow-y: auto;">
+            <div id="calendar" class="mt-3"></div>
         </section>
     </div>
 </div>
