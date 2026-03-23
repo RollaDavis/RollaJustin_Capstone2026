@@ -14,7 +14,7 @@
     <link href="https://fonts.bunny.net/css?family=Nunito" rel="stylesheet">
 
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/js/dropdown.js'])
 </head>
 <body>
     <div id="app">
@@ -31,14 +31,47 @@
                             @if (request()->routeIs('home'))
                                 <li class="nav-item d-flex align-items-center gap-4 my-2 my-md-0">
                                     <span class="navbar-text fw-semibold fs-6">View Schedule By:</span>
-                                    <select class="form-select w-auto" aria-label="Primary view selector">
-                                        <option value="instructor">Instructor</option>
-                                        <option value="room">Room</option>
-                                        <option value="program">Program</option>
-                                    </select>
-                                    <select class="form-select w-auto" aria-label="Secondary view selector">
-                                        <option value=""></option>
-                                    </select>
+                                    <input id="scheduleBySelect" type="hidden" value="instructor">
+                                    <div class="dropdown">
+                                        <button
+                                            id="scheduleByDropdownButton"
+                                            class="btn btn-outline-secondary dropdown-toggle"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            data-bs-auto-close="true"
+                                            aria-expanded="false"
+                                        >
+                                            Instructor
+                                        </button>
+                                        <div id="scheduleByOptions" class="dropdown-menu p-1" style="min-width: 12rem;">
+                                            <button type="button" class="dropdown-item" data-schedule-by-value="instructor">Instructor</button>
+                                            <button type="button" class="dropdown-item" data-schedule-by-value="room">Room</button>
+                                            <button type="button" class="dropdown-item" data-schedule-by-value="program">Program</button>
+                                        </div>
+                                    </div>
+                                    <input id="scheduleValueSelect" type="hidden" value="">
+                                    <div class="dropdown">
+                                        <button
+                                            id="scheduleValueDropdownButton"
+                                            class="btn btn-outline-secondary dropdown-toggle"
+                                            type="button"
+                                            data-bs-toggle="dropdown"
+                                            data-bs-auto-close="outside"
+                                            aria-expanded="false"
+                                        >
+                                            Select an option
+                                        </button>
+                                        <div id="scheduleValueDropdownMenu" class="dropdown-menu p-2" style="min-width: 18rem; max-height: 20rem;">
+                                            <input
+                                                id="scheduleValueSearch"
+                                                type="search"
+                                                class="form-control mb-2"
+                                                placeholder="Search instructors"
+                                                aria-label="Search instructors"
+                                            >
+                                            <div id="scheduleValueOptions" class="d-flex flex-column" style="overflow-y: auto; max-height: 14rem;"></div>
+                                        </div>
+                                    </div>
                                 </li>
                             @endif
                         @endauth

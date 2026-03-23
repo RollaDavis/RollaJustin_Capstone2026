@@ -1,9 +1,8 @@
-import './bootstrap';
 import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
-import interactionPlugin from '@fullcalendar/interaction';
+import interactionPlugin from '@fullcalendar/interaction/index.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 	const calendarEl = document.getElementById('calendar');
