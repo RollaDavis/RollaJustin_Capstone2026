@@ -118,53 +118,70 @@ id,name
 117,WLDG-213 Pipe Welding I Lab
 118,WLDG-294 WK: Gas Tungsten Arc Weld Lect
 119,WLDG-294 WK: Gas Tungsten Arc Lab
-120,AHUS-111 Intro to Clinical and Scan Lab
-121,AHXR-101 Patient Care in Radiology
-122,AHXR-108 Intro to Radiologic Physics
-123,AHXR-150 Radiological Technology I
-124,AHXR-151 Radiology I Positioning Lab
-125,AHXR-250 Radiological Technology III
-126,BIOH-201 Human Anatomy & Physiology I
-127,BIOH-202 Human Anatomy & Phys I Lab
-128,BIOH-211 Human Anatomy & Physiology II
-129,BIOH-212 Human Anatomy & Phys II Lab
-130,BIOM-250 Microbiology for Hlth Sciences
-131,BIOM-251 Microbiology Hlth Sciences Lab
-132,CHMY-121 Intro to General Chemistry
-133,CHMY-122 Intro to Gen Chem Lab
-134,COLS-108 The College Experience
-135,COMX-106 Comm in a Dynamic Workplace
-136,COMX-115 Intro to Interpersonal Comm
-137,ECP-201 Paramedic Fundamentals
-138,ECP-202 Paramedic Fundamentals Lab
-139,ECP-230 Trauma
-140,ECP-232 Pulmonary
-141,ECP-233 Trauma/Pulmonary Lab and PHTLS
-142,FIRE-115 Firefighter I Foundations
-143,FIRE-130 Firefighter Ldrshp & Influence
-144,FIRE-131 Fire Apparatus and Hydraulics
-145,FIRE-201 Firefighter Resilience
-146,FIRE-270 Fire Prevention
-147,M-111 Technical Mathematics
-148,M-114 Extended Technical Mathematics
-149,M-121 College Algebra
-150,M-140 College Math for Healthcare
-151,M-143 Finite Mathematics
-152,NASX-105 Intro Native American Studies
-153,NRSG-230 Nursing Pharmacology
-154,NRSG-231 Nursing Pharmacology Lab
-155,NRSG-232 Foundations for Nursing
-156,NRSG-233 Foundations of Nursing Lab
-157,NRSG-234 Adult Nursing I
-158,NRSG-236 Health/Ill Maternity Nsg
-159,NRSG-244 Adult Nursing II
-160,NRSG-246 Hlth/Illness Child/Fmly Nursng
-161,NRSG-254 Mental Health Concepts
-162,NRSG-256 Pathophysiology
-163,NRSG-259 Adult Nursing III
-164,NRSG-260 Adult Nursing III Lab
-165,NRSG-266 Managing Client Care RN
-166,PSYX-100 Intro to Psychology
-167,WRIT-101 College Writing I
-168,WRIT-121 Intro to Technical Writing
-169,WRIT-122 Intro to Business Writing
+120,AHXR-160 Radiological Technology II
+121,AHXR-161 Radiology II Positioning Lab
+122,AHXR-225 Radiobiology/Radiation Ptrctn
+123,AHXR-260 Radiological Technology IV
+124,AHXR-270 Radiographic Registry Review
+125,BIOH-201 Human Anatomy & Physiology I
+126,BIOH-202 Human Anatomy & Phys I Lab
+127,BIOH-211 Human Anatomy & Physiology II
+128,BIOH-212 Human Anatomy & Phys II Lab
+129,BIOM-251 Microbiology Hlth Sciences Lab
+130,CHMY-121 Intro to General Chemistry
+131,CHMY-122 Intro to Gen Chem Lab
+132,COMX-106 Comm in a Dynamic Workplace
+133,COMX-115 Intro to Interpersonal Comm
+134,ECP-207 Cardiology
+135,ECP-208 Cardiology Lab and ACLS
+136,ECP-220 Special Considerations
+137,ECP-221 OB/Neonate/Pediatrics
+138,"ECP-222 OB/Neonate/Ped Lab, NRP, PALS"
+139,ECP-242 Medical
+140,ECP-243 Medical Lab
+141,FIRE-106 Wildland Firefighting
+142,FIRE-119 Fire Service Ethics
+143,FIRE-180 Incident Command
+144,FIRE-275 Fire Service Instructor
+145,M-114 Extended Technical Mathematics
+146,M-121 College Algebra
+147,M-140 College Math for Healthcare
+148,M-143 Finite Mathematics
+149,NASX-105 Intro Native American Studies
+150,NRSG-230 Nursing Pharmacology
+151,NRSG-231 Nursing Pharmacology Lab
+152,NRSG-232 Foundations for Nursing
+153,NRSG-233 Foundations of Nursing Lab
+154,NRSG-234 Adult Nursing I
+155,NRSG-236 Health/Ill Maternity Nsg
+156,NRSG-244 Adult Nursing II
+157,NRSG-246 Hlth/Illness Child/Fmly Nursng
+158,NRSG-254 Mental Health Concepts
+159,NRSG-256 Pathophysiology
+160,NRSG-259 Adult Nursing III
+161,NRSG-260 Adult Nursing III Lab
+162,NRSG-266 Managing Client Care RN
+163,PSYX-100 Intro to Psychology
+164,TRID-160 Hazrdz Mtrl Tech Gen Trng
+165,WRIT-101 College Writing I
+166,WRIT-121 Intro to Technical Writing
+167,AHUS-111 Intro to Clinical and Scan Lab
+168,AHXR-101 Patient Care in Radiology
+169,AHXR-108 Intro to Radiologic Physics
+170,AHXR-150 Radiological Technology I
+171,AHXR-151 Radiology I Positioning Lab
+172,AHXR-250 Radiological Technology III
+173,BIOM-250 Microbiology for Hlth Sciences
+174,COLS-108 The College Experience
+175,ECP-201 Paramedic Fundamentals
+176,ECP-202 Paramedic Fundamentals Lab
+177,ECP-230 Trauma
+178,ECP-232 Pulmonary
+179,ECP-233 Trauma/Pulmonary Lab and PHTLS
+180,FIRE-115 Firefighter I Foundations
+181,FIRE-130 Firefighter Ldrshp & Influence
+182,FIRE-131 Fire Apparatus and Hydraulics
+183,FIRE-201 Firefighter Resilience
+184,FIRE-270 Fire Prevention
+185,M-111 Technical Mathematics
+186,WRIT-122 Intro to Business Writing
