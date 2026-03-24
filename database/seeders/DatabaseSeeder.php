@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $personalUser = User::factory()->personalRolla()->create();
+        $personalJustin = User::factory()->personalJustin()->create();
 
         $this->call([
             InstructorSeeder::class,
