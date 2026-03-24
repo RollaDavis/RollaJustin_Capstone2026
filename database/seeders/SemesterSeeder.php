@@ -13,7 +13,7 @@ class SemesterSeeder extends CsvSeeder
         $this->file = '/database/seeds/csvs/semesters.csv';
         $this->delimiter = ',';
         $this->tablename = 'semesters';
-        $this->mapping = ['id', 'name'];
+        $this->mapping = ['id', 'term', 'sequence'];
     }
 
     /**
