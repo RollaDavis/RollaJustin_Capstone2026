@@ -42,4 +42,13 @@ class UserFactory extends Factory
             'email_verified_at' => null,
         ]);
     }
+
+        public function personalRolla(): static {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Rolla Davis',
+            'email' => 'rolliedavis911@gmail.com',
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+        ]);
+    }
 }
