@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
         selectable: true,
         droppable: true,
         dragScroll: true,
-        eventMaxStack: 2,
+        eventMaxStack: 1,
         moreLinkClick: "popover",
         dayHeaderFormat: { weekday: 'short' },
 		height: '100%',

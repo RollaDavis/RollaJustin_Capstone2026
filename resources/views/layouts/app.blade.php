@@ -54,6 +54,16 @@
                                 <li class="nav-item d-flex align-items-center gap-4 my-2 my-md-0">
                                     <span class="navbar-text fw-semibold fs-6">View Schedule By:</span>
                                     <input id="scheduleBySelect" type="hidden" value="">
+                                    
+                                    <div class="dropdown">
+                                        <button id="termDropdownButton" class="btn btn-outline-secondary dropdown-toggle"
+                                            type="button" data-bs-toggle="dropdown" data-bs-auto-close="true"
+                                            aria-expanded="false">
+                                            Select a term
+                                        </button>
+                                        <div id="termOptions" class="dropdown-menu p-1" style="min-width: 12rem;"></div>
+                                    </div>
+
                                     <div class="dropdown">
                                         <button id="scheduleByDropdownButton" class="btn btn-outline-secondary dropdown-toggle"
                                             type="button" data-bs-toggle="dropdown" data-bs-auto-close="true"
@@ -70,7 +80,7 @@
                                         </div>
                                     </div>
                                     <input id="scheduleValueSelect" type="hidden" value="">
-                                    {{-- another dropdown --}}
+
                                     <div class="dropdown">
                                         <button id="scheduleValueDropdownButton"
                                             class="btn btn-outline-secondary dropdown-toggle" type="button"
@@ -85,6 +95,7 @@
                                                 style="overflow-y: auto; max-height: 14rem;"></div>
                                         </div>
                                     </div>
+
                                 </li>
                             @endif
                         @endauth

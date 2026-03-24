@@ -10,6 +10,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const scheduleValueOptions = document.getElementById('scheduleValueOptions');
 
     let scheduleValueOptionsData = [];
+    let selectedTermId = null;
+    let selectedTermName = null;
 
     const scheduleValueConfig = {
         instructor: {
@@ -118,7 +120,14 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const response = await fetch(selectedConfig.coursesEndpoint(selectedId));
+            let endpoint = selectedConfig.coursesEndpoint(selectedId);
+            
+            // Add term parameter if a term has been selected
+            if (selectedTermId) {
+                endpoint += `?term=${selectedTermId}`;
+            }
+
+            const response = await fetch(endpoint);
 
             if (!response.ok) {
                 throw new Error(`Failed to load ${selectedView} courses: ${response.status}`);
@@ -126,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             const courses = await response.json();
 
-            console.log(`Courses for ${selectedView} ${selectedName} (ID: ${selectedId})`, courses);
+            console.log(`Courses for ${selectedView} ${selectedName} (ID: ${selectedId}) in term ${selectedTermName}`, courses);
             publishSelectedCourses(selectedView, selectedId, selectedName, courses);
         } catch (error) {
             console.error(`Unable to load courses for ${selectedView}`, error);
@@ -319,5 +328,79 @@ document.addEventListener('DOMContentLoaded', () => {
             setScheduleValueSearchLabels();
             resetSecondarySelector('Select an option');
         }
+    }
+
+    // Terms dropdown functionality
+    const termDropdownButton = document.getElementById('termDropdownButton');
+    const termOptions = document.getElementById('termOptions');
+
+    if (termDropdownButton && termOptions) {
+        // Disable scheduleByDropdownButton and scheduleValueDropdownButton initially
+        if (scheduleByDropdownButton) {
+            scheduleByDropdownButton.disabled = true;
+        }
+        if (scheduleValueDropdownButton) {
+            scheduleValueDropdownButton.disabled = true;
+        }
+
+        const fetchTerms = async () => {
+            try {
+                const response = await fetch('/api/terms');
+
+                if (!response.ok) {
+                    throw new Error(`Failed to load terms: ${response.status}`);
+                }
+
+                const terms = await response.json();
+
+                termOptions.innerHTML = '';
+
+                if (Array.isArray(terms) && terms.length > 0) {
+                    terms.forEach((term) => {
+                        const button = document.createElement('button');
+                        button.type = 'button';
+                        button.className = 'dropdown-item';
+                        button.textContent = term.name;
+                        button.addEventListener('click', () => {
+                            selectedTermId = term.id;
+                            selectedTermName = term.name;
+                            termDropdownButton.textContent = term.name;
+                            
+                            // Enable only the second dropdown when a term is selected
+                            if (scheduleByDropdownButton) {
+                                scheduleByDropdownButton.disabled = false;
+                            }
+
+                            // If a schedule value is already selected, refetch courses with the new term
+                            if (scheduleValueSelect && scheduleValueSelect.value) {
+                                const selectedView = normalizeScheduleByValue(scheduleBySelect?.value || '');
+                                const selectedId = parseInt(scheduleValueSelect.value, 10);
+                                const selectedName = scheduleValueDropdownButton?.textContent || '';
+                                
+                                if (selectedView && selectedId && selectedName) {
+                                    fetchCoursesForSelection(selectedView, selectedId, selectedName);
+                                }
+                            }
+                        });
+
+                        termOptions.appendChild(button);
+                    });
+                } else {
+                    const emptyMessage = document.createElement('span');
+                    emptyMessage.className = 'dropdown-item-text text-muted small';
+                    emptyMessage.textContent = 'No terms available';
+                    termOptions.appendChild(emptyMessage);
+                }
+            } catch (error) {
+                console.error('Error fetching terms:', error);
+                termOptions.innerHTML = '<span class="dropdown-item-text text-muted small">Unable to load terms</span>';
+            }
+        };
+
+        // Fetch terms when dropdown is shown
+        termDropdownButton.addEventListener('shown.bs.dropdown', fetchTerms);
+
+        // Also try to fetch on page load
+        fetchTerms();
     }
 });

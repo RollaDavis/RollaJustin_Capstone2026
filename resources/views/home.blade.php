@@ -21,8 +21,10 @@
                 <div class="w-100 position-relative" style="height: 100%;">
                     <h6 class="fw-bold mb-2">Course Details</h6>
                     <hr>
-                    <p class="text-muted fw-semibold mb-0 position-absolute top-50 start-50 translate-middle"
-                        style="max-width: 14ch; width: 100%;">No Course Selected...</p>
+                    {{-- <p class="text-muted fw-semibold mb-0 position-absolute top-50 start-50 translate-middle"
+                        style="max-width: 14ch; width: 100%;">No Course Selected...</p> --}}
+
+                    
                 </div>
             </div>
         </div>

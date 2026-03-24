@@ -117,9 +117,27 @@ const getSemesterEventStyle = (courses = []) => {
     };
 };
 
-export const buildCalendarEventsFromCourses = (courses = []) => {
-    let sequence = 0;
+const makeCourseKey = (course = {}) => {
+    if (course.assignment_id !== undefined && course.assignment_id !== null) {
+        return `assignment-${course.assignment_id}`;
+    }
 
+    if (course.instructor_room_section_id !== undefined && course.instructor_room_section_id !== null) {
+        return `irs-${course.instructor_room_section_id}`;
+    }
+
+    if (course.section_id !== undefined && course.section_id !== null) {
+        return `section-${course.section_id}`;
+    }
+
+    if (course.course_id !== undefined && course.course_id !== null) {
+        return `course-${course.course_id}`;
+    }
+
+    return `unknown-${Math.random().toString(36).slice(2, 10)}`;
+};
+
+export const buildCalendarEventsFromCourses = (courses = []) => {
     return courses
         .map((course) => {
             const daysOfWeek = parseDays(course.timeslot_days);
@@ -133,21 +151,27 @@ export const buildCalendarEventsFromCourses = (courses = []) => {
             const courseName = course.course_name || course.section_name || 'Untitled course';
             const groupId = makeGroupIdFromCourses([course]);
             const style = getSemesterEventStyle([course]);
-
-            sequence += 1;
+            const courseKey = makeCourseKey(course);
+            const endTime = addMinutesToTime(startTime, Math.round(durationHours * 60));
 
             return {
-                id: `slot-${sequence}`,
+                id: `slot-${courseKey}`,
                 groupId,
                 title: courseName,
                 daysOfWeek,
                 startTime,
-                endTime: addMinutesToTime(startTime, Math.round(durationHours * 60)),
+                endTime,
                 backgroundColor: style.backgroundColor,
                 borderColor: style.borderColor,
                 textColor: style.textColor,
                 allDay: false,
                 extendedProps: {
+                    courseKey,
+                    originalSchedule: {
+                        daysOfWeek,
+                        startTime,
+                        endTime
+                    },
                     courseCount: 1,
                     courses: [course]
                 }
