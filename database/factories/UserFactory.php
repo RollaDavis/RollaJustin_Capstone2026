@@ -51,4 +51,13 @@ class UserFactory extends Factory
             'remember_token' => Str::random(10),
         ]);
     }
+    
+    public function personalJustin(): static {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Justin King',
+            'email' => 'justin@test.com',
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+        ]);
+    }
 }
