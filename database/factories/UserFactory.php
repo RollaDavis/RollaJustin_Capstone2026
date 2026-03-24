@@ -43,7 +43,7 @@ class UserFactory extends Factory
         ]);
     }
 
-        public function personalRolla(): static {
+    public function personalRolla(): static {
         return $this->state(fn (array $attributes) => [
             'name' => 'Rolla Davis',
             'email' => 'rolliedavis911@gmail.com',
