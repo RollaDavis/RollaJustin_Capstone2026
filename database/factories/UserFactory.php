@@ -43,10 +43,19 @@ class UserFactory extends Factory
         ]);
     }
 
-        public function personalRolla(): static {
+    public function personalRolla(): static {
         return $this->state(fn (array $attributes) => [
             'name' => 'Rolla Davis',
             'email' => 'rolliedavis911@gmail.com',
+            'password' => static::$password ??= Hash::make('password'),
+            'remember_token' => Str::random(10),
+        ]);
+    }
+    
+    public function personalJustin(): static {
+        return $this->state(fn (array $attributes) => [
+            'name' => 'Justin King',
+            'email' => 'justin@test.com',
             'password' => static::$password ??= Hash::make('password'),
             'remember_token' => Str::random(10),
         ]);
