@@ -3,17 +3,18 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction/index.js';
+import { Modal } from 'bootstrap';
 import { buildCalendarEventsFromCourses } from './calendarEvents';
 
 document.addEventListener('DOMContentLoaded', () => {
-	const calendarEl = document.getElementById('calendar');
+    const calendarEl = document.getElementById('calendar');
 
-	if (!calendarEl) {
-		return;
-	}
+    if (!calendarEl) {
+        return;
+    }
 
-	const calendar = new Calendar(calendarEl, {
-		plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+    const calendar = new Calendar(calendarEl, {
+        plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
         initialView: 'timeGridWeek',
         allDaySlot: false,
         slotMinTime: '08:00:00',
@@ -23,23 +24,37 @@ document.addEventListener('DOMContentLoaded', () => {
         selectMirror: true,
         themeSystem: 'bootstrap5',
         editable: true,
+        dragRevertDuration: false,
         selectable: true,
         droppable: true,
         dragScroll: true,
         eventMaxStack: 1,
         moreLinkClick: "popover",
         dayHeaderFormat: { weekday: 'short' },
-		height: '100%',
-		headerToolbar: false,
+        height: '100%',
+        headerToolbar: false,
         weekends: false,
         businessHours: {
             daysOfWeek: [1, 2, 3, 4, 5],
             startTime: '08:00',
             endTime: '17:00'
         },
-	});
+        eventClick: (info) => {
+            const modalEl = document.getElementById('eventDetailsModal');
 
-	calendar.render();
+            Modal.getOrCreateInstance(modalEl).show();
+        },
+
+    });
+
+    calendar.render();
+
+    document.dispatchEvent(new CustomEvent('schedule:calendar-ready', {
+        detail: {
+            calendar,
+            calendarEl
+        }
+    }));
 
     const renderSelectedCourses = (detail = {}) => {
         const events = buildCalendarEventsFromCourses(detail.courses || []);
@@ -53,4 +68,5 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('schedule:courses-selected', (event) => {
         renderSelectedCourses(event.detail || {});
     });
+
 });

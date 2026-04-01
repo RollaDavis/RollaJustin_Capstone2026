@@ -1,0 +1,114 @@
+html.theme-dark body {
+    background-color: #121417;
+    color: #e7ecf3;
+}
+
+html.theme-dark #app {
+    background-color: #121417;
+}
+
+html.theme-dark .navbar,
+html.theme-dark .bg-white {
+    background-color: #1a1f26 !important;
+    color: #e7ecf3 !important;
+}
+
+html.theme-dark .navbar,
+html.theme-dark .border-end,
+html.theme-dark .border-start,
+html.theme-dark hr,
+html.theme-dark .dropdown-divider {
+    border-color: #2f3640 !important;
+}
+
+html.theme-dark .navbar-light .navbar-nav .nav-link,
+html.theme-dark .navbar-light .navbar-text,
+html.theme-dark .navbar-light .navbar-brand,
+html.theme-dark .navbar-light .navbar-toggler,
+html.theme-dark .dropdown-item,
+html.theme-dark .dropdown-item-text {
+    color: #e7ecf3 !important;
+}
+
+html.theme-dark .dropdown-menu {
+    background-color: #1a1f26;
+    border-color: #2f3640;
+}
+
+html.theme-dark .dropdown-item:hover,
+html.theme-dark .dropdown-item:focus {
+    background-color: #2a313b;
+}
+
+html.theme-dark .btn-outline-secondary {
+    color: #dbe2ea;
+    border-color: #5a6677;
+}
+
+html.theme-dark .btn-outline-secondary:hover,
+html.theme-dark .btn-outline-secondary:focus {
+    color: #f4f7fb;
+    background-color: #3a4453;
+    border-color: #6e7c90;
+}
+
+html.theme-dark .form-control {
+    background-color: #11161c;
+    color: #e7ecf3;
+    border-color: #3f4a59;
+}
+
+html.theme-dark .form-control::placeholder {
+    color: #8f9bab;
+}
+
+html.theme-dark .calendar-pane-shell {
+    background-color: #161b22;
+}
+
+html.theme-dark .calendar-surface,
+html.theme-dark .modal-content,
+html.theme-dark .card,
+html.theme-dark .table {
+    background-color: #1a1f26 !important;
+    color: #e7ecf3 !important;
+}
+
+html.theme-dark .text-muted {
+    color: #9eabbc !important;
+}
+
+html.theme-dark .fc,
+html.theme-dark .fc-theme-standard td,
+html.theme-dark .fc-theme-standard th {
+    border-color: #2f3640;
+}
+
+html.theme-dark .fc .fc-timegrid-slot,
+html.theme-dark .fc .fc-scrollgrid,
+html.theme-dark .fc .fc-timegrid-col,
+html.theme-dark .fc .fc-timegrid-axis,
+html.theme-dark .fc .fc-timegrid-divider {
+    background-color: #1a1f26;
+}
+
+html.theme-dark .fc .fc-timegrid-axis-cushion,
+html.theme-dark .fc .fc-col-header-cell-cushion,
+html.theme-dark .fc .fc-timegrid-slot-label-cushion,
+html.theme-dark .fc .fc-daygrid-day-number,
+html.theme-dark .fc .fc-list-day-text,
+html.theme-dark .fc .fc-list-day-side-text {
+    color: #d7dfeb;
+}
+
+html.theme-dark .fc .fc-popover,
+html.theme-dark .fc .fc-more-popover .fc-popover-body {
+    background-color: #1a1f26;
+    color: #e7ecf3;
+    border-color: #2f3640;
+}
+
+html.theme-dark .modal-header,
+html.theme-dark .modal-footer {
+    border-color: #2f3640;
+}

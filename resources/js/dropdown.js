@@ -122,7 +122,6 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             let endpoint = selectedConfig.coursesEndpoint(selectedId);
             
-            // Add term parameter if a term has been selected
             if (selectedTermId) {
                 endpoint += `?term=${selectedTermId}`;
             }
@@ -330,12 +329,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Terms dropdown functionality
     const termDropdownButton = document.getElementById('termDropdownButton');
     const termOptions = document.getElementById('termOptions');
 
     if (termDropdownButton && termOptions) {
-        // Disable scheduleByDropdownButton and scheduleValueDropdownButton initially
         if (scheduleByDropdownButton) {
             scheduleByDropdownButton.disabled = true;
         }
@@ -366,12 +363,10 @@ document.addEventListener('DOMContentLoaded', () => {
                             selectedTermName = term.name;
                             termDropdownButton.textContent = term.name;
                             
-                            // Enable only the second dropdown when a term is selected
                             if (scheduleByDropdownButton) {
                                 scheduleByDropdownButton.disabled = false;
                             }
 
-                            // If a schedule value is already selected, refetch courses with the new term
                             if (scheduleValueSelect && scheduleValueSelect.value) {
                                 const selectedView = normalizeScheduleByValue(scheduleBySelect?.value || '');
                                 const selectedId = parseInt(scheduleValueSelect.value, 10);

@@ -150,6 +150,7 @@ export const buildCalendarEventsFromCourses = (courses = []) => {
 
             const courseName = course.course_name || course.section_name || 'Untitled course';
             const groupId = makeGroupIdFromCourses([course]);
+    ;
             const style = getSemesterEventStyle([course]);
             const courseKey = makeCourseKey(course);
             const endTime = addMinutesToTime(startTime, Math.round(durationHours * 60));

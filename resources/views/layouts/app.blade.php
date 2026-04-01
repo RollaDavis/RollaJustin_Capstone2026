@@ -16,32 +16,9 @@
 
 
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/js/dropdown.js', 'resources/js/drag.js'])
+    @vite(['resources/sass/app.scss', 'resources/css/light-mode.css', 'resources/css/dark-mode.css', 'resources/js/app.js', 'resources/js/dropdown.js', 'resources/js/draggable.js', 'resources/js/theme-toggle.js'])
     <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css' rel='stylesheet'>
     <link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'>
-
-    <style>
-        .fc-theme-standard .fc-col-header-cell-cushion {
-            text-decoration: none !important;
-        }
-
-        .fc-theme-standard .fc-col-header-cell-cushion:hover {
-            text-decoration: none !important;
-            cursor: default;
-        }
-
-        .fc-timegrid-slot:hover {
-            cursor: pointer !important;
-        }
-
-        .fc .fc-popover {
-            z-index: 2147483647 !important;
-        }
-
-        .fc-timegrid-now-indicator-container {
-            background-color: #fff !important;
-        }
-    </style>
 </head>
 
 <body class="min-vh-100">
@@ -69,7 +46,7 @@
                                             aria-expanded="false">
                                             Select a term
                                         </button>
-                                        <div id="termOptions" class="dropdown-menu p-1" style="min-width: 12rem;"></div>
+                                        <div id="termOptions" class="dropdown-menu p-1 dropdown-term-options"></div>
                                     </div>
 
                                     <div class="dropdown">
@@ -78,7 +55,7 @@
                                             aria-expanded="false">
                                             Select an option
                                         </button>
-                                        <div id="scheduleByOptions" class="dropdown-menu p-1" style="min-width: 12rem;">
+                                        <div id="scheduleByOptions" class="dropdown-menu p-1 dropdown-schedule-by-options">
                                             <button type="button" class="dropdown-item"
                                                 data-schedule-by-value="instructor">Instructor</button>
                                             <button type="button" class="dropdown-item"
@@ -95,12 +72,10 @@
                                             data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                             Select an option
                                         </button>
-                                        <div id="scheduleValueDropdownMenu" class="dropdown-menu p-2"
-                                            style="min-width: 18rem; max-height: 20rem;">
+                                        <div id="scheduleValueDropdownMenu" class="dropdown-menu p-2 dropdown-schedule-value-menu">
                                             <input id="scheduleValueSearch" type="search" class="form-control mb-2"
                                                 placeholder="Search instructors" aria-label="Search instructors">
-                                            <div id="scheduleValueOptions" class="d-flex flex-column"
-                                                style="overflow-y: auto; max-height: 14rem;"></div>
+                                            <div id="scheduleValueOptions" class="d-flex flex-column dropdown-schedule-value-options"></div>
                                         </div>
                                     </div>
 
@@ -132,6 +107,11 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
+                                    <button id="darkModeToggle" type="button" class="dropdown-item d-flex align-items-center gap-2">
+                                        <i id="darkModeToggleIcon" class="bi bi-moon-stars"></i>
+                                        <span id="darkModeToggleLabel">Enable dark mode</span>
+                                    </button>
+                                    <hr class="dropdown-divider">
                                     <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                                          document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
@@ -139,10 +119,6 @@
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
                                         @csrf
                                     </form>
-                                </div>
-                                <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-
-
                                 </div>
                             </li>
                         @endguest

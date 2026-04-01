@@ -1,0 +1,70 @@
+.fc-theme-standard .fc-col-header-cell-cushion {
+    text-decoration: none !important;
+}
+
+.fc-theme-standard .fc-col-header-cell-cushion:hover {
+    text-decoration: none !important;
+    cursor: default;
+}
+
+.fc-timegrid-slot:hover {
+    cursor: pointer !important;
+}
+
+.fc .fc-popover {
+    z-index: 2147483647 !important;
+}
+
+.fc-timegrid-now-indicator-container {
+    background-color: #fff !important;
+}
+
+.dropdown-term-options,
+.dropdown-schedule-by-options {
+    min-width: 12rem;
+}
+
+.dropdown-schedule-value-menu {
+    min-width: 18rem;
+    max-height: 20rem;
+}
+
+.dropdown-schedule-value-options {
+    overflow-y: auto;
+    max-height: 14rem;
+}
+
+.home-layout-shell {
+    height: calc(100vh - 72px);
+    overflow: hidden;
+}
+
+.unscheduled-pane,
+.details-pane {
+    flex: 0 0 15%;
+}
+
+.full-height {
+    height: 100%;
+}
+
+.unscheduled-events-body {
+    height: calc(100% - 42px);
+    min-height: 220px;
+}
+
+.unscheduled-empty-state {
+    max-width: 14ch;
+    width: 100%;
+}
+
+.calendar-pane-shell {
+    flex: 1 1 auto;
+    overflow: visible;
+    background-color: #ebeaea;
+}
+
+.calendar-surface {
+    flex: 1 1 auto;
+    background-color: #fff;
+}
