@@ -92,9 +92,9 @@ const normalizeSemesterName = (semesterName) => {
 };
 
 const getSemesterEventStyle = (courses = []) => {
-    const semesterName = normalizeSemesterName(courses[0]?.semester_name);
+    const termName = normalizeSemesterName(courses[0]?.term_name);
 
-    if (semesterName.includes('spring')) {
+    if (termName.includes('spring')) {
         return {
             backgroundColor: '#0d6efd',
             borderColor: '#0d6efd',
@@ -102,7 +102,7 @@ const getSemesterEventStyle = (courses = []) => {
         };
     }
 
-    if (semesterName.includes('fall')) {
+    if (termName.includes('fall')) {
         return {
             backgroundColor: '#08a80b',
             borderColor: '#08a80b',

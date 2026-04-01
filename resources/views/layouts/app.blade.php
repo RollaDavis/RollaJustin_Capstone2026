@@ -16,7 +16,7 @@
 
 
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/js/dropdown.js'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/js/dropdown.js', 'resources/js/drag.js'])
     <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css' rel='stylesheet'>
     <link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'>
 
@@ -32,6 +32,14 @@
 
         .fc-timegrid-slot:hover {
             cursor: pointer !important;
+        }
+
+        .fc .fc-popover {
+            z-index: 2147483647 !important;
+        }
+
+        .fc-timegrid-now-indicator-container {
+            background-color: #fff !important;
         }
     </style>
 </head>
@@ -54,7 +62,7 @@
                                 <li class="nav-item d-flex align-items-center gap-4 my-2 my-md-0">
                                     <span class="navbar-text fw-semibold fs-6">View Schedule By:</span>
                                     <input id="scheduleBySelect" type="hidden" value="">
-                                    
+
                                     <div class="dropdown">
                                         <button id="termDropdownButton" class="btn btn-outline-secondary dropdown-toggle"
                                             type="button" data-bs-toggle="dropdown" data-bs-auto-close="true"
@@ -125,7 +133,7 @@
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                     <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
-                                                                     document.getElementById('logout-form').submit();">
+                                                                         document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">

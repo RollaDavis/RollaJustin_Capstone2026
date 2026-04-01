@@ -397,10 +397,8 @@ document.addEventListener('DOMContentLoaded', () => {
             }
         };
 
-        // Fetch terms when dropdown is shown
         termDropdownButton.addEventListener('shown.bs.dropdown', fetchTerms);
 
-        // Also try to fetch on page load
         fetchTerms();
     }
 });

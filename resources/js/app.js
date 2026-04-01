@@ -3,7 +3,6 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import interactionPlugin from '@fullcalendar/interaction/index.js';
-import { Popover } from 'bootstrap';
 import { buildCalendarEventsFromCourses } from './calendarEvents';
 
 document.addEventListener('DOMContentLoaded', () => {
