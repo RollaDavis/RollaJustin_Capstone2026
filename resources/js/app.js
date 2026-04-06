@@ -6,6 +6,16 @@ import interactionPlugin from '@fullcalendar/interaction/index.js';
 import { Modal } from 'bootstrap';
 import { buildCalendarEventsFromCourses } from './calendarEvents';
 
+const showEventDetailsModal = () => {
+    const modalEl = document.getElementById('eventDetailsModal');
+
+    if (!modalEl) {
+        return;
+    }
+
+    Modal.getOrCreateInstance(modalEl).show();
+};
+
 document.addEventListener('DOMContentLoaded', () => {
     const calendarEl = document.getElementById('calendar');
 
@@ -21,7 +31,6 @@ document.addEventListener('DOMContentLoaded', () => {
         slotMaxTime: '17:00:00',
         slotDuration: '00:10:00',
         snapDuration: '00:10:00',
-        selectMirror: true,
         themeSystem: 'bootstrap5',
         editable: true,
         dragRevertDuration: false,
@@ -30,6 +39,10 @@ document.addEventListener('DOMContentLoaded', () => {
         dragScroll: true,
         eventMaxStack: 1,
         moreLinkClick: "popover",
+        eventDidMount: (info) => {
+            info.el.dataset.scheduleEventId = info.event.id;
+            info.el.style.setProperty('--event-opaque-color', info.event.borderColor || '#6c757d');
+        },
         dayHeaderFormat: { weekday: 'short' },
         height: '100%',
         headerToolbar: false,
@@ -38,13 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
             daysOfWeek: [1, 2, 3, 4, 5],
             startTime: '08:00',
             endTime: '17:00'
-        },
-        eventClick: (info) => {
-            const modalEl = document.getElementById('eventDetailsModal');
-
-            Modal.getOrCreateInstance(modalEl).show();
-        },
-
+        }
     });
 
     calendar.render();
@@ -67,6 +74,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.addEventListener('schedule:courses-selected', (event) => {
         renderSelectedCourses(event.detail || {});
+    });
+
+    document.addEventListener('schedule:open-event-details', () => {
+        showEventDetailsModal();
     });
 
 });
