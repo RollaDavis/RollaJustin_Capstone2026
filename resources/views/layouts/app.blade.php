@@ -107,10 +107,6 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <button id="darkModeToggle" type="button" class="dropdown-item d-flex align-items-center gap-2">
-                                        <i id="darkModeToggleIcon" class="bi bi-moon-stars"></i>
-                                        <span id="darkModeToggleLabel">Enable dark mode</span>
-                                    </button>
                                     <hr class="dropdown-divider">
                                     <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
                                                                          document.getElementById('logout-form').submit();">
