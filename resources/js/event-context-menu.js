@@ -75,20 +75,20 @@ const createMenu = (target, payload, x, y) => {
         createBlockoffButton.type = 'button';
         createBlockoffButton.className = MENU_ITEM_CLASS;
         createBlockoffButton.dataset.action = 'create-blockoff';
-        createBlockoffButton.textContent = 'Create blockoff';
+        createBlockoffButton.textContent = 'Create Blockoff';
         menu.append(createBlockoffButton);
     } else {
         const detailsButton = document.createElement('button');
         detailsButton.type = 'button';
         detailsButton.className = MENU_ITEM_CLASS;
         detailsButton.dataset.action = 'details';
-        detailsButton.textContent = 'Details';
+        detailsButton.textContent = 'Course Details';
 
         const unscheduleButton = document.createElement('button');
         unscheduleButton.type = 'button';
         unscheduleButton.className = MENU_ITEM_CLASS;
         unscheduleButton.dataset.action = 'unschedule';
-        unscheduleButton.textContent = 'Unschedule';
+        unscheduleButton.textContent = 'Unschedule Course';
 
         menu.append(detailsButton, unscheduleButton);
     }
@@ -104,6 +104,7 @@ const createMenu = (target, payload, x, y) => {
 
         runMenuAction(action, payload);
         closeMenu();
+        
     });
 
     placeMenuWithinViewport(menu, x, y);
@@ -214,6 +215,17 @@ const initializeContextMenu = () => {
     if (!calendarElRef) {
         return;
     }
+
+    calendarElRef.addEventListener('mousedown', (event) => {
+        const eventEl = event.target instanceof Element
+            ? event.target.closest('.fc-event')
+            : null;
+
+        if (event.button === 2 && eventEl && calendarElRef.contains(eventEl)) {
+            event.preventDefault();
+            event.stopPropagation();
+        }
+    }, true);
 
     calendarElRef.addEventListener('contextmenu', onCalendarContextMenu);
     resetStateOnGeneralInteractions();

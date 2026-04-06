@@ -19,7 +19,7 @@ Route::middleware('auth:sanctum')->group(function() {
 });
 
 Route::get('/instructors', function(Request $request) {
-    return Instructor::all();
+    return Instructor::orderBy('name')->get();
 });
 
 Route::get('/instructors/{instructor}/courses', function (Instructor $instructor, Request $request) {
@@ -38,7 +38,6 @@ Route::get('/instructors/{instructor}/courses', function (Instructor $instructor
         ->leftJoin('semesters', 'semesters.id', '=', 'programs_semesters.semester_id')
         ->where('instructors_rooms_sections.instructor_id', $instructor->id);
 
-    // Filter by term if provided
     if ($request->has('term')) {
         $query->where('assignments.term_id', $request->input('term'));
     }
@@ -96,7 +95,6 @@ Route::get('/rooms/{room}/courses', function (Room $room, Request $request) {
         ->leftJoin('semesters', 'semesters.id', '=', 'programs_semesters.semester_id')
         ->where('instructors_rooms_sections.room_id', $room->id);
 
-    // Filter by term if provided
     if ($request->has('term')) {
         $query->where('assignments.term_id', $request->input('term'));
     }
@@ -154,7 +152,6 @@ Route::get('/programs/{program}/courses', function (Program $program, Request $r
         ->join('semesters', 'semesters.id', '=', 'programs_semesters.semester_id')
         ->where('programs.id', $program->id);
 
-    // Filter by term if provided
     if ($request->has('term')) {
         $query->where('assignments.term_id', $request->input('term'));
     }

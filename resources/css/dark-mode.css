@@ -146,6 +146,20 @@ html.theme-dark .fc .fc-timegrid-event {
     filter: saturate(1.2) contrast(1.06);
 }
 
+html.theme-dark .fc .fc-timegrid-event.is-selected,
+html.theme-dark .fc .fc-list-event.is-selected {
+    filter: brightness(0.95) saturate(1.2) contrast(1.06) !important;
+}
+
+html.theme-dark .fc .fc-timegrid-event:hover,
+html.theme-dark .fc .fc-timegrid-event:active,
+html.theme-dark .fc .fc-timegrid-event:focus,
+html.theme-dark .fc .fc-timegrid-event:focus-visible {
+    filter: saturate(1.2) contrast(1.06) !important;
+    opacity: 1 !important;
+    outline: none !important;
+}
+
 html.theme-dark .fc .fc-timegrid-event .fc-event-main-frame {
     padding-left: 10px;
     text-align: left;
@@ -175,4 +189,8 @@ html.theme-dark .fc .fc-timegrid-event .fc-event-title {
     font-weight: 700;
     letter-spacing: 0.01em;
     text-align: left;
+}
+
+html.theme-dark .fc .fc-event-mirror .fc-timegrid-more-link {
+    display: none !important;
 }

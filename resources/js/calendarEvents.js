@@ -85,6 +85,27 @@ const makeGroupIdFromCourses = (courses) => {
     return 'course-unknown';
 };
 
+const getCourseColorKey = (course = {}) => {
+    const rawCodeSource = [course.course_name, course.section_name]
+        .filter(Boolean)
+        .map((value) => String(value).trim())
+        .find(Boolean) || '';
+
+    if (rawCodeSource) {
+        const codeMatch = rawCodeSource.toUpperCase().match(/[A-Z]{1,6}\s*-?\s*\d{2,4}[A-Z]?/);
+
+        if (codeMatch?.[0]) {
+            return codeMatch[0].replace(/\s+/g, '');
+        }
+    }
+
+    if (course.course_id !== undefined && course.course_id !== null) {
+        return `course-${course.course_id}`;
+    }
+
+    return toSafeGroupToken(rawCodeSource || 'course-unknown');
+};
+
 const normalizeSemesterName = (semesterName) => {
     return String(semesterName || '')
         .trim()
@@ -93,121 +114,118 @@ const normalizeSemesterName = (semesterName) => {
         .replace(/\s+/g, ' ');
 };
 
-// const hashString = (value) => {
-//     const input = String(value || '');
-//     let hash = 0;
+const getTermBucket = (course = {}) => {
+    const termName = normalizeSemesterName(course.term_name || course.semester_name);
 
-//     for (let i = 0; i < input.length; i += 1) {
-//         hash = ((hash << 5) - hash) + input.charCodeAt(i);
-//         hash |= 0;
-//     }
-
-//     return Math.abs(hash);
-// };
-
-// const mapSeedToRange = (seed, min, max) => {
-//     const span = max - min;
-
-//     if (span <= 0) {
-//         return min;
-//     }
-
-//     return min + (seed % (span + 1));
-// };
-
-// const makeHsl = (h, s, l) => `hsl(${h} ${s}% ${l}%)`;
-// const makeHsla = (h, s, l, a) => `hsla(${h}, ${s}%, ${l}%, ${a})`;
-
-// const getSemesterEventStyle = (course = {}) => {
-//     const termName = normalizeSemesterName(course.term_name);
-//     const seedSource = [
-//         course.course_id,
-//         course.section_id,
-//         course.assignment_id,
-//         course.course_name,
-//         course.section_name
-//     ].filter(Boolean).join('|');
-//     const seed = hashString(seedSource || termName || 'course');
-
-//     // Keep spring in blue range and fall in green range while varying shade per course.
-//     if (termName.includes('spring')) {
-//         const hue = mapSeedToRange(seed, 186, 236);
-//         const saturation = mapSeedToRange(seed >> 7, 48, 98);
-//         const lightness = mapSeedToRange(seed >> 13, 24, 62);
-
-//         return {
-//             backgroundColor: makeHsla(hue, saturation, lightness, 0.72),
-//             borderColor: makeHsl(hue, saturation, lightness),
-//             textColor: '#ffffff'
-//         };
-//     }
-
-//     if (termName.includes('fall')) {
-//         const hue = mapSeedToRange(seed, 94, 154);
-//         const saturation = mapSeedToRange(seed >> 7, 45, 96);
-//         const lightness = mapSeedToRange(seed >> 13, 20, 54);
-
-//         return {
-//             backgroundColor: makeHsla(hue, saturation, lightness, 0.72),
-//             borderColor: makeHsl(hue, saturation, lightness),
-//             textColor: '#ffffff'
-//         };
-//     }
-
-//     const neutralHue = mapSeedToRange(seed, 206, 214);
-//     const neutralSaturation = mapSeedToRange(seed >> 2, 10, 20);
-//     const neutralLightness = mapSeedToRange(seed >> 4, 40, 48);
-
-//     return {
-//         backgroundColor: makeHsla(neutralHue, neutralSaturation, neutralLightness, 0.82),
-//         borderColor: makeHsl(neutralHue, neutralSaturation, neutralLightness),
-//         textColor: '#ffffff'
-//     };
-// };
-
-const hashString = (value) => {
-    const input = String(value || '');
-    let hash = 0;
-
-    for (let i = 0; i < input.length; i += 1) {
-        hash = ((hash << 5) - hash) + input.charCodeAt(i);
-        hash |= 0;
+    if (termName.includes('fall')) {
+        return 'fall';
     }
 
-    return Math.abs(hash);
+    if (termName.includes('spring')) {
+        return 'spring';
+    }
+
+    return 'other';
 };
 
-const getSemesterEventStyleFromPalette = (course = {}) => {
-    const termName = normalizeSemesterName(course.term_name);
+const getUniquePaletteColors = (paletteInput = []) => {
+    const palette = Array.isArray(paletteInput) ? paletteInput : [];
+    const usedTokens = new Set();
 
-    const springPalette = Array.isArray(SPRING_EVENT_COLOR_PALETTE) ? SPRING_EVENT_COLOR_PALETTE : [];
-    const fallPalette = Array.isArray(FALL_EVENT_COLOR_PALETTE) ? FALL_EVENT_COLOR_PALETTE : [];
-    const fallbackPalette = [...springPalette, ...fallPalette];
-    const palette = termName.includes('spring')
-        ? springPalette
-        : (termName.includes('fall') ? fallPalette : fallbackPalette);
+    return palette.filter((color) => {
+        const token = `${color?.backgroundColor || ''}|${color?.borderColor || ''}`;
 
-    const seedSource = [
-        course.course_id,
-        course.section_id,
-        course.assignment_id,
-        course.course_name,
-        course.section_name,
-        course.term_name
-    ].filter(Boolean).join('|');
+        if (!color?.backgroundColor || !color?.borderColor || usedTokens.has(token)) {
+            return false;
+        }
 
-    const seed = hashString(seedSource || 'course');
-    const selectedPalette = palette.length > 0 ? palette : fallbackPalette;
-    const selectedColor = selectedPalette[seed % selectedPalette.length];
+        usedTokens.add(token);
+        return true;
+    });
+};
+
+const shuffleArray = (items = []) => {
+    const shuffled = [...items];
+
+    for (let i = shuffled.length - 1; i > 0; i -= 1) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+
+    return shuffled;
+};
+
+const makeGeneratedStyle = (index, termBucket = 'other') => {
+    const hueBaseByBucket = {
+        fall: 24,
+        spring: 194,
+        other: 260
+    };
+    const hueBase = hueBaseByBucket[termBucket] ?? hueBaseByBucket.other;
+    const hue = Math.round((hueBase + (index * 47)) % 360);
+    const saturation = 74;
+    const lightness = 42;
 
     return {
-        backgroundColor: selectedColor.backgroundColor,
-        borderColor: selectedColor.borderColor,
-        textColor: selectedColor.borderColor
+        backgroundColor: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.72)`,
+        borderColor: `hsl(${hue} ${saturation}% ${lightness}%)`,
+        textColor: `hsl(${hue} ${saturation}% ${lightness}%)`
     };
 };
 
+const buildCourseColorStyleMap = (courses = []) => {
+    const springPalette = shuffleArray(getUniquePaletteColors(SPRING_EVENT_COLOR_PALETTE));
+    const fallPalette = shuffleArray(getUniquePaletteColors(FALL_EVENT_COLOR_PALETTE));
+    const otherPalette = shuffleArray(getUniquePaletteColors([...springPalette, ...fallPalette]));
+    const paletteByBucket = {
+        spring: springPalette,
+        fall: fallPalette,
+        other: otherPalette
+    };
 
+    const bucketedKeys = {
+        spring: new Set(),
+        fall: new Set(),
+        other: new Set()
+    };
+    const styleMap = new Map();
+
+    courses.forEach((course) => {
+        const bucket = getTermBucket(course);
+        const courseCode = getCourseColorKey(course);
+        bucketedKeys[bucket].add(courseCode);
+    });
+
+    ['spring', 'fall', 'other'].forEach((bucket) => {
+        const palette = paletteByBucket[bucket];
+        const uniqueCourseCodes = [...bucketedKeys[bucket]].sort((a, b) => String(a).localeCompare(String(b)));
+
+        uniqueCourseCodes.forEach((courseCode, index) => {
+            const paletteColor = palette[index];
+            const styleMapKey = `${bucket}:${courseCode}`;
+
+            if (paletteColor) {
+                styleMap.set(styleMapKey, {
+                    backgroundColor: paletteColor.backgroundColor,
+                    borderColor: paletteColor.borderColor,
+                    textColor: paletteColor.borderColor
+                });
+                return;
+            }
+
+            styleMap.set(styleMapKey, makeGeneratedStyle(index - palette.length, bucket));
+        });
+    });
+
+    return styleMap;
+};
+
+const getCourseStyleMapKey = (course = {}) => {
+    const termBucket = getTermBucket(course);
+    const courseCode = getCourseColorKey(course);
+
+    return `${termBucket}:${courseCode}`;
+};
 
 const makeCourseKey = (course = {}) => {
     if (course.assignment_id !== undefined && course.assignment_id !== null) {
@@ -230,6 +248,8 @@ const makeCourseKey = (course = {}) => {
 };
 
 export const buildCalendarEventsFromCourses = (courses = []) => {
+    const courseStyleMap = buildCourseColorStyleMap(courses);
+
     return courses
         .map((course) => {
             const daysOfWeek = parseDays(course.timeslot_days);
@@ -240,9 +260,9 @@ export const buildCalendarEventsFromCourses = (courses = []) => {
                 return null;
             }
 
-            const courseName = course.course_name || course.section_name || 'Untitled course';
+            const courseName = course.course_name || course.section_name || 'Untitled Course';
             const groupId = makeGroupIdFromCourses([course]);
-            const style = getSemesterEventStyleFromPalette(course);
+            const style = courseStyleMap.get(getCourseStyleMapKey(course)) || makeGeneratedStyle(courseStyleMap.size + 1, getTermBucket(course));
             const courseKey = makeCourseKey(course);
             const endTime = addMinutesToTime(startTime, Math.round(durationHours * 60));
 
@@ -259,6 +279,7 @@ export const buildCalendarEventsFromCourses = (courses = []) => {
                 allDay: false,
                 extendedProps: {
                     courseKey,
+                    durationHours,
                     originalSchedule: {
                         daysOfWeek,
                         startTime,
