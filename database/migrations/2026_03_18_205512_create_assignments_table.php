@@ -13,9 +13,11 @@ return new class extends Migration
     {
         Schema::create('assignments', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('instructors_rooms_sections_id')->constrained('instructors_rooms_sections')->onDelete('cascade');
-            $table->foreignId('timeslot_id')->constrained()->onDelete('cascade');
-            $table->foreignId('term_id')->constrained()->onDelete('cascade');
+            $table->foreignId('instructor_id')->constrained('instructors')->onDelete('cascade');
+            $table->foreignId('section_id')->constrained('sections')->onDelete('cascade');
+            $table->foreignId('room_id')->constrained('rooms')->onDelete('cascade');
+            $table->foreignId('timeslot_id')->nullable()->constrained('timeslots')->onDelete('set null');
+            $table->foreignId('term_id')->constrained('terms')->onDelete('cascade');
             $table->timestamps();
         });
     }

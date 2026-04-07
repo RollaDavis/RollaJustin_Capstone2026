@@ -28,17 +28,15 @@ class DatabaseSeeder extends Seeder
             CourseSeeder::class,
             SectionSeeder::class,
             TermSeeder::class,
-            SemesterSeeder::class,
             ProgramSeeder::class,
-            ProgramsSemestersSeeder::class,
-            SemestersCoursesSeeder::class,
             TimeslotSeeder::class,
+            ProgramsAssignmentsSeeder::class,
             InstructorsTimeslotsSeeder::class,
             RoomsTimeslotsSeeder::class,
             SectionsTimeslotsSeeder::class,
             RoomTimeBlockSeeder::class,
             InstructorTimeBlockSeeder::class,
-            InstructorsRoomsSectionsSeeder::class,
+            PossibilitiesSeeder::class,
             AssignmentsSeeder::class
         ]);
     }

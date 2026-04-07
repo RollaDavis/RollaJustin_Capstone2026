@@ -6,20 +6,22 @@ use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use JeroenZwart\CsvSeeder\CsvSeeder;
 
-class ProgramsSemestersSeeder extends CsvSeeder
+class PossibilitiesSeeder extends CsvSeeder
 {
     public function __construct()
     {
-        $this->file = '/database/seeds/csvs/programs_semesters.csv';
+        $this->file = '/database/seeds/csvs/possibilities.csv';
         $this->delimiter = ',';
-        $this->tablename = 'programs_semesters';
-        $this->mapping = ['id','program_id', 'semester_id'];
+        $this->tablename = 'possibilities';
+        $this->mapping = ['id', 'instructor_id', 'room_id', 'section_id'];
     }
 
     /**
      * Run the database seeds.
+     *
+     * @return void
      */
-    public function run()   
+    public function run()
     {
         parent::run();
     }

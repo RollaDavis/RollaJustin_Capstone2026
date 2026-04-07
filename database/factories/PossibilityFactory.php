@@ -2,13 +2,13 @@
 
 namespace Database\Factories;
 
-use App\Models\Semester;
+use App\Models\Possibility;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends Factory<Semester>
+ * @extends Factory<Possibility>
  */
-class SemesterFactory extends Factory
+class PossibilityFactory extends Factory
 {
     /**
      * Define the model's default state.
