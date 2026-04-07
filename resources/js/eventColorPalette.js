@@ -1,6 +1,6 @@
 const makeColor = (backgroundColor, borderColor) => ({ backgroundColor, borderColor });
 
-// Original palettes kept for reference.
+// original palettes kept for reference.
 // export const RED_EVENT_COLOR_PALETTE = [
 //     makeColor('rgba(254, 202, 202, 0.72)', '#ef4444'),
 //     makeColor('rgba(252, 165, 165, 0.72)', '#b91c1c'),
