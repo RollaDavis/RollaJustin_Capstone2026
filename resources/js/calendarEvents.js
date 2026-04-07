@@ -1,4 +1,4 @@
-import { FALL_EVENT_COLOR_PALETTE, SPRING_EVENT_COLOR_PALETTE } from './eventColorPalette';
+import { DEFAULT_EVENT_COLOR_PALETTE } from './eventColorPalette';
 
 const DAY_TO_INDEX = {
     U: 0,
@@ -85,26 +85,6 @@ const makeGroupIdFromCourses = (courses) => {
     return 'course-unknown';
 };
 
-const getCourseColorKey = (course = {}) => {
-    const rawCodeSource = [course.course_name, course.section_name]
-        .filter(Boolean)
-        .map((value) => String(value).trim())
-        .find(Boolean) || '';
-
-    if (rawCodeSource) {
-        const codeMatch = rawCodeSource.toUpperCase().match(/[A-Z]{1,6}\s*-?\s*\d{2,4}[A-Z]?/);
-
-        if (codeMatch?.[0]) {
-            return codeMatch[0].replace(/\s+/g, '');
-        }
-    }
-
-    if (course.course_id !== undefined && course.course_id !== null) {
-        return `course-${course.course_id}`;
-    }
-
-    return toSafeGroupToken(rawCodeSource || 'course-unknown');
-};
 
 const normalizeSemesterName = (semesterName) => {
     return String(semesterName || '')
@@ -128,105 +108,6 @@ const getTermBucket = (course = {}) => {
     return 'other';
 };
 
-const getUniquePaletteColors = (paletteInput = []) => {
-    const palette = Array.isArray(paletteInput) ? paletteInput : [];
-    const usedTokens = new Set();
-
-    return palette.filter((color) => {
-        const token = `${color?.backgroundColor || ''}|${color?.borderColor || ''}`;
-
-        if (!color?.backgroundColor || !color?.borderColor || usedTokens.has(token)) {
-            return false;
-        }
-
-        usedTokens.add(token);
-        return true;
-    });
-};
-
-const shuffleArray = (items = []) => {
-    const shuffled = [...items];
-
-    for (let i = shuffled.length - 1; i > 0; i -= 1) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-
-    return shuffled;
-};
-
-const makeGeneratedStyle = (index, termBucket = 'other') => {
-    const hueBaseByBucket = {
-        fall: 24,
-        spring: 194,
-        other: 260
-    };
-    const hueBase = hueBaseByBucket[termBucket] ?? hueBaseByBucket.other;
-    const hue = Math.round((hueBase + (index * 47)) % 360);
-    const saturation = 74;
-    const lightness = 42;
-
-    return {
-        backgroundColor: `hsla(${hue}, ${saturation}%, ${lightness}%, 0.72)`,
-        borderColor: `hsl(${hue} ${saturation}% ${lightness}%)`,
-        textColor: `hsl(${hue} ${saturation}% ${lightness}%)`
-    };
-};
-
-const buildCourseColorStyleMap = (courses = []) => {
-    const springPalette = shuffleArray(getUniquePaletteColors(SPRING_EVENT_COLOR_PALETTE));
-    const fallPalette = shuffleArray(getUniquePaletteColors(FALL_EVENT_COLOR_PALETTE));
-    const otherPalette = shuffleArray(getUniquePaletteColors([...springPalette, ...fallPalette]));
-    const paletteByBucket = {
-        spring: springPalette,
-        fall: fallPalette,
-        other: otherPalette
-    };
-
-    const bucketedKeys = {
-        spring: new Set(),
-        fall: new Set(),
-        other: new Set()
-    };
-    const styleMap = new Map();
-
-    courses.forEach((course) => {
-        const bucket = getTermBucket(course);
-        const courseCode = getCourseColorKey(course);
-        bucketedKeys[bucket].add(courseCode);
-    });
-
-    ['spring', 'fall', 'other'].forEach((bucket) => {
-        const palette = paletteByBucket[bucket];
-        const uniqueCourseCodes = [...bucketedKeys[bucket]].sort((a, b) => String(a).localeCompare(String(b)));
-
-        uniqueCourseCodes.forEach((courseCode, index) => {
-            const paletteColor = palette[index];
-            const styleMapKey = `${bucket}:${courseCode}`;
-
-            if (paletteColor) {
-                styleMap.set(styleMapKey, {
-                    backgroundColor: paletteColor.backgroundColor,
-                    borderColor: paletteColor.borderColor,
-                    textColor: paletteColor.borderColor
-                });
-                return;
-            }
-
-            styleMap.set(styleMapKey, makeGeneratedStyle(index - palette.length, bucket));
-        });
-    });
-
-    return styleMap;
-};
-
-const getCourseStyleMapKey = (course = {}) => {
-    const termBucket = getTermBucket(course);
-    const courseCode = getCourseColorKey(course);
-
-    return `${termBucket}:${courseCode}`;
-};
-
 const makeCourseKey = (course = {}) => {
     if (course.assignment_id !== undefined && course.assignment_id !== null) {
         return `assignment-${course.assignment_id}`;
@@ -248,8 +129,6 @@ const makeCourseKey = (course = {}) => {
 };
 
 export const buildCalendarEventsFromCourses = (courses = []) => {
-    const courseStyleMap = buildCourseColorStyleMap(courses);
-
     return courses
         .map((course) => {
             const daysOfWeek = parseDays(course.timeslot_days);
@@ -262,7 +141,8 @@ export const buildCalendarEventsFromCourses = (courses = []) => {
 
             const courseName = course.course_name || course.section_name || 'Untitled Course';
             const groupId = makeGroupIdFromCourses([course]);
-            const style = courseStyleMap.get(getCourseStyleMapKey(course)) || makeGeneratedStyle(courseStyleMap.size + 1, getTermBucket(course));
+            const defaultColor = DEFAULT_EVENT_COLOR_PALETTE[0] || { backgroundColor: 'rgba(147, 197, 253, 0.72)', borderColor: '#1d4ed8' };
+            const style = { backgroundColor: defaultColor.backgroundColor, borderColor: defaultColor.borderColor, textColor: defaultColor.borderColor };
             const courseKey = makeCourseKey(course);
             const endTime = addMinutesToTime(startTime, Math.round(durationHours * 60));
 
