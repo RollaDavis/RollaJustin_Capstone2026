@@ -32,3 +32,5 @@ Route::post('/login/token', function (Request $request) {
     $tokenText = $user->createToken($request->device_name)->plainTextToken;
     return ['token' => $tokenText];
 });
+
+

@@ -94,20 +94,6 @@ const normalizeSemesterName = (semesterName) => {
         .replace(/\s+/g, ' ');
 };
 
-const getTermBucket = (course = {}) => {
-    const termName = normalizeSemesterName(course.term_name || course.semester_name);
-
-    if (termName.includes('fall')) {
-        return 'fall';
-    }
-
-    if (termName.includes('spring')) {
-        return 'spring';
-    }
-
-    return 'other';
-};
-
 const makeCourseKey = (course = {}) => {
     if (course.assignment_id !== undefined && course.assignment_id !== null) {
         return `assignment-${course.assignment_id}`;
@@ -128,9 +114,29 @@ const makeCourseKey = (course = {}) => {
     return `unknown-${Math.random().toString(36).slice(2, 10)}`;
 };
 
+const normalizeCourseForCalendar = (course = {}) => {
+    const attributes = course.attributes || {};
+
+    return {
+        ...attributes,
+        ...course,
+        assignment_id: course.assignment_id ?? course.id,
+        course_id: course.course_id ?? attributes.course_id ?? course.section?.course_id ?? course.section?.course?.id,
+        section_id: course.section_id ?? attributes.section_id ?? course.section?.id,
+        section_name: course.section_name ?? attributes.section_name ?? course.section?.name,
+        course_name: course.course_name ?? attributes.course_name ?? course.section?.course?.name,
+        term_name: course.term_name ?? attributes.term_name ?? course.term?.name,
+        semester_name: course.semester_name ?? attributes.semester_name ?? course.term?.name,
+        timeslot_days: course.timeslot_days ?? attributes.timeslot_days ?? attributes.days ?? course.timeslot?.days,
+        timeslot_start_time: course.timeslot_start_time ?? attributes.timeslot_start_time ?? attributes.start_time ?? course.timeslot?.start_time,
+        timeslot_duration_hours: course.timeslot_duration_hours ?? attributes.timeslot_duration_hours ?? attributes.duration ?? course.timeslot?.duration
+    };
+};
+
 export const buildCalendarEventsFromCourses = (courses = []) => {
     return courses
-        .map((course) => {
+        .map((rawCourse) => {
+            const course = normalizeCourseForCalendar(rawCourse);
             const daysOfWeek = parseDays(course.timeslot_days);
             const startTime = normalizeTime(course.timeslot_start_time);
             const durationHours = Number(course.timeslot_duration_hours);

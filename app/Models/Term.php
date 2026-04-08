@@ -20,4 +20,16 @@ class Term extends Model
     {
         return $this->hasMany(ProgramAssignment::class);
     }
+
+    public function instructors() {
+        return $this->hasManyThrough(Instructor::class, Assignment::class, 'term_id', 'id', 'id', 'instructor_id')->distinct();
+    }
+
+    public function rooms() {
+        return $this->hasManyThrough(Room::class, Assignment::class, 'term_id', 'id', 'id', 'room_id')->distinct();
+    }
+
+    public function programs() {
+        return $this->hasManyThrough(Program::class, ProgramAssignment::class, 'terms_id', 'id', 'id', 'programs_id')->distinct();
+    }
 }

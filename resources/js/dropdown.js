@@ -15,8 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const scheduleValueConfig = {
         instructor: {
-            endpoint: '/api/instructors',
-            coursesEndpoint: (id) => `/api/instructors/${id}/courses`,
+            endpoint:(termId) => `/api/v1/terms/${termId}/instructors`,
+            coursesEndpoint: (id, termId) => `/api/v1/terms/${termId}/instructors/${id}`,
             loadingMessage: 'Loading instructors...',
             selectMessage: 'Select an instructor',
             emptyMessage: 'No instructors found',
@@ -24,8 +24,8 @@ document.addEventListener('DOMContentLoaded', () => {
             searchAriaLabel: 'Search instructors'
         },
         room: {
-            endpoint: '/api/rooms',
-            coursesEndpoint: (id) => `/api/rooms/${id}/courses`,
+            endpoint:(termId) => `/api/v1/terms/${termId}/rooms`,
+            coursesEndpoint: (id, termId) => `/api/v1/terms/${termId}/rooms/${id}`,
             loadingMessage: 'Loading rooms...',
             selectMessage: 'Select a room',
             emptyMessage: 'No rooms found',
@@ -33,8 +33,8 @@ document.addEventListener('DOMContentLoaded', () => {
             searchAriaLabel: 'Search rooms'
         },
         program: {
-            endpoint: '/api/programs',
-            coursesEndpoint: (id) => `/api/programs/${id}/courses`,
+            endpoint:(termId) => `/api/v1/terms/${termId}/programs`,
+            coursesEndpoint: '',
             loadingMessage: 'Loading programs...',
             selectMessage: 'Select a program',
             emptyMessage: 'No programs found',
@@ -120,10 +120,11 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            let endpoint = selectedConfig.coursesEndpoint(selectedId);
-            
-            if (selectedTermId) {
-                endpoint += `?term=${selectedTermId}`;
+            const endpoint = selectedConfig.coursesEndpoint(selectedId, selectedTermId);
+
+            if (!endpoint) {
+                publishSelectedCourses(selectedView, selectedId, selectedName, []);
+                return;
             }
 
             const response = await fetch(endpoint);
@@ -132,7 +133,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(`Failed to load ${selectedView} courses: ${response.status}`);
             }
 
-            const courses = await response.json();
+            const payload = await response.json();
+            const courses = Array.isArray(payload)
+                ? payload
+                : (Array.isArray(payload?.data) ? payload.data : []);
 
             console.log(`Courses for ${selectedView} ${selectedName} (ID: ${selectedId}) in term ${selectedTermName}`, courses);
             publishSelectedCourses(selectedView, selectedId, selectedName, courses);
@@ -241,6 +245,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const normalizedView = normalizeScheduleByValue(selectedView);
         const selectedConfig = scheduleValueConfig[normalizedView];
+        const endpoint = typeof selectedConfig?.endpoint === 'function'
+            ? selectedConfig.endpoint(selectedTermId)
+            : selectedConfig?.endpoint;
 
         if (!selectedConfig) {
             scheduleValueOptionsData = [];
@@ -249,24 +256,52 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        if (!endpoint) {
+            scheduleValueOptionsData = [];
+            setScheduleValueSearchLabels(selectedConfig.searchPlaceholder, selectedConfig.searchAriaLabel);
+            resetSecondarySelector('Select a term first');
+            return;
+        }
+
         setScheduleValueSearchLabels(selectedConfig.searchPlaceholder, selectedConfig.searchAriaLabel);
         resetSecondarySelector(selectedConfig.loadingMessage);
 
         try {
-            const response = await fetch(selectedConfig.endpoint);
+            const response = await fetch(endpoint);
 
             if (!response.ok) {
                 throw new Error(`Failed to load ${normalizedView} options: ${response.status}`);
             }
 
-            const options = await response.json();
+            const payload = await response.json();
+            const options = Array.isArray(payload)
+                ? payload
+                : (Array.isArray(payload?.data) ? payload.data : []);
 
             scheduleValueOptionsData = options
-                .filter((option) => option && option.id !== undefined && option.name)
-                .map((option) => ({
-                    id: option.id,
-                    name: String(option.name)
-                }));
+                .map((option) => {
+                    if (!option || option.id === undefined) {
+                        return null;
+                    }
+
+                    const optionName = option.name ?? option.attributes?.name;
+
+                    if (!optionName) {
+                        return null;
+                    }
+
+                    let displayName = String(optionName);
+                    const year = option.year ?? option.attributes?.year;
+                    if (year) {
+                        displayName = `${displayName} - Year ${year}`;
+                    }
+
+                    return {
+                        id: option.id,
+                        name: displayName
+                    };
+                })
+                .filter((option) => option !== null);
 
             enableSecondarySelector(selectedConfig.selectMessage);
             renderScheduleValueOptions();
@@ -342,7 +377,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const fetchTerms = async () => {
             try {
-                const response = await fetch('/api/terms');
+                const response = await fetch('/api/v1/terms');
 
                 if (!response.ok) {
                     throw new Error(`Failed to load terms: ${response.status}`);
@@ -362,13 +397,18 @@ document.addEventListener('DOMContentLoaded', () => {
                             selectedTermId = term.id;
                             selectedTermName = term.name;
                             termDropdownButton.textContent = term.name;
+
+                            const selectedView = normalizeScheduleByValue(scheduleBySelect?.value || '');
+
+                            if (scheduleValueConfig[selectedView]) {
+                                populateScheduleValueOptions(selectedView);
+                            }
                             
                             if (scheduleByDropdownButton) {
                                 scheduleByDropdownButton.disabled = false;
                             }
 
                             if (scheduleValueSelect && scheduleValueSelect.value) {
-                                const selectedView = normalizeScheduleByValue(scheduleBySelect?.value || '');
                                 const selectedId = parseInt(scheduleValueSelect.value, 10);
                                 const selectedName = scheduleValueDropdownButton?.textContent || '';
                                 

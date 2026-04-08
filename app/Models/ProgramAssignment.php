@@ -11,7 +11,7 @@ class ProgramAssignment extends Model
     /** @use HasFactory<\Database\Factories\Pr> */
     use HasFactory;
 
-    protected $fillable = ['programs_id', 'terms_id', 'course_id', 'year'];
+    protected $fillable = ['program_id', 'term_id', 'course_id', 'year'];
 
     public function program(): BelongsTo
     {

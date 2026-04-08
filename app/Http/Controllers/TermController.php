@@ -13,7 +13,7 @@ class TermController extends Controller
      */
     public function index()
     {
-        //
+        return Term::all();
     }
 
     /**
