@@ -16,7 +16,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const scheduleValueConfig = {
         instructor: {
             endpoint:(termId) => `/api/v1/terms/${termId}/instructors`,
-            coursesEndpoint: (id, termId) => `/api/v1/terms/${termId}/instructors/${id}`,
+            coursesEndpoint: (instructorId, termId) => `/api/v1/terms/${termId}/instructors/${instructorId}`,
             loadingMessage: 'Loading instructors...',
             selectMessage: 'Select an instructor',
             emptyMessage: 'No instructors found',
@@ -25,7 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         room: {
             endpoint:(termId) => `/api/v1/terms/${termId}/rooms`,
-            coursesEndpoint: (id, termId) => `/api/v1/terms/${termId}/rooms/${id}`,
+            coursesEndpoint: (roomId, termId) => `/api/v1/terms/${termId}/rooms/${roomId}`,
             loadingMessage: 'Loading rooms...',
             selectMessage: 'Select a room',
             emptyMessage: 'No rooms found',
@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         },
         program: {
             endpoint:(termId) => `/api/v1/terms/${termId}/programs`,
-            coursesEndpoint: '',
+            coursesEndpoint:(termId, programId, year) => `/api/v1/terms/${termId}/programs/${programId}/${year}`,
             loadingMessage: 'Loading programs...',
             selectMessage: 'Select a program',
             emptyMessage: 'No programs found',
@@ -112,7 +112,12 @@ document.addEventListener('DOMContentLoaded', () => {
         }));
     };
 
-    const fetchCoursesForSelection = async (selectedView, selectedId, selectedName) => {
+    const extractYearFromLabel = (label = '') => {
+        const match = String(label).match(/\bYear\s+(\d+)\b/i);
+        return match ? Number(match[1]) : null;
+    };
+
+    const fetchCoursesForSelection = async (selectedView, selectedId, selectedName, selectedOption = null) => {
         const selectedConfig = scheduleValueConfig[selectedView];
 
         if (!selectedConfig?.coursesEndpoint) {
@@ -120,7 +125,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
         try {
-            const endpoint = selectedConfig.coursesEndpoint(selectedId, selectedTermId);
+            let endpoint = '';
+
+            if (selectedView === 'program') {
+                const selectedYear = selectedOption?.year ?? extractYearFromLabel(selectedName);
+
+                if (!selectedTermId || !selectedId || selectedYear === null) {
+                    publishSelectedCourses(selectedView, selectedId, selectedName, []);
+                    return;
+                }
+
+                endpoint = selectedConfig.coursesEndpoint(selectedTermId, selectedId, selectedYear);
+            } else {
+                endpoint = selectedConfig.coursesEndpoint(selectedId, selectedTermId);
+            }
 
             if (!endpoint) {
                 publishSelectedCourses(selectedView, selectedId, selectedName, []);
@@ -201,7 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 setDropdownLabel(option.name);
                 closeSecondaryDropdown();
 
-                fetchCoursesForSelection(selectedView, option.id, option.name);
+                fetchCoursesForSelection(selectedView, option.id, option.name, option);
             });
 
             scheduleValueOptions.appendChild(item);
@@ -298,7 +316,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     return {
                         id: option.id,
-                        name: displayName
+                        name: displayName,
+                        year: year ?? null
                     };
                 })
                 .filter((option) => option !== null);

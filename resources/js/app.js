@@ -2,9 +2,9 @@ import { Calendar } from '@fullcalendar/core';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
-import interactionPlugin from '@fullcalendar/interaction/index.js';
 import { Modal } from 'bootstrap';
 import { buildCalendarEventsFromCourses } from './calendarEvents';
+import { initializeUnscheduledCourseDnd } from './unscheduled-course-dnd';
 
 const showEventDetailsModal = () => {
     const modalEl = document.getElementById('eventDetailsModal');
@@ -38,10 +38,6 @@ const formatDurationLabel = (durationHours) => {
 
 const applyDurationLabel = (eventElement, durationHours) => {
     if (!eventElement) {
-        return;
-    }
-
-    if (eventElement.classList.contains('fc-event-mirror') || eventElement.classList.contains('fc-event-ghost')) {
         return;
     }
 
@@ -84,73 +80,6 @@ const setSelectedGroupState = (calendarEl, groupId) => {
     });
 };
 
-const getDragScopeKey = (event) => event.groupId || event.id;
-
-const getScopedMoreLinksForDrag = (calendarEl, scopeKey) => {
-    if (!calendarEl || !scopeKey) {
-        return [];
-    }
-
-    const safeScopeKey = CSS.escape(String(scopeKey));
-    const affectedEvents = calendarEl.querySelectorAll(`.fc-timegrid-event[data-schedule-drag-key="${safeScopeKey}"]`);
-
-    if (affectedEvents.length === 0) {
-        return [];
-    }
-
-    const links = new Set();
-
-    affectedEvents.forEach((eventEl) => {
-        const eventHarness = eventEl.closest('.fc-timegrid-event-harness') || eventEl;
-        const colEvents = eventEl.closest('.fc-timegrid-col-events');
-
-        if (!colEvents) {
-            return;
-        }
-
-        const eventRect = eventHarness.getBoundingClientRect();
-        const colLinks = Array.from(colEvents.querySelectorAll('.fc-timegrid-more-link'));
-
-        if (colLinks.length === 0) {
-            return;
-        }
-
-        let hasOverlapMatch = false;
-
-        colLinks.forEach((link) => {
-            const linkRect = link.getBoundingClientRect();
-            const overlapsVertically = linkRect.top <= eventRect.bottom && linkRect.bottom >= eventRect.top;
-
-            if (overlapsVertically) {
-                links.add(link);
-                hasOverlapMatch = true;
-            }
-        });
-
-        if (!hasOverlapMatch) {
-            const eventMidpoint = eventRect.top + (eventRect.height / 2);
-            const nearestLink = colLinks.reduce((nearest, current) => {
-                if (!nearest) {
-                    return current;
-                }
-
-                const nearestRect = nearest.getBoundingClientRect();
-                const currentRect = current.getBoundingClientRect();
-                const nearestDistance = Math.abs((nearestRect.top + (nearestRect.height / 2)) - eventMidpoint);
-                const currentDistance = Math.abs((currentRect.top + (currentRect.height / 2)) - eventMidpoint);
-
-                return currentDistance < nearestDistance ? current : nearest;
-            }, null);
-
-            if (nearestLink) {
-                links.add(nearestLink);
-            }
-        }
-    });
-
-    return Array.from(links);
-};
-
 document.addEventListener('DOMContentLoaded', () => {
     const calendarEl = document.getElementById('calendar');
 
@@ -158,29 +87,10 @@ document.addEventListener('DOMContentLoaded', () => {
         return;
     }
 
-    let hiddenMoreLinks = [];
-
-    const hideLinks = (links) => {
-        hiddenMoreLinks = links.map((link) => ({
-            link,
-            originalVisibility: link.style.visibility
-        }));
-
-        hiddenMoreLinks.forEach(({ link }) => {
-            link.style.visibility = 'hidden';
-        });
-    };
-
-    const restoreHiddenLinks = () => {
-        hiddenMoreLinks.forEach(({ link, originalVisibility }) => {
-            link.style.visibility = originalVisibility;
-        });
-
-        hiddenMoreLinks = [];
-    };
+    let unscheduledCourseDnd = null;
 
     const calendar = new Calendar(calendarEl, {
-        plugins: [dayGridPlugin, timeGridPlugin, listPlugin, interactionPlugin],
+        plugins: [dayGridPlugin, timeGridPlugin, listPlugin],
         initialView: 'timeGridWeek',
         allDaySlot: false,
         slotMinTime: '08:00:00',
@@ -188,11 +98,11 @@ document.addEventListener('DOMContentLoaded', () => {
         slotDuration: '00:10:00',
         snapDuration: '00:10:00',
         themeSystem: 'bootstrap5',
-        editable: true,
-        dragRevertDuration: false,
+        editable: false,
+        eventStartEditable: false,
+        eventDurationEditable: false,
         selectable: true,
-        droppable: true,
-        dragScroll: true,
+        selectMirror: true,
         eventMaxStack: 1,
         moreLinkClick: "popover",
         dayHeaderFormat: { weekday: 'short' },
@@ -201,32 +111,22 @@ document.addEventListener('DOMContentLoaded', () => {
         weekends: false,
         eventDidMount: (info) => {
             info.el.dataset.scheduleEventId = info.event.id;
-            info.el.dataset.scheduleDragKey = getDragScopeKey(info.event);
             if (info.event.groupId) {
                 info.el.dataset.scheduleGroupId = info.event.groupId;
             }
+            info.el.removeAttribute('tabindex');
             info.el.style.setProperty('--event-opaque-color', info.event.borderColor || '#6c757d');
-            applyDurationLabel(info.el, info.event.extendedProps?.durationHours);
-        },
-        eventDrop: (info) => {
             applyDurationLabel(info.el, info.event.extendedProps?.durationHours);
         },
         eventClick: (info) => {
             clearSelectedEventState(calendarEl);
             setSelectedGroupState(calendarEl, info.event.groupId || info.event.id);
-        },
-        eventDragStart: function (info) {
-            restoreHiddenLinks();
-            const scopeKey = getDragScopeKey(info.event);
-            const scopedLinks = getScopedMoreLinksForDrag(calendarEl, scopeKey);
-            hideLinks(scopedLinks);
-        },
-        eventDragStop: function (info) {
-            restoreHiddenLinks();
         }
     });
 
     calendar.render();
+
+    unscheduledCourseDnd = initializeUnscheduledCourseDnd({ calendar });
 
     document.dispatchEvent(new CustomEvent('schedule:calendar-ready', {
         detail: {
@@ -254,11 +154,26 @@ document.addEventListener('DOMContentLoaded', () => {
     };
 
     document.addEventListener('schedule:courses-selected', (event) => {
+        unscheduledCourseDnd?.clear();
         renderSelectedCourses(event.detail || {});
     });
 
     document.addEventListener('schedule:open-event-details', () => {
         showEventDetailsModal();
+    });
+
+    document.addEventListener('schedule:move-event-to-unscheduled', (event) => {
+        const eventId = event.detail?.eventId;
+
+        if (!eventId) {
+            return;
+        }
+
+        const didMove = unscheduledCourseDnd?.moveEventToUnscheduled(eventId);
+
+        if (didMove) {
+            clearSelectedEventState(calendarEl);
+        }
     });
 
 });

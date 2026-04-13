@@ -121,12 +121,25 @@ class AssignmentController extends Controller
     public function getAssignmentsForProgram(Term $term, Program $program, $year)
     {
         $programAssignmentSections = ProgramAssignment::query()
-            ->with(['course.section',])
             ->where('term_id', $term->id)
             ->where('program_id', $program->id)
             ->where('year', $year)
             ->get();
 
-        
+
+        $my_assignments = [];
+        foreach($programAssignmentSections as $item){
+            $sections = $item->course->sections;
+            foreach($sections as $section){
+                $assignments = $section->assignments;
+                foreach($assignments as $a) {
+                    if($a->term_id == $term->id){
+                        $my_assignments[] = $a;
+                    }
+                }  
+            }
+        }
+
+        return AssignmentResource::collection($my_assignments);
     }
 }

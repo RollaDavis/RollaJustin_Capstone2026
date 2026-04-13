@@ -122,10 +122,67 @@
     background-image: linear-gradient(to right, var(--event-opaque-color, #6c757d) 0 6px, transparent 6px);
 }
 
+.unscheduled-course-item,
+.fc-event-mirror.unscheduled-course-item,
+.fc-unscheduled-drag-mirror-proxy {
+    border-color: rgba(255, 255, 255, 0.72) !important;
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 1px 2px rgba(15, 23, 42, 0.12);
+    background-image: linear-gradient(to right, var(--event-opaque-color, #6c757d) 0 6px, transparent 6px);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 0.35rem;
+    overflow: hidden;
+}
+
+.unscheduled-course-item .fc-event-main-frame,
+.fc-event-mirror.unscheduled-course-item .fc-event-main-frame,
+.fc-unscheduled-drag-mirror-proxy .fc-event-main-frame {
+    padding-left: 10px;
+    text-align: left;
+}
+
+.unscheduled-course-item .fc-event-main,
+.fc-event-mirror.unscheduled-course-item .fc-event-main,
+.fc-unscheduled-drag-mirror-proxy .fc-event-main {
+    transform: translateX(2px);
+}
+
+.unscheduled-course-item .fc-event-time,
+.fc-event-mirror.unscheduled-course-item .fc-event-time,
+.fc-unscheduled-drag-mirror-proxy .fc-event-time {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    opacity: 0.95;
+    text-align: left;
+    display: inline-block;
+    border-bottom: 1px solid currentColor;
+    margin-left: -12px;
+    padding-left: 12px;
+    padding-right: 6px;
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+}
+
+.unscheduled-course-item .fc-event-title,
+.fc-event-mirror.unscheduled-course-item .fc-event-title,
+.fc-unscheduled-drag-mirror-proxy .fc-event-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-align: left;
+}
+
+.fc-event-mirror.unscheduled-course-item,
+.fc-unscheduled-drag-mirror-proxy {
+    opacity: 0.92;
+}
+
 .fc .fc-timegrid-event.is-selected,
 .fc .fc-list-event.is-selected {
-    filter: brightness(0.85) !important;
+    filter: brightness(0.75) !important;
 }
+
 
 .fc .fc-timegrid-event .fc-event-main-frame {
     padding-left: 10px;

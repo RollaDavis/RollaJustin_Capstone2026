@@ -135,6 +135,58 @@ html.theme-dark .fc .fc-event-mirror {
     opacity: 0.92;
 }
 
+html.theme-dark .unscheduled-course-item,
+html.theme-dark .fc-event-mirror.unscheduled-course-item,
+html.theme-dark .fc-unscheduled-drag-mirror-proxy {
+    border-color: var(--event-opaque-color, #6c757d) !important;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.45);
+    background-image: linear-gradient(to right, var(--event-opaque-color, #6c757d) 0 6px, transparent 6px);
+    border-width: 1px;
+    border-style: solid;
+    border-radius: 0.35rem;
+    overflow: hidden;
+    filter: saturate(1.2) contrast(1.06);
+}
+
+html.theme-dark .unscheduled-course-item .fc-event-main-frame,
+html.theme-dark .fc-event-mirror.unscheduled-course-item .fc-event-main-frame,
+html.theme-dark .fc-unscheduled-drag-mirror-proxy .fc-event-main-frame {
+    padding-left: 10px;
+    text-align: left;
+}
+
+html.theme-dark .unscheduled-course-item .fc-event-main,
+html.theme-dark .fc-event-mirror.unscheduled-course-item .fc-event-main,
+html.theme-dark .fc-unscheduled-drag-mirror-proxy .fc-event-main {
+    transform: translateX(2px);
+}
+
+html.theme-dark .unscheduled-course-item .fc-event-time,
+html.theme-dark .fc-event-mirror.unscheduled-course-item .fc-event-time,
+html.theme-dark .fc-unscheduled-drag-mirror-proxy .fc-event-time {
+    font-size: 0.72rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    opacity: 0.95;
+    text-align: left;
+    display: inline-block;
+    border-bottom: 1px solid currentColor;
+    margin-left: -12px;
+    padding-left: 12px;
+    padding-right: 6px;
+    padding-bottom: 2px;
+    margin-bottom: 2px;
+}
+
+html.theme-dark .unscheduled-course-item .fc-event-title,
+html.theme-dark .fc-event-mirror.unscheduled-course-item .fc-event-title,
+html.theme-dark .fc-unscheduled-drag-mirror-proxy .fc-event-title {
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    text-align: left;
+}
+
 html.theme-dark .fc .fc-highlight {
     background-color: rgba(255, 90, 82, 0.28) !important;
 }
@@ -148,6 +200,27 @@ html.theme-dark .fc .fc-timegrid-event {
 
 html.theme-dark .fc .fc-timegrid-event.is-selected,
 html.theme-dark .fc .fc-list-event.is-selected {
+    filter: brightness(0.95) saturate(1.2) contrast(1.06) !important;
+}
+
+html.theme-dark .fc .fc-timegrid-event.is-selected:hover,
+html.theme-dark .fc .fc-timegrid-event.is-selected:active,
+html.theme-dark .fc .fc-timegrid-event.is-selected:focus,
+html.theme-dark .fc .fc-timegrid-event.is-selected:focus-visible,
+html.theme-dark .fc .fc-timegrid-event.fc-event-selected,
+html.theme-dark .fc .fc-timegrid-event.fc-event-selected:hover,
+html.theme-dark .fc .fc-timegrid-event.fc-event-selected:active,
+html.theme-dark .fc .fc-timegrid-event.fc-event-selected:focus,
+html.theme-dark .fc .fc-timegrid-event.fc-event-selected:focus-visible,
+html.theme-dark .fc .fc-list-event.is-selected:hover,
+html.theme-dark .fc .fc-list-event.is-selected:active,
+html.theme-dark .fc .fc-list-event.is-selected:focus,
+html.theme-dark .fc .fc-list-event.is-selected:focus-visible,
+html.theme-dark .fc .fc-list-event.fc-event-selected,
+html.theme-dark .fc .fc-list-event.fc-event-selected:hover,
+html.theme-dark .fc .fc-list-event.fc-event-selected:active,
+html.theme-dark .fc .fc-list-event.fc-event-selected:focus,
+html.theme-dark .fc .fc-list-event.fc-event-selected:focus-visible {
     filter: brightness(0.95) saturate(1.2) contrast(1.06) !important;
 }
 

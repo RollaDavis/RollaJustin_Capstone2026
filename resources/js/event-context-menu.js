@@ -45,9 +45,9 @@ const runMenuAction = (action, payload = {}) => {
     }
 
     if (action === 'unschedule') {
-        // document.dispatchEvent(new CustomEvent('schedule:move-event-to-unscheduled', {
-        //     detail: { eventId }
-        // }));
+        document.dispatchEvent(new CustomEvent('schedule:move-event-to-unscheduled', {
+            detail: { eventId }
+        }));
     }
 };
 
@@ -114,39 +114,6 @@ const createMenu = (target, payload, x, y) => {
 
 const onCalendarContextMenu = (event) => {
     if (!calendarElRef) {
-        return;
-    }
-
-    const selectionMirrorEl = event.target instanceof Element
-        ? event.target.closest('.fc-event-mirror, .fc-highlight')
-        : null;
-
-    if (selectionMirrorEl && calendarElRef.contains(selectionMirrorEl)) {
-        const now = Date.now();
-        const selectionTargetKey = MENU_TARGET_SELECTION;
-        const isSecondRightClickOnSelection =
-            menuEl !== null
-            && activeTargetKey === selectionTargetKey
-            && lastContextMenuState.targetKey === selectionTargetKey
-            && (now - lastContextMenuState.timestamp) <= NATIVE_MENU_DOUBLE_CLICK_WINDOW_MS;
-
-        if (isSecondRightClickOnSelection) {
-            closeMenu();
-            lastContextMenuState = {
-                targetKey: null,
-                timestamp: 0
-            };
-            return;
-        }
-
-        event.preventDefault();
-        closeMenu();
-        menuEl = createMenu(MENU_TARGET_SELECTION, {}, event.clientX, event.clientY);
-        activeTargetKey = selectionTargetKey;
-        lastContextMenuState = {
-            targetKey: selectionTargetKey,
-            timestamp: now
-        };
         return;
     }
 
