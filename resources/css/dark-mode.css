@@ -267,3 +267,51 @@ html.theme-dark .fc .fc-timegrid-event .fc-event-title {
 html.theme-dark .fc .fc-event-mirror .fc-timegrid-more-link {
     display: none !important;
 }
+
+html.theme-dark .event-details-header {
+    border-bottom: 1px solid #2f3845;
+    background: linear-gradient(140deg, #1e252f 0%, #1b222c 100%);
+}
+
+html.theme-dark .event-details-title {
+    color: #eef3fb;
+}
+
+html.theme-dark .event-details-subtitle {
+    color: #9bacbf;
+}
+
+html.theme-dark .event-details-hero {
+    border-color: #334052;
+    background: linear-gradient(145deg, #1f2732 0%, #1a212b 100%);
+}
+
+html.theme-dark .event-details-eyebrow {
+    color: #89a4c8;
+}
+
+html.theme-dark .event-details-course {
+    color: #f0f5fc;
+}
+
+html.theme-dark .event-details-meta {
+    color: #a7b8cd;
+}
+
+html.theme-dark .event-details-badge {
+    background-color: #2a3f63;
+    color: #cfe2ff;
+}
+
+html.theme-dark .event-details-card {
+    border-color: #334052;
+    background-color: #1c232d;
+}
+
+html.theme-dark .event-details-label {
+    color: #92a7c3;
+}
+
+html.theme-dark .event-details-value {
+    color: #e7eef8;
+}

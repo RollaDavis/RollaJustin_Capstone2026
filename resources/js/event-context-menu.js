@@ -117,6 +117,43 @@ const onCalendarContextMenu = (event) => {
         return;
     }
 
+    const highlightEl = event.target instanceof Element
+        ? event.target.closest('.fc-highlight')
+        : null;
+
+    if (highlightEl && calendarElRef.contains(highlightEl)) {
+        const selection = calendarRef?.getSelection?.() || null;
+        const targetKey = selection
+            ? `selection:${selection.startStr || ''}:${selection.endStr || ''}`
+            : MENU_TARGET_SELECTION;
+        const now = Date.now();
+        const isSecondRightClickOnSameSelection =
+            menuEl !== null
+            && activeTargetKey === targetKey
+            && lastContextMenuState.targetKey === targetKey
+            && (now - lastContextMenuState.timestamp) <= NATIVE_MENU_DOUBLE_CLICK_WINDOW_MS;
+
+        if (isSecondRightClickOnSameSelection) {
+            closeMenu();
+            lastContextMenuState = {
+                targetKey: null,
+                timestamp: 0
+            };
+            return;
+        }
+
+        event.preventDefault();
+
+        closeMenu();
+        menuEl = createMenu(MENU_TARGET_SELECTION, { selection }, event.clientX, event.clientY);
+        activeTargetKey = targetKey;
+        lastContextMenuState = {
+            targetKey,
+            timestamp: now
+        };
+        return;
+    }
+
     const eventEl = event.target instanceof Element
         ? event.target.closest('.fc-event')
         : null;

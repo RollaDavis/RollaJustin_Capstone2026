@@ -1,20 +1,11 @@
 import { Calendar } from '@fullcalendar/core';
+import interactionPlugin from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
-import { Modal } from 'bootstrap';
 import { buildCalendarEventsFromCourses } from './calendarEvents';
 import { initializeUnscheduledCourseDnd } from './unscheduled-course-dnd';
-
-const showEventDetailsModal = () => {
-    const modalEl = document.getElementById('eventDetailsModal');
-
-    if (!modalEl) {
-        return;
-    }
-
-    Modal.getOrCreateInstance(modalEl).show();
-};
+import { showEventDetailsModal } from './event-details-modal';
 
 const formatDurationLabel = (durationHours) => {
     if (!Number.isFinite(durationHours) || durationHours <= 0) {
@@ -90,7 +81,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let unscheduledCourseDnd = null;
 
     const calendar = new Calendar(calendarEl, {
-        plugins: [dayGridPlugin, timeGridPlugin, listPlugin],
+        plugins: [interactionPlugin, dayGridPlugin, timeGridPlugin, listPlugin],
         initialView: 'timeGridWeek',
         allDaySlot: false,
         slotMinTime: '08:00:00',
@@ -98,11 +89,11 @@ document.addEventListener('DOMContentLoaded', () => {
         slotDuration: '00:10:00',
         snapDuration: '00:10:00',
         themeSystem: 'bootstrap5',
-        editable: false,
+        editable: true,
         eventStartEditable: false,
         eventDurationEditable: false,
         selectable: true,
-        selectMirror: true,
+        selectMirror: false,
         eventMaxStack: 1,
         moreLinkClick: "popover",
         dayHeaderFormat: { weekday: 'short' },
@@ -158,8 +149,8 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSelectedCourses(event.detail || {});
     });
 
-    document.addEventListener('schedule:open-event-details', () => {
-        showEventDetailsModal();
+    document.addEventListener('schedule:open-event-details', (event) => {
+        showEventDetailsModal(event.detail || {}, calendar);
     });
 
     document.addEventListener('schedule:move-event-to-unscheduled', (event) => {
