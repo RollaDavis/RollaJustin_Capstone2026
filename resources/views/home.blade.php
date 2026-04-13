@@ -34,7 +34,7 @@
                 <div class="modal-header event-details-header">
                     <div class="event-details-title-wrap">
                         <h5 class="modal-title event-details-title" id="eventDetailsModalLabel">Course Details</h5>
-                        <p class="event-details-subtitle mb-0">Schedule and section overview</p>
+                        <p class="event-details-subtitle mb-0">Course and Section overview</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>

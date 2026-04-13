@@ -21,6 +21,7 @@ class AssignmentResource extends JsonResource
                 'course_name' => $this->section->course->name,
                 'days' => $this->timeslot->days,
                 'room_name' => $this->room->name,
+                'instructor_name' => $this->instructor->name,
                 'start_time' => $this->timeslot->start_time,
                 'duration' => $this->timeslot->duration,
             ]
