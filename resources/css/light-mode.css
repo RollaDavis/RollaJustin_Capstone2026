@@ -218,3 +218,111 @@
 .fc .fc-event-mirror .fc-timegrid-more-link {
     display: none !important;
 }
+
+.event-details-modal {
+    border-radius: 1rem;
+    overflow: hidden;
+}
+
+.event-details-header {
+    border-bottom: 1px solid #e7edf5;
+    padding: 1rem 1.25rem;
+    background: linear-gradient(140deg, #f7fbff 0%, #edf3fb 100%);
+}
+
+.event-details-title {
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    color: #12223b;
+}
+
+.event-details-subtitle {
+    font-size: 0.85rem;
+    color: #5e708a;
+}
+
+.event-details-body {
+    padding: 1.25rem;
+}
+
+.event-details-hero {
+    border: 1px solid #dbe5f3;
+    border-radius: 0.85rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background: linear-gradient(145deg, #ffffff 0%, #f4f8ff 100%);
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.event-details-eyebrow {
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #587094;
+    font-weight: 700;
+}
+
+.event-details-course {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #12223b;
+}
+
+.event-details-meta {
+    font-size: 0.86rem;
+    color: #5a6a83;
+}
+
+.event-details-badge {
+    border-radius: 999px;
+    background-color: #dbe9ff;
+    color: #1f4d8f;
+    font-size: 0.74rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    padding: 0.35rem 0.65rem;
+    white-space: nowrap;
+}
+
+.event-details-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.event-details-card {
+    border: 1px solid #e2e9f4;
+    border-radius: 0.75rem;
+    padding: 0.8rem 0.9rem;
+    background-color: #ffffff;
+}
+
+.event-details-label {
+    margin-bottom: 0.25rem;
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    color: #687b97;
+    font-weight: 700;
+}
+
+.event-details-value {
+    margin: 0;
+    font-size: 0.95rem;
+    color: #1d2f4a;
+    font-weight: 600;
+}
+
+@media (max-width: 576px) {
+    .event-details-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .event-details-hero {
+        flex-direction: column;
+    }
+}
