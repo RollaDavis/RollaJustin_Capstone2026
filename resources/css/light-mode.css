@@ -227,7 +227,7 @@
 .event-details-header {
     border-bottom: 1px solid #e7edf5;
     padding: 1rem 1.25rem;
-    background: linear-gradient(140deg, #f7fbff 0%, #edf3fb 100%);
+    background: linear-gradient(140deg, #f7fbff 0%, #deedff 100%);
 }
 
 .event-details-title {
@@ -250,7 +250,7 @@
     border-radius: 0.85rem;
     padding: 1rem;
     margin-bottom: 1rem;
-    background: linear-gradient(145deg, #ffffff 0%, #f4f8ff 100%);
+    background: linear-gradient(145deg, #ffffff 0%, #eef4ff 100%);
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
@@ -310,6 +310,10 @@
     font-weight: 700;
 }
 
+.modal-header {
+    background: linear-gradient(140deg, #f7fbff 0%, #deedff 100%);
+}
+
 .event-details-value {
     margin: 0;
     font-size: 0.95rem;
@@ -317,7 +321,89 @@
     font-weight: 600;
 }
 
+.event-details-label-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 0.25rem;
+}
+
+.event-details-value-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.event-details-value-row .event-details-value {
+    min-width: 0;
+}
+
+.event-details-edit-btn {
+    line-height: 1;
+    padding: 0.2rem 0.45rem;
+    border: 0;
+    background: transparent;
+    color: #5a6a83;
+    box-shadow: none;
+}
+
+.event-details-edit-btn:hover,
+.event-details-edit-btn:focus,
+.event-details-edit-btn:focus-visible,
+.event-details-edit-btn:active {
+    border: 0;
+    background-color: #eef3ff;
+    color: #1f4d8f;
+    box-shadow: none;
+}
+
+.event-details-selection-list {
+    max-height: 20rem;
+    overflow-y: auto;
+}
+
+.event-details-selector-modal .modal-dialog {
+    width: 32rem;
+    max-width: 32rem;
+}
+
+.event-details-selector-modal {
+    z-index: 1070;
+}
+
+#eventDetailsModal.event-details-modal-behind-selector {
+    z-index: 1040;
+}
+
+.event-details-selector-modal .modal-content {
+    height: 32rem;
+}
+
+.event-details-selector-modal .modal-body {
+    padding: 0.8rem 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.event-details-selector-modal .event-details-selection-list {
+    flex: 1 1 auto;
+    min-height: 0;
+    max-height: none;
+}
+
 @media (max-width: 576px) {
+    .event-details-selector-modal .modal-dialog {
+        width: auto;
+        max-width: calc(100vw - 1rem);
+        margin: 0.5rem auto;
+    }
+
+    .event-details-selector-modal .modal-content {
+        height: 28rem;
+    }
+
     .event-details-grid {
         grid-template-columns: 1fr;
     }

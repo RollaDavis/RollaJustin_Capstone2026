@@ -34,7 +34,7 @@
                 <div class="modal-header event-details-header">
                     <div class="event-details-title-wrap">
                         <h5 class="modal-title event-details-title" id="eventDetailsModalLabel">Course Details</h5>
-                        <p class="event-details-subtitle mb-0">Course and Section overview</p>
+                        <p class="event-details-subtitle mb-0">Course Detail Overview</p>
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -45,17 +45,30 @@
                             <h4 class="event-details-course mb-1" id="eventDetailsCourse">No course selected</h4>
                             <p class="event-details-meta mb-0" id="eventDetailsMeta">Right-click an event and choose Course Details.</p>
                         </div>
-                        <span class="event-details-badge">Details</span>
                     </div>
 
                     <div class="event-details-grid">
                         <div class="event-details-card">
-                            <p class="event-details-label">Instructor</p>
-                            <p class="event-details-value" id="eventDetailsInstructor">Not available</p>
+                            <p class="event-details-label mb-1">Instructor</p>
+                            <div class="event-details-value-row">
+                                <p class="event-details-value mb-0" id="eventDetailsInstructorValue">Not available</p>
+                                <button id="eventDetailsInstructorEditButton" type="button"
+                                    class="btn btn-sm event-details-edit-btn"
+                                    aria-label="Edit instructor" title="Edit instructor">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="event-details-card">
-                            <p class="event-details-label">Location</p>
-                            <p class="event-details-value" id="eventDetailsLocation">Not available</p>
+                            <p class="event-details-label mb-1">Room</p>
+                            <div class="event-details-value-row">
+                                <p class="event-details-value mb-0" id="eventDetailsLocationValue">Not available</p>
+                                <button id="eventDetailsLocationEditButton" type="button"
+                                    class="btn btn-sm event-details-edit-btn"
+                                    aria-label="Edit room" title="Edit room">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
                         </div>
                         <div class="event-details-card">
                             <p class="event-details-label">Days</p>
@@ -66,6 +79,40 @@
                             <p class="event-details-value" id="eventDetailsTime">Not available</p>
                         </div>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade event-details-selector-modal" id="eventDetailsInstructorSelectModal" tabindex="-1"
+        aria-labelledby="eventDetailsInstructorSelectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventDetailsInstructorSelectModalLabel">Select Instructor</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="eventDetailsInstructorSearch" type="search" class="form-control form-control-sm mb-2"
+                        placeholder="Search instructors" aria-label="Search instructors">
+                    <div id="eventDetailsInstructorList" class="list-group event-details-selection-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade event-details-selector-modal" id="eventDetailsLocationSelectModal" tabindex="-1"
+        aria-labelledby="eventDetailsLocationSelectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventDetailsLocationSelectModalLabel">Select Room</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <input id="eventDetailsLocationSearch" type="search" class="form-control form-control-sm mb-2"
+                        placeholder="Search rooms" aria-label="Search rooms">
+                    <div id="eventDetailsLocationList" class="list-group event-details-selection-list"></div>
                 </div>
             </div>
         </div>

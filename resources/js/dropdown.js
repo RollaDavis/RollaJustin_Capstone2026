@@ -416,6 +416,14 @@ document.addEventListener('DOMContentLoaded', () => {
                             selectedTermId = term.id;
                             selectedTermName = term.name;
                             termDropdownButton.textContent = term.name;
+                            termDropdownButton.dataset.termId = String(term.id);
+
+                            document.dispatchEvent(new CustomEvent('schedule:term-selected', {
+                                detail: {
+                                    termId: term.id,
+                                    termName: term.name
+                                }
+                            }));
 
                             const selectedView = normalizeScheduleByValue(scheduleBySelect?.value || '');
 
