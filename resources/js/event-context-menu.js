@@ -3,11 +3,13 @@ const MENU_ITEM_CLASS = 'event-context-menu__item';
 const NATIVE_MENU_DOUBLE_CLICK_WINDOW_MS = 1200;
 const MENU_TARGET_EVENT = 'event';
 const MENU_TARGET_SELECTION = 'selection';
+const MENU_TARGET_BLOCKOFF = 'blockoff';
 
 let calendarRef = null;
 let calendarElRef = null;
 let menuEl = null;
 let activeTargetKey = null;
+let calendarSelectionRef = null;
 let lastContextMenuState = {
     targetKey: null,
     timestamp: 0
@@ -19,6 +21,36 @@ const getEventIdFromElement = (eventEl) => {
     }
 
     return eventEl.dataset.scheduleEventId || eventEl.getAttribute('data-event-id') || null;
+};
+
+const getBlockoffMetaFromElement = (eventEl) => {
+    if (!eventEl) {
+        return null;
+    }
+
+    const isBlockoff = String(eventEl.dataset.scheduleIsBlockoff || '').toLowerCase() === 'true';
+
+    if (!isBlockoff) {
+        return null;
+    }
+
+    const blockoffId = Number(eventEl.dataset.scheduleBlockoffId || '');
+    const targetId = Number(eventEl.dataset.scheduleBlockoffTargetId || '');
+    const blockoffType = String(eventEl.dataset.scheduleBlockoffType || '').trim();
+
+    if (!Number.isInteger(blockoffId) || blockoffId <= 0 || !Number.isInteger(targetId) || targetId <= 0) {
+        return null;
+    }
+
+    if (!['instructor', 'room'].includes(blockoffType)) {
+        return null;
+    }
+
+    return {
+        blockoffId,
+        targetId,
+        blockoffType
+    };
 };
 
 const closeMenu = () => {
@@ -41,12 +73,29 @@ const runMenuAction = (action, payload = {}) => {
     }
 
     if (action === 'create-blockoff') {
+        document.dispatchEvent(new CustomEvent('schedule:open-blockoff-creation', {
+            detail: {
+                selection: payload.selection || null,
+                clickedDate: payload.clickedDate || null
+            }
+        }));
         return;
     }
 
     if (action === 'unschedule') {
         document.dispatchEvent(new CustomEvent('schedule:move-event-to-unscheduled', {
             detail: { eventId }
+        }));
+        return;
+    }
+
+    if (action === 'remove-blockoff') {
+        document.dispatchEvent(new CustomEvent('schedule:remove-blockoff', {
+            detail: {
+                blockoffId: payload.blockoffId,
+                targetId: payload.targetId,
+                blockoffType: payload.blockoffType
+            }
         }));
     }
 };
@@ -77,6 +126,13 @@ const createMenu = (target, payload, x, y) => {
         createBlockoffButton.dataset.action = 'create-blockoff';
         createBlockoffButton.textContent = 'Create Blockoff';
         menu.append(createBlockoffButton);
+    } else if (target === MENU_TARGET_BLOCKOFF) {
+        const removeBlockoffButton = document.createElement('button');
+        removeBlockoffButton.type = 'button';
+        removeBlockoffButton.className = MENU_ITEM_CLASS;
+        removeBlockoffButton.dataset.action = 'remove-blockoff';
+        removeBlockoffButton.textContent = 'Remove Blockoff';
+        menu.append(removeBlockoffButton);
     } else {
         const detailsButton = document.createElement('button');
         detailsButton.type = 'button';
@@ -117,12 +173,48 @@ const onCalendarContextMenu = (event) => {
         return;
     }
 
+    const clickedEventEl = event.target instanceof Element
+        ? event.target.closest('[data-schedule-event-id], .fc-event')
+        : null;
+    const blockoffMeta = getBlockoffMetaFromElement(clickedEventEl);
+
+    if (clickedEventEl && blockoffMeta && calendarElRef.contains(clickedEventEl)) {
+        const blockoffKey = `blockoff:${blockoffMeta.blockoffType}:${blockoffMeta.targetId}:${blockoffMeta.blockoffId}`;
+        const now = Date.now();
+        const isSecondRightClickOnSameBlockoff =
+            menuEl !== null
+            && activeTargetKey === blockoffKey
+            && lastContextMenuState.targetKey === blockoffKey
+            && (now - lastContextMenuState.timestamp) <= NATIVE_MENU_DOUBLE_CLICK_WINDOW_MS;
+
+        if (isSecondRightClickOnSameBlockoff) {
+            closeMenu();
+            lastContextMenuState = {
+                targetKey: null,
+                timestamp: 0
+            };
+            return;
+        }
+
+        event.preventDefault();
+
+        closeMenu();
+        menuEl = createMenu(MENU_TARGET_BLOCKOFF, blockoffMeta, event.clientX, event.clientY);
+        activeTargetKey = blockoffKey;
+        lastContextMenuState = {
+            targetKey: blockoffKey,
+            timestamp: now
+        };
+        return;
+    }
+
     const highlightEl = event.target instanceof Element
         ? event.target.closest('.fc-highlight')
         : null;
 
     if (highlightEl && calendarElRef.contains(highlightEl)) {
-        const selection = calendarRef?.getSelection?.() || null;
+        const selection = calendarSelectionRef;
+        const clickedDate = highlightEl.closest('.fc-timegrid-col, .fc-daygrid-day')?.getAttribute('data-date') || null;
         const targetKey = selection
             ? `selection:${selection.startStr || ''}:${selection.endStr || ''}`
             : MENU_TARGET_SELECTION;
@@ -145,7 +237,7 @@ const onCalendarContextMenu = (event) => {
         event.preventDefault();
 
         closeMenu();
-        menuEl = createMenu(MENU_TARGET_SELECTION, { selection }, event.clientX, event.clientY);
+        menuEl = createMenu(MENU_TARGET_SELECTION, { selection, clickedDate }, event.clientX, event.clientY);
         activeTargetKey = targetKey;
         lastContextMenuState = {
             targetKey,
@@ -154,9 +246,7 @@ const onCalendarContextMenu = (event) => {
         return;
     }
 
-    const eventEl = event.target instanceof Element
-        ? event.target.closest('.fc-event')
-        : null;
+    const eventEl = clickedEventEl;
 
     if (!eventEl || !calendarElRef.contains(eventEl)) {
         closeMenu();
@@ -222,10 +312,20 @@ const initializeContextMenu = () => {
 
     calendarElRef.addEventListener('mousedown', (event) => {
         const eventEl = event.target instanceof Element
-            ? event.target.closest('.fc-event')
+            ? event.target.closest('[data-schedule-event-id], .fc-event')
             : null;
+        const highlightEl = event.target instanceof Element
+            ? event.target.closest('.fc-highlight')
+            : null;
+        const blockoffMeta = getBlockoffMetaFromElement(eventEl);
 
-        if (event.button === 2 && eventEl && calendarElRef.contains(eventEl)) {
+        if (event.button === 0 && eventEl && blockoffMeta && calendarElRef.contains(eventEl)) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+        }
+
+        if (event.button === 2 && ((eventEl && calendarElRef.contains(eventEl)) || (highlightEl && calendarElRef.contains(highlightEl)))) {
             event.preventDefault();
             event.stopPropagation();
         }
@@ -246,6 +346,11 @@ document.addEventListener('schedule:calendar-ready', (event) => {
     initializeContextMenu();
 });
 
+document.addEventListener('schedule:selection-changed', (event) => {
+    calendarSelectionRef = event.detail?.selection || null;
+});
+
 document.addEventListener('schedule:courses-selected', () => {
+    calendarSelectionRef = null;
     closeMenu();
 });
