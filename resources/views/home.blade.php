@@ -117,4 +117,77 @@
             </div>
         </div>
     </div>
+
+    <div class="modal fade" id="blockoffCreationModal" tabindex="-1" aria-labelledby="blockoffCreationModalLabel"
+        aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow blockoff-creation-modal">
+                <div class="modal-header blockoff-creation-header">
+                    <div>
+                        <h5 class="modal-title blockoff-creation-title" id="blockoffCreationModalLabel">Create Blockoff</h5>
+                        <p class="blockoff-creation-subtitle mb-0">Block availability for the selected schedule target</p>
+                    </div>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <form id="blockoffCreationForm" class="modal-body blockoff-creation-body">
+                    <div id="blockoffCreationFormBody">
+                        <div class="blockoff-creation-target mb-3">
+                            <p class="blockoff-creation-target-label mb-1">Current Target</p>
+                            <p class="mb-0 fw-semibold" id="blockoffCreationTargetSummary">No target selected</p>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label blockoff-creation-label">Days</label>
+                            <div class="blockoff-days-grid">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="M" id="blockoffDayM"
+                                        name="blockoffDays">
+                                    <label class="form-check-label" for="blockoffDayM">Mon</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="T" id="blockoffDayT"
+                                        name="blockoffDays">
+                                    <label class="form-check-label" for="blockoffDayT">Tue</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="W" id="blockoffDayW"
+                                        name="blockoffDays">
+                                    <label class="form-check-label" for="blockoffDayW">Wed</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="R" id="blockoffDayR"
+                                        name="blockoffDays">
+                                    <label class="form-check-label" for="blockoffDayR">Thu</label>
+                                </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="F" id="blockoffDayF"
+                                        name="blockoffDays">
+                                    <label class="form-check-label" for="blockoffDayF">Fri</label>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="row g-2 mb-3">
+                            <div class="col-6">
+                                <label for="blockoffStartTime" class="form-label blockoff-creation-label">Start Time</label>
+                                <input id="blockoffStartTime" type="time" class="form-control" step="300" required>
+                            </div>
+                            <div class="col-6">
+                                <label for="blockoffEndTime" class="form-label blockoff-creation-label">End Time</label>
+                                <input id="blockoffEndTime" type="time" class="form-control" step="300" required>
+                            </div>
+                        </div>
+
+                        <div id="blockoffCreationError" class="alert alert-danger py-2 px-3 d-none" role="alert"></div>
+                        <div id="blockoffCreationSuccess" class="alert alert-success py-2 px-3 d-none" role="status"></div>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-2">
+                        <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                        <button type="submit" id="blockoffCreateSubmit" class="btn btn-primary">Create Blockoff</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
 @endsection

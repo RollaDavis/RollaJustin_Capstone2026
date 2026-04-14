@@ -257,6 +257,39 @@ html.theme-dark .fc .fc-timegrid-event .fc-event-time {
     margin-bottom: 2px;
 }
 
+html.theme-dark .blockoff-creation-header {
+    border-color: #2f3640;
+    background: linear-gradient(145deg, #232c37 0%, #1f2731 100%);
+}
+
+html.theme-dark .blockoff-creation-title {
+    color: #f1f5fb;
+}
+
+html.theme-dark .blockoff-creation-subtitle {
+    color: #a2b2c4;
+}
+
+html.theme-dark .blockoff-creation-target {
+    background: linear-gradient(145deg, #1f2630 0%, #1a212b 100%);
+    border-color: #3a4554;
+    color: #e7ecf3;
+}
+
+html.theme-dark .blockoff-creation-target-label,
+html.theme-dark .blockoff-creation-label {
+    color: #9cadc0;
+}
+
+html.theme-dark .blockoff-days-grid {
+    background-color: #1a1f26;
+    border-color: #3a4554;
+}
+
+html.theme-dark .blockoff-days-grid .form-check-label {
+    color: #e7ecf3;
+}
+
 html.theme-dark .fc .fc-timegrid-event .fc-event-title {
     font-size: 0.8rem;
     font-weight: 700;
