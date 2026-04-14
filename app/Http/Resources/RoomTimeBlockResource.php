@@ -14,6 +14,15 @@ class RoomTimeBlockResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'type' => 'room_time_blocks',
+            'id' => $this->id,
+            'attributes' => [
+                'room_id' => $this->room->id,
+                'days' => $this->days,
+                'start_time' => $this->start_time,
+                'duration' => $this->duration,
+            ]
+        ];
     }
 }
