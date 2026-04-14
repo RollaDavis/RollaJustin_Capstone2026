@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('instructor__time__blocks', function (Blueprint $table) {
             $table->id();
             $table->foreignId('instructor_id')->constrained()->onDelete('cascade');
+            $table->string('note')->nullable();
             $table->string('days', 5);
             $table->time('start_time');
             $table->integer('duration')->comment('Duration in hours');

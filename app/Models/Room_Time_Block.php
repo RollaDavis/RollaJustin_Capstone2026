@@ -11,7 +11,7 @@ class Room_Time_Block extends Model
     /** @use HasFactory<\Database\Factories\RoomTimeBlockFactory> */
     use HasFactory;
 
-    protected $fillable = ['room_id', 'days', 'start_time', 'duration'];
+    protected $fillable = ['room_id', 'note', 'days', 'start_time', 'duration'];
 
     public function room(): BelongsTo
     {

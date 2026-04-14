@@ -25,10 +25,11 @@ class UpdateRoom_Time_BlockRequest extends FormRequest
         return [
             'data' => ['required', 'array', 'required_array_keys:type,attributes'],
             'data.type' => ['required', 'in:room_time_blocks'],
-            'data.attributes' => ['required', 'array:room_id,days,start_time,duration', 'min:1'],
+            'data.attributes' => ['required', 'array:room_id,note,days,start_time,duration', 'min:1'],
             'data.id' => ['sometimes', 'integer'],
 
             'data.attributes.room_id' => ['sometimes', 'exists:rooms,id'],
+            'data.attributes.note' => ['sometimes', 'string', 'max:255'],
             'data.attributes.days' => ['sometimes', 'string', 'regex:/^[MTWRF]+$/'],
             'data.attributes.start_time' => ['sometimes', 'date_format:H:i'],
             'data.attributes.duration' => ['sometimes', 'decimal:2', 'gt:0'],
