@@ -25,7 +25,7 @@ class StoreInstructor_Time_BlockRequest extends FormRequest
         return [
             'data' => ['required', 'array', 'required_array_keys:type,attributes'],
             'data.type' => ['required', 'in:instructor_time_blocks'],
-            'data.attributes' => ['required', 'array', 'required_array_keys:instructor_id,note,days,start_time,duration'],
+            'data.attributes' => ['required', 'array', 'required_array_keys:instructor_id,days,start_time,duration'],
             'data.id' => ['sometimes', 'integer'],
 
             'data.attributes.instructor_id' => ['required', 'exists:instructors,id'],

@@ -25,7 +25,7 @@ class StoreRoom_Time_BlockRequest extends FormRequest
         return [
             'data' => ['required', 'array', 'required_array_keys:type,attributes'],
             'data.type' => ['required', 'in:room_time_blocks'],
-            'data.attributes' => ['required', 'array', 'required_array_keys:room_id,note,days,start_time,duration'],
+            'data.attributes' => ['required', 'array', 'required_array_keys:room_id,days,start_time,duration'],
             'data.id' => ['sometimes', 'integer'],
 
             'data.attributes.room_id' => ['required', 'exists:rooms,id'],
