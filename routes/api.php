@@ -11,6 +11,7 @@ use App\Http\Controllers\InstructorController;
 use App\Http\Controllers\InstructorTimeBlockController;
 use App\Http\Controllers\RoomController;
 use App\Http\Controllers\RoomTimeBlockController;
+use App\Http\Controllers\AssignmentLogController;
 
 Route::prefix('v1')->group(function () {
     // INSTRUCTORS
@@ -40,4 +41,10 @@ Route::prefix('v1')->group(function () {
 
     // TERMS
     Route::apiResource('terms', TermController::class);
+
+    // ASSIGNMENTS
+    Route::apiResource('terms/{term}/assignments', AssignmentController::class);
+    Route::get('terms/{term}/assignments/{assignment}/options', [AssignmentController::class, 'showAssignmentOptions']);
+    Route::get('terms/{term}/assignments/{assignment}/conflicts', [AssignmentController::class, 'showAssignmentConflicts']);
+    Route::apiResource('terms/{term}/assignments/{assignment}/logs', AssignmentLogController::class);
 });
