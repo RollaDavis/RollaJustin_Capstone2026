@@ -315,3 +315,32 @@ html.theme-dark .event-details-label {
 html.theme-dark .event-details-value {
     color: #e7eef8;
 }
+
+html.theme-dark .event-details-edit-btn {
+    border: 0;
+    background: transparent;
+    color: #b2c4dc;
+    box-shadow: none;
+}
+
+html.theme-dark .event-details-edit-btn:hover,
+html.theme-dark .event-details-edit-btn:focus,
+html.theme-dark .event-details-edit-btn:focus-visible,
+html.theme-dark .event-details-edit-btn:active {
+    border: 0;
+    background-color: #253142;
+    color: #eaf2ff;
+    box-shadow: none;
+}
+
+html.theme-dark .event-details-selector-modal .list-group-item {
+    background-color: #1c232d;
+    color: #e7eef8;
+    border-color: #334052;
+}
+
+html.theme-dark .event-details-selector-modal .list-group-item:hover,
+html.theme-dark .event-details-selector-modal .list-group-item:focus {
+    background-color: #253142;
+    color: #f5f9ff;
+}
