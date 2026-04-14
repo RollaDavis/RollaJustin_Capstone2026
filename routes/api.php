@@ -7,7 +7,10 @@ use Illuminate\Support\Facades\Route;
 use App\Models\Instructor;
 use App\Http\Controllers\TermController;
 use App\Http\Controllers\AssignmentController;
-
+use App\Http\Controllers\InstructorController;
+use App\Http\Controllers\InstructorTimeBlockController;
+use App\Http\Controllers\RoomController;
+use App\Http\Controllers\RoomTimeBlockController;
 
 Route::prefix('v1')->group(function () {
     // INSTRUCTORS
@@ -16,6 +19,8 @@ Route::prefix('v1')->group(function () {
     });
     Route::get('terms/{term}/instructors', [AssignmentController::class, 'getTermInstructors']);
     Route::get('terms/{term}/instructors/{instructor}', [AssignmentController::class, 'getAssignmentsForInstructor']);
+    Route::apiResource('instructors', InstructorController::class);
+    Route::apiResource('instructors/{instructor}/timeblocks', InstructorTimeBlockController::class);
 
     // ROOMS
     Route::get('/rooms', function(Request $request) {
@@ -23,6 +28,8 @@ Route::prefix('v1')->group(function () {
     });
     Route::get('terms/{term}/rooms', [AssignmentController::class, 'getTermRooms']);
     Route::get('terms/{term}/rooms/{room}', [AssignmentController::class, 'getAssignmentsForRoom']);
+    Route::apiResource('rooms', RoomController::class);
+    Route::apiResource('rooms/{room}/timeblocks', RoomTimeBlockController::class);
 
     // PROGRAMS
     Route::get('/programs', function(Request $request) {

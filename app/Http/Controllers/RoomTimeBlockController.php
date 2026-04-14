@@ -5,62 +5,52 @@ namespace App\Http\Controllers;
 use App\Models\Room_Time_Block;
 use App\Http\Requests\StoreRoom_Time_BlockRequest;
 use App\Http\Requests\UpdateRoom_Time_BlockRequest;
+use App\Http\Resources\RoomTimeBlockResource;
+use App\Models\Room;
 
 class RoomTimeBlockController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Room $room)
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return RoomTimeBlockResource::collection($room->roomTimeBlocks()->get());
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreRoom_Time_BlockRequest $request)
+    public function store(Room $room, StoreRoom_Time_BlockRequest $request)
     {
-        //
+        $roomTimeBlock = $room->roomTimeBlocks()->create($request->validated()['data']['attributes']);
+        return new RoomTimeBlockResource($roomTimeBlock);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(Room_Time_Block $room_Time_Block)
+    public function show(Room $room, Room_Time_Block $timeblock)
     {
-        //
+        return new RoomTimeBlockResource($timeblock);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Room_Time_Block $room_Time_Block)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateRoom_Time_BlockRequest $request, Room_Time_Block $room_Time_Block)
+    public function update(Room $room, Room_Time_Block $timeblock, UpdateRoom_Time_BlockRequest $request)
     {
-        //
+        $timeblock->update($request->validated()['data']['attributes']);
+        return new RoomTimeBlockResource($timeblock);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Room_Time_Block $room_Time_Block)
+    public function destroy(Room $room, Room_Time_Block $timeblock)
     {
-        //
+        $timeblock->delete();
+        return response()->noContent();
     }
 }

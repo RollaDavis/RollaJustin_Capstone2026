@@ -12,7 +12,7 @@ class UpdateInstructor_Time_BlockRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,15 @@ class UpdateInstructor_Time_BlockRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'data' => ['required', 'array', 'required_array_keys:type,attributes'],
+            'data.type' => ['required', 'in:instructor_time_blocks'],
+            'data.attributes' => ['required', 'array:instructor_id,days,start_time,duration', 'min:1'],
+            'data.id' => ['sometimes', 'integer'],
+
+            'data.attributes.instructor_id' => ['sometimes', 'exists:instructors,id'],
+            'data.attributes.days' => ['sometimes', 'string', 'regex:/^[MTWRF]+$/'],
+            'data.attributes.start_time' => ['sometimes', 'date_format:H:i'],
+            'data.attributes.duration' => ['sometimes', 'decimal:2', 'gt:0'],
         ];
     }
 }
