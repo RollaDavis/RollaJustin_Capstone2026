@@ -19,6 +19,7 @@ class RoomTimeBlockResource extends JsonResource
             'id' => $this->id,
             'attributes' => [
                 'room_id' => $this->room->id,
+                'note' => $this->note,
                 'days' => $this->days,
                 'start_time' => $this->start_time,
                 'duration' => $this->duration,

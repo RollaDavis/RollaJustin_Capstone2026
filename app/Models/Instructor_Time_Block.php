@@ -11,7 +11,7 @@ class Instructor_Time_Block extends Model
     /** @use HasFactory<\Database\Factories\InstructorTimeBlockFactory> */
     use HasFactory;
 
-    protected $fillable = ['instructor_id', 'days', 'start_time', 'duration'];
+    protected $fillable = ['instructor_id', 'note', 'days', 'start_time', 'duration'];
 
     public function instructor(): BelongsTo
     {

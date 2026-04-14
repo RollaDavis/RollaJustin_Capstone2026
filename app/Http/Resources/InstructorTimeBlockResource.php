@@ -19,6 +19,7 @@ class InstructorTimeBlockResource extends JsonResource
             'id' => $this->id,
             'attributes' => [
                 'instructor_id' => $this->instructor->id,
+                'note' => $this->note,
                 'days' => $this->days,
                 'start_time' => $this->start_time,
                 'duration' => $this->duration,
