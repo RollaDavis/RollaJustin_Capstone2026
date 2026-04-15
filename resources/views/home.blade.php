@@ -48,7 +48,7 @@
                     </div>
 
                     <div class="event-details-grid">
-                        <div class="event-details-card">
+                        <div class="event-details-card event-details-card--instructor">
                             <p class="event-details-label mb-1">Instructor</p>
                             <div class="event-details-value-row">
                                 <p class="event-details-value mb-0" id="eventDetailsInstructorValue">Not available</p>
@@ -59,7 +59,7 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="event-details-card">
+                        <div class="event-details-card event-details-card--room">
                             <p class="event-details-label mb-1">Room</p>
                             <div class="event-details-value-row">
                                 <p class="event-details-value mb-0" id="eventDetailsLocationValue">Not available</p>
@@ -70,11 +70,29 @@
                                 </button>
                             </div>
                         </div>
-                        <div class="event-details-card">
-                            <p class="event-details-label">Days</p>
-                            <p class="event-details-value" id="eventDetailsDays">Not available</p>
+                        <div class="event-details-card event-details-card--days">
+                            <p class="event-details-label mb-1">Days</p>
+                            <div class="event-details-value-row">
+                                <p class="event-details-value mb-0" id="eventDetailsDays">Not available</p>
+                                <button id="eventDetailsDaysEditButton" type="button"
+                                    class="btn btn-sm event-details-edit-btn"
+                                    aria-label="Edit days" title="Edit days">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
                         </div>
-                        <div class="event-details-card">
+                        <div class="event-details-card event-details-card--duration">
+                            <p class="event-details-label mb-1">Duration</p>
+                            <div class="event-details-value-row">
+                                <p class="event-details-value mb-0" id="eventDetailsDuration">Not available</p>
+                                <button id="eventDetailsDurationEditButton" type="button"
+                                    class="btn btn-sm event-details-edit-btn"
+                                    aria-label="Edit duration" title="Edit duration">
+                                    <i class="bi bi-pencil"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="event-details-card event-details-card--time">
                             <p class="event-details-label">Time</p>
                             <p class="event-details-value" id="eventDetailsTime">Not available</p>
                         </div>
@@ -113,6 +131,78 @@
                     <input id="eventDetailsLocationSearch" type="search" class="form-control form-control-sm mb-2"
                         placeholder="Search rooms" aria-label="Search rooms">
                     <div id="eventDetailsLocationList" class="list-group event-details-selection-list"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade event-details-selector-modal" id="eventDetailsDaysSelectModal" tabindex="-1"
+        aria-labelledby="eventDetailsDaysSelectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventDetailsDaysSelectModalLabel">Select Days</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="event-details-days-grid mb-3" id="eventDetailsDaysCheckboxGrid">
+                        <div class="event-details-day-option">
+                            <input class="event-details-day-input" type="checkbox" value="1" id="eventDetailsDayMon" name="eventDetailsDays">
+                            <label class="event-details-day-chip" for="eventDetailsDayMon">Mon</label>
+                        </div>
+                        <div class="event-details-day-option">
+                            <input class="event-details-day-input" type="checkbox" value="2" id="eventDetailsDayTue" name="eventDetailsDays">
+                            <label class="event-details-day-chip" for="eventDetailsDayTue">Tue</label>
+                        </div>
+                        <div class="event-details-day-option">
+                            <input class="event-details-day-input" type="checkbox" value="3" id="eventDetailsDayWed" name="eventDetailsDays">
+                            <label class="event-details-day-chip" for="eventDetailsDayWed">Wed</label>
+                        </div>
+                        <div class="event-details-day-option">
+                            <input class="event-details-day-input" type="checkbox" value="4" id="eventDetailsDayThu" name="eventDetailsDays">
+                            <label class="event-details-day-chip" for="eventDetailsDayThu">Thu</label>
+                        </div>
+                        <div class="event-details-day-option">
+                            <input class="event-details-day-input" type="checkbox" value="5" id="eventDetailsDayFri" name="eventDetailsDays">
+                            <label class="event-details-day-chip" for="eventDetailsDayFri">Fri</label>
+                        </div>
+                    </div>
+                    <p id="eventDetailsDaysValidation" class="small text-danger d-none mb-0">Select at least one day.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="eventDetailsDaysApplyButton">Apply Changes</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade event-details-selector-modal" id="eventDetailsDurationSelectModal" tabindex="-1"
+        aria-labelledby="eventDetailsDurationSelectModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventDetailsDurationSelectModalLabel">Edit Duration</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row g-2">
+                        <div class="col-6">
+                            <label for="eventDetailsDurationHoursInput" class="form-label mb-1">Hours</label>
+                            <input id="eventDetailsDurationHoursInput" type="number" min="0" max="12" step="1" class="form-control"
+                                placeholder="0">
+                        </div>
+                        <div class="col-6">
+                            <label for="eventDetailsDurationMinutesInput" class="form-label mb-1">Minutes</label>
+                            <input id="eventDetailsDurationMinutesInput" type="number" min="0" max="55" step="5" class="form-control"
+                                placeholder="0">
+                        </div>
+                    </div>
+                    <p id="eventDetailsDurationValidation" class="small text-danger d-none mt-2 mb-0">Enter a valid duration greater than 0 in 5-minute increments.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="eventDetailsDurationApplyButton">Apply Changes</button>
                 </div>
             </div>
         </div>

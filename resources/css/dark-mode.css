@@ -377,3 +377,30 @@ html.theme-dark .event-details-selector-modal .list-group-item:focus {
     background-color: #253142;
     color: #f5f9ff;
 }
+
+html.theme-dark .event-details-days-grid {
+    background: linear-gradient(155deg, #1b2129 0%, #181e27 100%);
+    border-color: #3a4554;
+}
+
+html.theme-dark .event-details-day-chip {
+    border-color: #465466;
+    background-color: #1f2731;
+    color: #e8eef7;
+}
+
+html.theme-dark .event-details-day-chip:hover {
+    border-color: #6a7f9f;
+    background-color: #263242;
+}
+
+html.theme-dark .event-details-day-input:focus-visible + .event-details-day-chip {
+    outline-color: #7ea4de;
+}
+
+html.theme-dark .event-details-day-input:checked + .event-details-day-chip {
+    border-color: #5a9cf5;
+    background: linear-gradient(155deg, #3f7fd9 0%, #2f61b3 100%);
+    color: #f7fbff;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+}
