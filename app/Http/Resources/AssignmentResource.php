@@ -24,6 +24,32 @@ class AssignmentResource extends JsonResource
                 'instructor_name' => $this->instructor->name,
                 'start_time' => $this->timeslot->start_time,
                 'duration' => $this->timeslot->duration,
+            ],
+            'relationships' => [
+                'section' => [
+                    'data' => [
+                        'type' => 'sections',
+                        'id' => $this->section->id,
+                    ]
+                ],
+                'room' => [
+                    'data' => [
+                        'type' => 'rooms',
+                        'id' => $this->room->id,
+                    ]
+                ],
+                'instructor' => [
+                    'data' => [
+                        'type' => 'instructors',
+                        'id' => $this->instructor->id,
+                    ]
+                ],
+                'timeslot' => [
+                    'data' => [
+                        'type' => 'timeslots',
+                        'id' => $this->timeslot->id,
+                    ]
+                ]
             ]
         ];
     }
