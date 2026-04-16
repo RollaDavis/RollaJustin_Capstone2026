@@ -12,6 +12,14 @@ class Timeslot extends Model
     /** @use HasFactory<\Database\Factories\TimeslotFactory> */
     use HasFactory;
 
+    protected $fillable = [
+        'timeslot_id',
+        'days',
+        'start_time',
+        'duration',
+        'location_id',
+    ];
+
     public function assignments(): HasMany
     {
         return $this->hasMany(Assignment::class);

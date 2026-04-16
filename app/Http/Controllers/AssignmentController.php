@@ -14,6 +14,7 @@ use App\Models\Program;
 use App\Models\ProgramAssignment;
 use App\Models\Room;
 use App\Models\Term;
+use App\Models\Timeslot;
 
 class AssignmentController extends Controller
 {
@@ -141,5 +142,213 @@ class AssignmentController extends Controller
         }
 
         return AssignmentResource::collection($my_assignments);
+    }
+
+
+    public function checkAssignmentConflicts(Assignment $assignment)
+    {
+        $conflicts = [];
+        $hasConflict = false;
+
+        if ($this->checkInstructorConflict($assignment)) {
+            $conflicts[] = $assignment->instructor->name . ' has a scheduling conflict at this timeslot.';
+            $hasConflict = true;
+        }
+
+        if ($this->checkRoomConflict($assignment)) {
+            $conflicts[] = $assignment->room->name . ' has a scheduling conflict at this timeslot.';
+            $hasConflict = true;
+        }
+
+        if ($this->checkTermProgramConflicts($assignment)['all_program_years_have_valid_schedule'] === false) {
+            foreach ($this->checkTermProgramConflicts($assignment)['invalid_program_years'] as $invalidProgramYear) {
+                $conflicts[] = 'Program ' . $invalidProgramYear['program_name'] . ' Year ' . $invalidProgramYear['year'] . ' does not have a valid schedule with this assignment.';
+                $hasConflict = true;
+            }
+        }
+
+        return ['has_conflict' => $hasConflict, 'conflicts' => $conflicts];
+    }
+
+    public function checkInstructorConflict(Assignment $assignment)
+    {
+        $conflict = false;
+
+        $assignments = Assignment::query()
+            ->with(['section.course', 'timeslot', 'room', 'instructor'])
+            ->where('term_id', $assignment->term_id)
+            ->where('instructor_id', $assignment->instructor_id)
+            ->get();
+
+            foreach ($assignments as $existingAssignment) {
+                if ($existingAssignment->id === $assignment->id) {
+                    continue; // Skip the same assignment
+                }
+
+                if ($this->timeslotsConflict($assignment->timeslot, $existingAssignment->timeslot)) {
+                    $conflict = true;
+                    break;
+                }
+            }
+        
+    
+            if ($this->checkInstructorTimeBlockConflict($assignment->timeslot, $assignment->instructor_id)) {
+                $conflict = true;
+            }
+
+            return $conflict;
+    }
+
+    public function checkRoomConflict(Assignment $assignment)
+    {
+        $conflict = false;
+
+        $assignments = Assignment::query()
+            ->with(['section.course', 'timeslot', 'room', 'instructor'])
+            ->where('term_id', $assignment->term_id)
+            ->where('room_id', $assignment->room_id)
+            ->get();
+
+            foreach ($assignments as $existingAssignment) {
+                if ($existingAssignment->id === $assignment->id) {
+                    continue; // Skip the same assignment
+                }
+
+                if ($this->timeslotsConflict($assignment->timeslot, $existingAssignment->timeslot)) {
+                    $conflict = true;
+                    break;
+                }
+            }
+        
+    
+            if ($this->checkRoomTimeBlockConflict($assignment->timeslot, $assignment->room_id)) {
+                $conflict = true;
+            }
+
+            return $conflict;
+    }
+
+    public function checkTermProgramConflicts(Assignment $assignment)
+    {
+        $course = $assignment->section->course;
+
+        $programYearCombinations = $course->programAssignments()
+            ->where('term_id', $assignment->term_id)
+            ->with('program')
+            ->get()
+            ->map(function ($programAssignment) {
+                return [
+                    'program_assignment_id' => $programAssignment->id,
+                    'program_id' => $programAssignment->program_id,
+                    'program_name' => $programAssignment->program->name,
+                    'year' => $programAssignment->year,
+                ];
+            })
+            ->values();
+
+        $programYearResults = $programYearCombinations->map(function (array $programYearCombination) use ($assignment) {
+            $programAssignments = ProgramAssignment::query()
+                ->where('term_id', $assignment->term_id)
+                ->where('program_id', $programYearCombination['program_id'])
+                ->where('year', $programYearCombination['year'])
+                ->with([
+                    'course.sections.assignments' => function ($query) use ($assignment) {
+                        $query->where('term_id', $assignment->term_id);
+                    },
+                    'course.sections.assignments.timeslot',
+                ])
+                ->orderBy('course_id')
+                ->get();
+
+            $courseSectionOptions = $programAssignments->map(function (ProgramAssignment $programAssignment) {
+                return [
+                    'program_assignment_id' => $programAssignment->id,
+                    'course_id' => $programAssignment->course_id,
+                    'course_name' => $programAssignment->course->name,
+                    'sections' => $programAssignment->course->sections->values(),
+                ];
+            })->values();
+
+            $hasValidSchedule = $courseSectionOptions->isNotEmpty()
+                && ! $courseSectionOptions->contains(function (array $option) {
+                    return $option['sections']->isEmpty();
+                })
+                && $this->hasValidProgramYearSectionPermutation($courseSectionOptions->all(), $assignment->term_id);
+
+            return [
+                'program_id' => $programYearCombination['program_id'],
+                'program_name' => $programYearCombination['program_name'],
+                'year' => $programYearCombination['year'],
+                'has_valid_schedule' => $hasValidSchedule,
+            ];
+        })->values();
+
+        $invalidProgramYears = $programYearResults
+            ->filter(function (array $result) {
+                return ! $result['has_valid_schedule'];
+            })
+            ->values();
+
+        return [
+            'all_program_years_have_valid_schedule' => $invalidProgramYears->isEmpty(),
+            'invalid_program_years' => $invalidProgramYears,
+            'program_year_results' => $programYearResults,
+        ];
+    }
+
+    private function hasValidProgramYearSectionPermutation(array $courseSectionOptions, int $termId, int $index = 0, array $chosenTimeslots = []): bool
+    {
+        if ($index === count($courseSectionOptions)) {
+            return true;
+        }
+
+        $courseOption = $courseSectionOptions[$index];
+
+        foreach ($courseOption['sections'] as $section) {
+            $sectionTimeslotsForTerm = $this->getSectionTimeslotsForTerm($section, $termId);
+
+            if ($this->timeslotsConflictWithChosenTimeslots($sectionTimeslotsForTerm, $chosenTimeslots)) {
+                continue;
+            }
+
+            if ($this->hasValidProgramYearSectionPermutation(
+                $courseSectionOptions,
+                $termId,
+                $index + 1,
+                array_merge($chosenTimeslots, $sectionTimeslotsForTerm)
+            )) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private function getSectionTimeslotsForTerm($section, int $termId): array
+    {
+        return $section->assignments
+            ->where('term_id', $termId)
+            ->pluck('timeslot')
+            ->filter()
+            ->values()
+            ->all();
+    }
+
+    private function timeslotsConflictWithChosenTimeslots(array $sectionTimeslots, array $chosenTimeslots): bool
+    {
+        foreach ($sectionTimeslots as $sectionTimeslot) {
+            foreach ($chosenTimeslots as $chosenTimeslot) {
+                if ($this->timeslotsConflict($sectionTimeslot, $chosenTimeslot)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    private function timeslotsConflict(Timeslot $timeslot1, Timeslot $timeslot2): bool
+    {
+        return app(TimeslotController::class)->checkConflict($timeslot1, $timeslot2);
     }
 }
