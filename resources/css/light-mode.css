@@ -290,8 +290,31 @@
 
 .event-details-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    grid-template-areas:
+        "instructor instructor instructor room room room"
+        "days days duration duration time time";
     gap: 0.75rem;
+}
+
+.event-details-card--instructor {
+    grid-area: instructor;
+}
+
+.event-details-card--room {
+    grid-area: room;
+}
+
+.event-details-card--days {
+    grid-area: days;
+}
+
+.event-details-card--duration {
+    grid-area: duration;
+}
+
+.event-details-card--time {
+    grid-area: time;
 }
 
 .event-details-card {
@@ -393,6 +416,101 @@
     max-height: none;
 }
 
+#eventDetailsDaysSelectModal .modal-dialog {
+    width: 24rem;
+    max-width: calc(100vw - 1rem);
+}
+
+#eventDetailsDurationSelectModal .modal-dialog {
+    width: 24rem;
+    max-width: calc(100vw - 1rem);
+}
+
+#eventDetailsDaysSelectModal .modal-content {
+    height: auto;
+}
+
+#eventDetailsDurationSelectModal .modal-content {
+    height: auto;
+}
+
+#eventDetailsDaysSelectModal .modal-body {
+    padding: 0.8rem 1rem 0.3rem;
+    display: block;
+}
+
+#eventDetailsDurationSelectModal .modal-body {
+    padding: 0.8rem 1rem 0.3rem;
+    display: block;
+}
+
+#eventDetailsDaysSelectModal .modal-footer {
+    border-top: 0;
+    padding: 0.55rem 1rem 0.95rem;
+}
+
+#eventDetailsDurationSelectModal .modal-footer {
+    border-top: 0;
+    padding: 0.55rem 1rem 0.95rem;
+}
+
+.event-details-days-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 0.6rem;
+    border: 1px solid #e2e9f4;
+    border-radius: 0.85rem;
+    padding: 0.8rem;
+    background: linear-gradient(155deg, #ffffff 0%, #f5f9ff 100%);
+}
+
+.event-details-day-option {
+    margin: 0;
+    min-height: 2.25rem;
+}
+
+.event-details-day-input {
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
+}
+
+.event-details-day-chip {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    min-height: 2.25rem;
+    margin: 0;
+    border: 1px solid #d7e3f6;
+    border-radius: 0.65rem;
+    background-color: #ffffff;
+    color: #1e3150;
+    font-size: 0.84rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    cursor: pointer;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.12s ease, box-shadow 0.2s ease;
+}
+
+.event-details-day-chip:hover {
+    border-color: #9fb8e0;
+    background-color: #f4f8ff;
+    transform: translateY(-1px);
+}
+
+.event-details-day-input:focus-visible + .event-details-day-chip {
+    outline: 2px solid #95b4e8;
+    outline-offset: 1px;
+}
+
+.event-details-day-input:checked + .event-details-day-chip {
+    border-color: #2f6ec7;
+    background: linear-gradient(155deg, #3e84e9 0%, #2f6ec7 100%);
+    color: #ffffff;
+    box-shadow: 0 4px 10px rgba(30, 74, 142, 0.3);
+}
+
 .blockoff-creation-modal {
     border-radius: 1rem;
     overflow: hidden;
@@ -468,8 +586,21 @@
         height: 28rem;
     }
 
+    #eventDetailsDaysSelectModal .modal-content {
+        height: auto;
+    }
+
+    #eventDetailsDurationSelectModal .modal-content {
+        height: auto;
+    }
+
+    .event-details-days-grid {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
     .event-details-grid {
         grid-template-columns: 1fr;
+        grid-template-areas: none;
     }
 
     .event-details-hero {

@@ -1,11 +1,16 @@
 import { Modal } from 'bootstrap';
 
-const DAY_LABELS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const detailState = {
     selectedTermId: null,
     terms: null,
     instructorsByTerm: new Map(),
     roomsByTerm: new Map(),
+    selectedEventGroupKey: null,
+    selectedDayIndexes: [],
+    daySelectionsByGroup: new Map(),
+    selectedDurationMinutes: null,
+    durationSelectionsByGroup: new Map(),
     activeRequestToken: 0,
     actionsBound: false
 };
@@ -48,15 +53,125 @@ const getDetailElements = () => {
         locationValue: document.getElementById('eventDetailsLocationValue'),
         instructorEditButton: document.getElementById('eventDetailsInstructorEditButton'),
         locationEditButton: document.getElementById('eventDetailsLocationEditButton'),
+        daysEditButton: document.getElementById('eventDetailsDaysEditButton'),
+        durationEditButton: document.getElementById('eventDetailsDurationEditButton'),
         instructorSearch: document.getElementById('eventDetailsInstructorSearch'),
         locationSearch: document.getElementById('eventDetailsLocationSearch'),
         instructorList: document.getElementById('eventDetailsInstructorList'),
         locationList: document.getElementById('eventDetailsLocationList'),
         instructorSelectModal: document.getElementById('eventDetailsInstructorSelectModal'),
         locationSelectModal: document.getElementById('eventDetailsLocationSelectModal'),
+        daysSelectModal: document.getElementById('eventDetailsDaysSelectModal'),
+        daysApplyButton: document.getElementById('eventDetailsDaysApplyButton'),
+        daysValidation: document.getElementById('eventDetailsDaysValidation'),
+        duration: document.getElementById('eventDetailsDuration'),
+        durationSelectModal: document.getElementById('eventDetailsDurationSelectModal'),
+        durationHoursInput: document.getElementById('eventDetailsDurationHoursInput'),
+        durationMinutesInput: document.getElementById('eventDetailsDurationMinutesInput'),
+        durationApplyButton: document.getElementById('eventDetailsDurationApplyButton'),
+        durationValidation: document.getElementById('eventDetailsDurationValidation'),
         days: document.getElementById('eventDetailsDays'),
         time: document.getElementById('eventDetailsTime')
     };
+};
+
+const formatDurationLabel = (durationMinutes) => {
+    const roundedMinutes = Math.round(Number(durationMinutes));
+
+    if (!Number.isInteger(roundedMinutes) || roundedMinutes <= 0) {
+        return 'Not available';
+    }
+
+    const hours = Math.floor(roundedMinutes / 60);
+    const minutes = roundedMinutes % 60;
+
+    if (hours > 0 && minutes > 0) {
+        return `${hours}h ${minutes}m`;
+    }
+
+    if (hours > 0) {
+        return `${hours}h`;
+    }
+
+    return `${minutes}m`;
+};
+
+const toValidDurationMinutes = (hoursValue, minutesValue) => {
+    const parsedHours = Number(hoursValue);
+    const parsedMinutes = Number(minutesValue);
+
+    if (!Number.isFinite(parsedHours) || !Number.isFinite(parsedMinutes)) {
+        return null;
+    }
+
+    const hours = Math.floor(parsedHours);
+    const minutes = Math.floor(parsedMinutes);
+
+    if (!Number.isInteger(hours) || hours < 0 || hours > 12) {
+        return null;
+    }
+
+    if (!Number.isInteger(minutes) || minutes < 0 || minutes > 55 || (minutes % 5) !== 0) {
+        return null;
+    }
+
+    const totalMinutes = (hours * 60) + minutes;
+
+    return totalMinutes > 0 ? totalMinutes : null;
+};
+
+const setDurationValidationState = (showError) => {
+    const validationEl = document.getElementById('eventDetailsDurationValidation');
+
+    if (!validationEl) {
+        return;
+    }
+
+    validationEl.classList.toggle('d-none', !showError);
+};
+
+const toUniqueSortedDayIndexes = (dayIndexes = []) => {
+    return [...new Set(dayIndexes.map((index) => Number(index)).filter((index) => Number.isInteger(index) && index >= 0 && index <= 6))]
+        .sort((a, b) => a - b);
+};
+
+const getSelectedDayIndexesFromCheckboxes = () => {
+    const checkboxEls = document.querySelectorAll('input[name="eventDetailsDays"]:checked');
+    const selectedDayIndexes = [...checkboxEls].map((checkboxEl) => Number(checkboxEl.value));
+
+    return toUniqueSortedDayIndexes(selectedDayIndexes);
+};
+
+const setSelectedDayCheckboxes = (selectedDayIndexes = []) => {
+    const selected = new Set(toUniqueSortedDayIndexes(selectedDayIndexes));
+    const checkboxEls = document.querySelectorAll('input[name="eventDetailsDays"]');
+
+    checkboxEls.forEach((checkboxEl) => {
+        checkboxEl.checked = selected.has(Number(checkboxEl.value));
+    });
+};
+
+const setDaysValidationState = (showError) => {
+    const validationEl = document.getElementById('eventDetailsDaysValidation');
+
+    if (!validationEl) {
+        return;
+    }
+
+    validationEl.classList.toggle('d-none', !showError);
+};
+
+const getDaysLabelFromIndexes = (dayIndexes = []) => {
+    const normalizedDayIndexes = toUniqueSortedDayIndexes(dayIndexes);
+
+    if (normalizedDayIndexes.length === 0) {
+        return 'Not available';
+    }
+
+    return normalizedDayIndexes
+        .map((dayIndex) => DAY_LABELS[dayIndex] || null)
+        .filter(Boolean)
+        .join(', ');
 };
 
 const toUniqueValues = (values = []) => {
@@ -158,12 +273,99 @@ const bindDetailActions = () => {
         openSelectorModal(detailEls.locationSelectModal);
     });
 
+    detailEls.daysEditButton?.addEventListener('click', () => {
+        setSelectedDayCheckboxes(detailState.selectedDayIndexes);
+        setDaysValidationState(false);
+        openSelectorModal(detailEls.daysSelectModal);
+    });
+
+    detailEls.durationEditButton?.addEventListener('click', () => {
+        const durationMinutes = Number(detailState.selectedDurationMinutes || 0);
+        const normalizedToFive = Math.round(durationMinutes / 5) * 5;
+        const hours = Math.floor(normalizedToFive / 60);
+        const minutes = normalizedToFive % 60;
+
+        if (detailEls.durationHoursInput) {
+            detailEls.durationHoursInput.value = String(Math.max(0, hours));
+        }
+
+        if (detailEls.durationMinutesInput) {
+            detailEls.durationMinutesInput.value = String(Math.max(0, minutes));
+        }
+
+        setDurationValidationState(false);
+        openSelectorModal(detailEls.durationSelectModal);
+    });
+
+    detailEls.daysApplyButton?.addEventListener('click', () => {
+        const selectedDayIndexes = getSelectedDayIndexesFromCheckboxes();
+
+        if (selectedDayIndexes.length === 0) {
+            setDaysValidationState(true);
+            return;
+        }
+
+        detailState.selectedDayIndexes = selectedDayIndexes;
+
+        if (detailState.selectedEventGroupKey) {
+            detailState.daySelectionsByGroup.set(detailState.selectedEventGroupKey, selectedDayIndexes);
+        }
+
+        if (detailEls.days) {
+            detailEls.days.textContent = getDaysLabelFromIndexes(selectedDayIndexes);
+        }
+
+        setDaysValidationState(false);
+
+        if (detailEls.daysSelectModal) {
+            Modal.getOrCreateInstance(detailEls.daysSelectModal).hide();
+        }
+    });
+
+    detailEls.durationApplyButton?.addEventListener('click', () => {
+        const selectedDurationMinutes = toValidDurationMinutes(
+            detailEls.durationHoursInput?.value,
+            detailEls.durationMinutesInput?.value
+        );
+
+        if (!selectedDurationMinutes) {
+            setDurationValidationState(true);
+            return;
+        }
+
+        detailState.selectedDurationMinutes = selectedDurationMinutes;
+
+        if (detailState.selectedEventGroupKey) {
+            detailState.durationSelectionsByGroup.set(detailState.selectedEventGroupKey, selectedDurationMinutes);
+        }
+
+        if (detailEls.duration) {
+            detailEls.duration.textContent = formatDurationLabel(selectedDurationMinutes);
+        }
+
+        setDurationValidationState(false);
+
+        if (detailEls.durationSelectModal) {
+            Modal.getOrCreateInstance(detailEls.durationSelectModal).hide();
+        }
+    });
+
     detailEls.instructorSelectModal?.addEventListener('hidden.bs.modal', () => {
         setDetailModalBehindSelector(false);
     });
 
     detailEls.locationSelectModal?.addEventListener('hidden.bs.modal', () => {
         setDetailModalBehindSelector(false);
+    });
+
+    detailEls.daysSelectModal?.addEventListener('hidden.bs.modal', () => {
+        setDetailModalBehindSelector(false);
+        setDaysValidationState(false);
+    });
+
+    detailEls.durationSelectModal?.addEventListener('hidden.bs.modal', () => {
+        setDetailModalBehindSelector(false);
+        setDurationValidationState(false);
     });
 
     detailState.actionsBound = true;
@@ -296,30 +498,22 @@ const collectRelatedEvents = (calendar, event) => {
     return calendar.getEvents().filter((entry) => toGroupKey(entry) === key);
 };
 
-const getDaysLabel = (event, relatedEvents = []) => {
+const getDayIndexes = (event, relatedEvents = []) => {
     const dayIndexesFromDates = [...new Set(relatedEvents
         .map((entry) => (entry.start instanceof Date ? entry.start.getDay() : null))
         .filter((dayIndex) => Number.isInteger(dayIndex)))];
 
     if (dayIndexesFromDates.length > 0) {
-        return dayIndexesFromDates
-            .sort((a, b) => a - b)
-            .map((dayIndex) => DAY_LABELS[dayIndex] || null)
-            .filter(Boolean)
-            .join(', ');
+        return toUniqueSortedDayIndexes(dayIndexesFromDates);
     }
 
     const originalDays = event.extendedProps?.originalSchedule?.daysOfWeek;
 
     if (Array.isArray(originalDays) && originalDays.length > 0) {
-        return [...new Set(originalDays)]
-            .sort((a, b) => a - b)
-            .map((dayIndex) => DAY_LABELS[Number(dayIndex)] || null)
-            .filter(Boolean)
-            .join(', ');
+        return toUniqueSortedDayIndexes(originalDays);
     }
 
-    return 'Not available';
+    return [];
 };
 
 const getTimeLabel = (event) => {
@@ -339,6 +533,31 @@ const getTimeLabel = (event) => {
     }
 
     return 'Not available';
+};
+
+const getDurationMinutes = (event) => {
+    if (event.start instanceof Date && event.end instanceof Date) {
+        const durationMs = event.end.getTime() - event.start.getTime();
+        const minutesFromEvent = Math.round(durationMs / 60000);
+
+        if (minutesFromEvent > 0) {
+            return minutesFromEvent;
+        }
+    }
+
+    const durationHours = Number(event.extendedProps?.durationHours);
+
+    if (Number.isFinite(durationHours) && durationHours > 0) {
+        return Math.round(durationHours * 60);
+    }
+
+    const scheduleDurationHours = Number(event.extendedProps?.courses?.[0]?.timeslot_duration_hours);
+
+    if (Number.isFinite(scheduleDurationHours) && scheduleDurationHours > 0) {
+        return Math.round(scheduleDurationHours * 60);
+    }
+
+    return null;
 };
 
 const getPrimaryCourse = (event) => {
@@ -389,6 +608,9 @@ const populateEventDetails = ({ calendar, eventId }) => {
     const event = calendar?.getEventById?.(String(eventId || '')) || null;
 
     if (!event) {
+        detailState.selectedEventGroupKey = null;
+        detailState.selectedDayIndexes = [];
+        detailState.selectedDurationMinutes = null;
         detailEls.course.textContent = 'No course selected';
         detailEls.meta.textContent = 'Right-click an event and choose Course Details.';
         setDetailSelectorValues({
@@ -408,11 +630,21 @@ const populateEventDetails = ({ calendar, eventId }) => {
             fallbackLabel: 'Not available'
         });
         detailEls.days.textContent = 'Not available';
+        if (detailEls.duration) {
+            detailEls.duration.textContent = 'Not available';
+        }
         detailEls.time.textContent = 'Not available';
+        if (detailEls.daysEditButton) {
+            detailEls.daysEditButton.disabled = true;
+        }
+        if (detailEls.durationEditButton) {
+            detailEls.durationEditButton.disabled = true;
+        }
         return;
     }
 
     const relatedEvents = collectRelatedEvents(calendar, event);
+    const eventGroupKey = toGroupKey(event);
     const primaryCourse = getPrimaryCourse(event);
     const relatedCourses = getCoursesFromEventGroup(event, relatedEvents);
     const courseTitle = event.title || primaryCourse.course_name || primaryCourse.section_name || 'Untitled Course';
@@ -442,7 +674,27 @@ const populateEventDetails = ({ calendar, eventId }) => {
         preferredValue: eventRooms[0] || null,
         fallbackLabel: 'Loading rooms...'
     });
-    detailEls.days.textContent = getDaysLabel(event, relatedEvents);
+    detailState.selectedEventGroupKey = eventGroupKey;
+    const defaultSelectedDayIndexes = getDayIndexes(event, relatedEvents);
+    const persistedSelectedDayIndexes = detailState.daySelectionsByGroup.get(eventGroupKey);
+    detailState.selectedDayIndexes = Array.isArray(persistedSelectedDayIndexes)
+        ? toUniqueSortedDayIndexes(persistedSelectedDayIndexes)
+        : defaultSelectedDayIndexes;
+    const defaultDurationMinutes = getDurationMinutes(event);
+    const persistedDurationMinutes = detailState.durationSelectionsByGroup.get(eventGroupKey);
+    detailState.selectedDurationMinutes = Number.isInteger(persistedDurationMinutes) && persistedDurationMinutes > 0
+        ? persistedDurationMinutes
+        : defaultDurationMinutes;
+    if (detailEls.daysEditButton) {
+        detailEls.daysEditButton.disabled = false;
+    }
+    if (detailEls.durationEditButton) {
+        detailEls.durationEditButton.disabled = false;
+    }
+    detailEls.days.textContent = getDaysLabelFromIndexes(detailState.selectedDayIndexes);
+    if (detailEls.duration) {
+        detailEls.duration.textContent = formatDurationLabel(detailState.selectedDurationMinutes);
+    }
     detailEls.time.textContent = getTimeLabel(event);
 
     const requestToken = ++detailState.activeRequestToken;
