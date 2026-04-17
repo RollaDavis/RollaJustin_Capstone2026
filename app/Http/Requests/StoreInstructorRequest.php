@@ -12,7 +12,7 @@ class StoreInstructorRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -23,7 +23,13 @@ class StoreInstructorRequest extends FormRequest
     public function rules(): array
     {
         return [
-            //
+            'data' => ['required', 'array', 'required_array_keys:type,attributes'],
+            'data.type' => ['required', 'in:instructors'],
+            'data.attributes' => ['required', 'array', 'required_array_keys:name,active'],
+            'data.id' => ['sometimes', 'integer'],
+
+            'data.attributes.name' => ['required', 'string', 'max:255'],
+            'data.attributes.active' => ['required', 'integer', 'in:0,1'],
         ];
     }
 }

@@ -15,31 +15,34 @@ use App\Models\ProgramAssignment;
 use App\Models\Room;
 use App\Models\Term;
 use App\Models\Timeslot;
+use Illuminate\Http\Request;
 
 class AssignmentController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index()
+    public function index(Term $term)
     {
-        //
+        $assignments = Assignment::query()
+            ->with(['section.course', 'timeslot', 'room', 'instructor'])
+            ->where('term_id', $term->id)
+            ->get();
+
+        return AssignmentResource::collection($assignments);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
      */
     public function store(StoreAssignmentRequest $request)
     {
-        //
+        $attributes = $request->validated()['data']['attributes'];
+
+        $assignment = Assignment::create($attributes);
+
+        return new AssignmentResource($assignment);
     }
 
     /**
@@ -47,23 +50,20 @@ class AssignmentController extends Controller
      */
     public function show(Assignment $assignment)
     {
-        //
+        return new AssignmentResource($assignment);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(Assignment $assignment)
-    {
-        //
-    }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateAssignmentRequest $request, Assignment $assignment)
     {
-        //
+        $attributes = $request->validated()['data']['attributes'];
+
+        $assignment->update($attributes);
+
+        return new AssignmentResource($assignment);
     }
 
     /**
@@ -71,7 +71,10 @@ class AssignmentController extends Controller
      */
     public function destroy(Assignment $assignment)
     {
-        //
+        $assignment->delete();
+
+        return response()->json(null, 204);
+
     }
 
     public function getTermInstructors(Term $term)
@@ -144,6 +147,43 @@ class AssignmentController extends Controller
         return AssignmentResource::collection($my_assignments);
     }
 
+
+    public function showAssignmentOptions(Assignment $assignment, Request $request)
+    {
+        $testAssignment = $assignment->copy();
+        $days = $request->input('data.attributes.days');
+        $duration = $request->input('data.attributes.duration');
+        $start_times = ['08:00', '9:10', '10:20', '11:30', '12:40', '1:50', '3:00'];
+        $options = [];
+        $failures = [];
+
+        foreach ($start_times as $start_time) {
+            $timeslot = $this->timeslotsForOptions($days, $duration, $start_time);
+
+            $testAssignment->timeslot_id = $timeslot->id;
+
+            $conflicts = $this->checkAssignmentConflicts($testAssignment);
+
+            if ($conflicts['has_conflict']) {
+                $failures[] = [
+                    'timeslot_id' => $timeslot->id,
+                    'days' => $days,
+                    'start_time' => $start_time,
+                    'duration' => $duration,
+                    'conflicts' => $conflicts['conflicts']
+                ];
+            } else {
+                $options[] = [
+                    'timeslot_id' => $timeslot->id,
+                    'days' => $days,
+                    'start_time' => $start_time,
+                    'duration' => $duration,
+                ];
+            }
+
+        }
+        return ['options' => $options, 'failures' => $failures];
+    }
 
     public function checkAssignmentConflicts(Assignment $assignment)
     {
@@ -350,5 +390,28 @@ class AssignmentController extends Controller
     private function timeslotsConflict(Timeslot $timeslot1, Timeslot $timeslot2): bool
     {
         return app(TimeslotController::class)->checkConflict($timeslot1, $timeslot2);
+    }
+
+    private function timeslotsForOptions (string $days, int $duration, string $startTime): Timeslot{
+                // Check if timeslot already exists
+        $existingTimeslot = Timeslot::where('days', $days)
+            ->where('start_time', $startTime)
+            ->where('duration', $duration)
+            ->first();
+
+        if ($existingTimeslot) {
+            return $existingTimeslot;
+        }
+
+        // Create and save the new timeslot
+        $newTimeslot = Timeslot::create([
+            'days' => $days,
+            'start_time' => $startTime,
+            'duration' => $duration,
+            'location_id' => 1, // Assuming location as COT for the moment
+            // TODO: Add logic to determine location based on timeslot options or other factors
+        ]);
+
+        return $newTimeslot;
     }
 }
