@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->string('days', 5);
             $table->time('start_time');
-            $table->integer('duration')->comment('Duration in hours');
+            $table->double('duration')->comment('Duration in hours');
             $table->foreignId('location_id')->constrained()->onDelete('cascade');
             $table->timestamps();
         });

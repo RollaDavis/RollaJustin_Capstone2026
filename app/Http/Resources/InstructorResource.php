@@ -14,6 +14,14 @@ class InstructorResource extends JsonResource
      */
     public function toArray(Request $request): array
     {
-        return parent::toArray($request);
+        return [
+            'type' => 'instructors',
+            'id' => $this->id,
+            'attributes' => [
+                'instructor_id' => $this->id,
+                'name' => $this->name,
+                'active' => $this->active,
+            ]
+        ];
     }
 }
