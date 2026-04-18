@@ -190,6 +190,60 @@ export const initializeUnscheduledCourseDnd = ({
         unscheduledEventsContainer.append(item);
         unscheduledByKey.set(key, item);
         updateUnscheduledEmptyState();
+
+        // Add context menu for unscheduled course item
+        item.addEventListener('contextmenu', (e) => {
+            e.preventDefault();
+            // Remove any existing menu
+            document.querySelectorAll('.unscheduled-context-menu').forEach((el) => el.remove());
+
+            const menu = document.createElement('div');
+            menu.className = 'unscheduled-context-menu event-context-menu';
+            menu.style.position = 'fixed';
+            menu.style.zIndex = 9999;
+            menu.style.left = `${e.clientX}px`;
+            menu.style.top = `${e.clientY}px`;
+            menu.setAttribute('role', 'menu');
+
+            // View Details
+            const detailsBtn = document.createElement('button');
+            detailsBtn.type = 'button';
+            detailsBtn.className = 'event-context-menu__item';
+            detailsBtn.textContent = 'View Details';
+            detailsBtn.addEventListener('click', () => {
+                document.dispatchEvent(new CustomEvent('schedule:open-event-details', {
+                    detail: { eventId: payload.id }
+                }));
+                menu.remove();
+            });
+
+            // Reschedule
+            const rescheduleBtn = document.createElement('button');
+            rescheduleBtn.type = 'button';
+            rescheduleBtn.className = 'event-context-menu__item';
+            rescheduleBtn.textContent = 'Reschedule';
+            rescheduleBtn.addEventListener('click', () => {
+                // Custom event to trigger rescheduling logic (e.g., open a modal or drag back to calendar)
+                document.dispatchEvent(new CustomEvent('schedule:reschedule-unscheduled-course', {
+                    detail: { eventId: payload.id, payload }
+                }));
+                menu.remove();
+            });
+
+            menu.append(detailsBtn, rescheduleBtn);
+
+            // Remove menu on click elsewhere
+            setTimeout(() => {
+                document.addEventListener('mousedown', function handler(ev) {
+                    if (!menu.contains(ev.target)) {
+                        menu.remove();
+                        document.removeEventListener('mousedown', handler);
+                    }
+                });
+            }, 0);
+
+            document.body.appendChild(menu);
+        });
     };
 
     const moveEventToUnscheduled = (eventId) => {
