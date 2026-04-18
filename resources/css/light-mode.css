@@ -55,13 +55,36 @@
     flex: 0 0 15%;
 }
 
+.unscheduled-pane {
+    align-items: stretch !important;
+    min-height: 0;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
 .full-height {
     height: 100%;
 }
 
+.unscheduled-pane .full-height {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
 .unscheduled-events-body {
-    height: calc(100% - 42px);
-    min-height: 220px;
+    flex: 1 1 auto;
+    min-height: 0;
+    height: auto;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+.unscheduled-events {
+    display: flex;
+    flex-direction: column;
+    gap: 0.65rem;
 }
 
 .unscheduled-empty-state {
@@ -125,6 +148,10 @@
 .unscheduled-course-item,
 .fc-event-mirror.unscheduled-course-item,
 .fc-unscheduled-drag-mirror-proxy {
+    flex: 0 0 auto;
+    width: 100%;
+    max-width: 100%;
+    display: block;
     border-color: rgba(255, 255, 255, 0.72) !important;
     box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.35), 0 1px 2px rgba(15, 23, 42, 0.12);
     background-image: linear-gradient(to right, var(--event-opaque-color, #6c757d) 0 6px, transparent 6px);
@@ -137,45 +164,58 @@
 .unscheduled-course-item .fc-event-main-frame,
 .fc-event-mirror.unscheduled-course-item .fc-event-main-frame,
 .fc-unscheduled-drag-mirror-proxy .fc-event-main-frame {
-    padding-left: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.5rem 0.65rem 0.55rem 0.7rem;
     text-align: left;
 }
 
 .unscheduled-course-item .fc-event-main,
 .fc-event-mirror.unscheduled-course-item .fc-event-main,
 .fc-unscheduled-drag-mirror-proxy .fc-event-main {
-    transform: translateX(2px);
+    transform: none;
 }
 
-.unscheduled-course-item .fc-event-time,
-.fc-event-mirror.unscheduled-course-item .fc-event-time,
-.fc-unscheduled-drag-mirror-proxy .fc-event-time {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    opacity: 0.95;
-    text-align: left;
+.unscheduled-course-item__meta {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.1rem;
+}
+
+.unscheduled-course-item__time {
     display: inline-block;
-    border-bottom: 1px solid currentColor;
-    margin-left: -12px;
-    padding-left: 12px;
-    padding-right: 6px;
-    padding-bottom: 2px;
-    margin-bottom: 2px;
+    color: inherit;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
 }
 
-.unscheduled-course-item .fc-event-title,
-.fc-event-mirror.unscheduled-course-item .fc-event-title,
-.fc-unscheduled-drag-mirror-proxy .fc-event-title {
-    font-size: 0.8rem;
+.unscheduled-course-item__divider {
+    width: 100%;
+    border: 0;
+    border-top: 1px solid currentColor;
+    opacity: 0.4;
+    margin: 0 0 0.28rem;
+}
+
+.unscheduled-course-item__title,
+.fc-event-mirror.unscheduled-course-item .unscheduled-course-item__title,
+.fc-unscheduled-drag-mirror-proxy .unscheduled-course-item__title {
+    font-size: 0.82rem;
     font-weight: 700;
     letter-spacing: 0.01em;
+    line-height: 1.2;
+    color: inherit;
     text-align: left;
 }
 
 .fc-event-mirror.unscheduled-course-item,
 .fc-unscheduled-drag-mirror-proxy {
-    opacity: 0.92;
+    opacity: 0.96;
 }
 
 .fc .fc-timegrid-event.is-selected,
@@ -274,6 +314,22 @@
 .event-details-meta {
     font-size: 0.86rem;
     color: #5a6a83;
+}
+
+.event-details-hero-icon {
+    margin-left: auto;
+    align-self: center;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 0.55rem;
+    border: 1px solid #cdddf4;
+    background: #ffffff;
+    color: #335f98;
+    font-size: 1rem;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 .event-details-badge {
@@ -605,6 +661,10 @@
 
     .event-details-hero {
         flex-direction: column;
+    }
+
+    .event-details-hero-icon {
+        align-self: flex-end;
     }
 
     .blockoff-days-grid {

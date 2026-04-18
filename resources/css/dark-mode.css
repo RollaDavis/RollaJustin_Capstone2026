@@ -151,39 +151,52 @@ html.theme-dark .fc-unscheduled-drag-mirror-proxy {
 html.theme-dark .unscheduled-course-item .fc-event-main-frame,
 html.theme-dark .fc-event-mirror.unscheduled-course-item .fc-event-main-frame,
 html.theme-dark .fc-unscheduled-drag-mirror-proxy .fc-event-main-frame {
-    padding-left: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 0.5rem 0.65rem 0.55rem 0.7rem;
     text-align: left;
 }
 
 html.theme-dark .unscheduled-course-item .fc-event-main,
 html.theme-dark .fc-event-mirror.unscheduled-course-item .fc-event-main,
 html.theme-dark .fc-unscheduled-drag-mirror-proxy .fc-event-main {
-    transform: translateX(2px);
+    transform: none;
 }
 
-html.theme-dark .unscheduled-course-item .fc-event-time,
-html.theme-dark .fc-event-mirror.unscheduled-course-item .fc-event-time,
-html.theme-dark .fc-unscheduled-drag-mirror-proxy .fc-event-time {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.01em;
-    opacity: 0.95;
-    text-align: left;
+html.theme-dark .unscheduled-course-item__meta {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+    margin-bottom: 0.1rem;
+}
+
+html.theme-dark .unscheduled-course-item__time {
     display: inline-block;
-    border-bottom: 1px solid currentColor;
-    margin-left: -12px;
-    padding-left: 12px;
-    padding-right: 6px;
-    padding-bottom: 2px;
-    margin-bottom: 2px;
+    color: inherit;
+    font-size: 0.7rem;
+    font-weight: 700;
+    letter-spacing: 0.02em;
 }
 
-html.theme-dark .unscheduled-course-item .fc-event-title,
-html.theme-dark .fc-event-mirror.unscheduled-course-item .fc-event-title,
-html.theme-dark .fc-unscheduled-drag-mirror-proxy .fc-event-title {
-    font-size: 0.8rem;
+html.theme-dark .unscheduled-course-item__divider {
+    width: 100%;
+    border: 0;
+    border-top: 1px solid currentColor;
+    opacity: 0.35;
+    margin: 0 0 0.28rem;
+}
+
+html.theme-dark .unscheduled-course-item__title,
+html.theme-dark .fc-event-mirror.unscheduled-course-item .unscheduled-course-item__title,
+html.theme-dark .fc-unscheduled-drag-mirror-proxy .unscheduled-course-item__title {
+    font-size: 0.82rem;
     font-weight: 700;
     letter-spacing: 0.01em;
+    line-height: 1.2;
+    color: inherit;
     text-align: left;
 }
 
@@ -329,6 +342,13 @@ html.theme-dark .event-details-course {
 
 html.theme-dark .event-details-meta {
     color: #a7b8cd;
+}
+
+html.theme-dark .event-details-hero-icon {
+    border-color: #3e4d62;
+    background: #202a36;
+    color: #b9d1f5;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.35);
 }
 
 html.theme-dark .event-details-badge {

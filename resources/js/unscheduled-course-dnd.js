@@ -28,6 +28,49 @@ const dateToTimeString = (date) => {
     return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}:00`;
 };
 
+const formatTimeLabelFromHHMMSS = (timeString) => {
+    const normalized = String(timeString || '').trim();
+
+    if (!normalized) {
+        return null;
+    }
+
+    const [hoursText, minutesText = '00'] = normalized.split(':');
+    const hours = Number(hoursText);
+    const minutes = Number(minutesText);
+
+    if (!Number.isFinite(hours) || !Number.isFinite(minutes)) {
+        return null;
+    }
+
+    const period = hours >= 12 ? 'PM' : 'AM';
+    const normalizedHours = hours % 12 || 12;
+
+    return `${normalizedHours}:${String(minutes).padStart(2, '0')} ${period}`;
+};
+
+const formatScheduleWindowLabel = (payload = {}) => {
+    const schedule = payload.originalSchedule || payload.extendedProps?.originalSchedule || null;
+    const start = formatTimeLabelFromHHMMSS(schedule?.startTime);
+    const end = formatTimeLabelFromHHMMSS(schedule?.endTime);
+
+    if (start && end) {
+        return `${start} - ${end}`;
+    }
+
+    return null;
+};
+
+const formatUnscheduledTimeMetaLabel = (payload = {}) => {
+    const timeLabel = formatScheduleWindowLabel(payload);
+
+    if (timeLabel) {
+        return timeLabel;
+    }
+
+    return 'Time TBD';
+};
+
 const toUnscheduledPayload = (calendarEvent) => {
     const durationHours = Number(calendarEvent.extendedProps?.durationHours);
 
@@ -115,23 +158,34 @@ export const initializeUnscheduledCourseDnd = ({
         item.dataset.unscheduledGroupKey = key;
         item.dataset.unscheduledEventPayload = JSON.stringify(payload);
         item.setAttribute('title', 'Unscheduled course');
-        item.style.setProperty('--event-opaque-color', payload.borderColor || '#6c757d');
-        item.style.backgroundColor = payload.backgroundColor || '#6c757d';
-        item.style.borderColor = payload.borderColor || '#6c757d';
-        item.style.color = payload.textColor || '#ffffff';
+        const backgroundColor = payload.backgroundColor || '#6c757d';
+        const borderColor = payload.borderColor || backgroundColor;
+        const textColor = payload.textColor || '#ffffff';
+
+        item.style.setProperty('--event-opaque-color', borderColor);
+        item.style.backgroundColor = backgroundColor;
+        item.style.borderColor = borderColor;
+        item.style.color = textColor;
 
         const mainFrame = document.createElement('div');
         mainFrame.className = 'fc-event-main-frame';
 
-        const time = document.createElement('div');
-        time.className = 'fc-event-time';
-        time.textContent = formatDurationLabel(Number(payload.durationHours)) || 'Duration unknown';
+        const meta = document.createElement('div');
+        meta.className = 'unscheduled-course-item__meta';
+
+        const time = document.createElement('span');
+        time.className = 'unscheduled-course-item__time';
+        time.textContent = formatUnscheduledTimeMetaLabel(payload);
+
+        const divider = document.createElement('hr');
+        divider.className = 'unscheduled-course-item__divider';
 
         const title = document.createElement('div');
-        title.className = 'fc-event-title';
+        title.className = 'fc-event-title unscheduled-course-item__title';
         title.textContent = payload.title || 'Untitled Course';
 
-        mainFrame.append(time, title);
+        meta.append(time);
+        mainFrame.append(meta, divider, title);
         item.append(mainFrame);
         unscheduledEventsContainer.append(item);
         unscheduledByKey.set(key, item);

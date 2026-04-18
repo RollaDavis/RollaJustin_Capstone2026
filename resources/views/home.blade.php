@@ -36,7 +36,6 @@
                         <h5 class="modal-title event-details-title" id="eventDetailsModalLabel">Course Details</h5>
                         <p class="event-details-subtitle mb-0">Course Detail Overview</p>
                     </div>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body event-details-body">
                     <div class="event-details-hero">
@@ -45,6 +44,9 @@
                             <h4 class="event-details-course mb-1" id="eventDetailsCourse">No course selected</h4>
                             <p class="event-details-meta mb-0" id="eventDetailsMeta">Right-click an event and choose Course Details.</p>
                         </div>
+                        <span class="event-details-hero-icon" aria-hidden="true">
+                            <i class="bi bi-journal-bookmark"></i>
+                        </span>
                     </div>
 
                     <div class="event-details-grid">
@@ -97,6 +99,10 @@
                             <p class="event-details-value" id="eventDetailsTime">Not available</p>
                         </div>
                     </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="eventDetailsSaveChangesButton">Save Changes</button>
                 </div>
             </div>
         </div>
