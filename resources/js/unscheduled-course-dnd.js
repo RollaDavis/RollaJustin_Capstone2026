@@ -205,32 +205,19 @@ export const initializeUnscheduledCourseDnd = ({
             menu.style.top = `${e.clientY}px`;
             menu.setAttribute('role', 'menu');
 
-            // View Details
-            const detailsBtn = document.createElement('button');
-            detailsBtn.type = 'button';
-            detailsBtn.className = 'event-context-menu__item';
-            detailsBtn.textContent = 'View Details';
-            detailsBtn.addEventListener('click', () => {
+            // Reschedule (opens detail view)
+            const rescheduleBtn = document.createElement('button');
+            rescheduleBtn.type = 'button';
+            rescheduleBtn.className = 'event-context-menu__item';
+            rescheduleBtn.textContent = 'Reschedule';
+            rescheduleBtn.addEventListener('click', () => {
                 document.dispatchEvent(new CustomEvent('schedule:open-event-details', {
                     detail: { eventId: payload.id }
                 }));
                 menu.remove();
             });
 
-            // Reschedule
-            const rescheduleBtn = document.createElement('button');
-            rescheduleBtn.type = 'button';
-            rescheduleBtn.className = 'event-context-menu__item';
-            rescheduleBtn.textContent = 'Reschedule';
-            rescheduleBtn.addEventListener('click', () => {
-                // Custom event to trigger rescheduling logic (e.g., open a modal or drag back to calendar)
-                document.dispatchEvent(new CustomEvent('schedule:reschedule-unscheduled-course', {
-                    detail: { eventId: payload.id, payload }
-                }));
-                menu.remove();
-            });
-
-            menu.append(detailsBtn, rescheduleBtn);
+            menu.append(rescheduleBtn);
 
             // Remove menu on click elsewhere
             setTimeout(() => {
