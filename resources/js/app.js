@@ -7,6 +7,7 @@ import { buildCalendarEventsFromCourses } from './calendarEvents';
 import { initializeUnscheduledCourseDnd } from './unscheduled-course-dnd';
 import { showEventDetailsModal } from './event-details-modal';
 import { showBlockoffCreationModal } from './blockoff-creation-modal';
+import './dropdown.js';
 
 const DAY_TO_INDEX = {
     U: 0,
