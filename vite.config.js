@@ -17,5 +17,6 @@ export default defineConfig({
     input: [
         'resources/css/app.css',
         'resources/css/light-mode.css',
+        'resources/css/dark-mode.css',
     ]
 });
