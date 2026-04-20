@@ -16,12 +16,11 @@
 
 
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss'])
-    <link rel="stylesheet" href="{{ asset('public/css/light-mode.css') }}">
-    <link rel="stylesheet" href="{{ asset('public/css/dark-mode.css') }}">
-    <script src="{{ asset('public/js/app.js') }}" type="module"></script>
-    <script src="{{ asset('public/js/dropdown.js') }}" type="module"></script>
-    <script src="{{ asset('public/js/event-context-menu.js') }}" type="module"></script>
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    <link rel="stylesheet" href="{{ asset('css/light-mode.css') }}">
+    <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
+    <script src="{{ asset('js/dropdown.js') }}" type="module"></script>
+    <script src="{{ asset('js/event-context-menu.js') }}" type="module"></script>
     <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css' rel='stylesheet'>
     <link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'>
 </head>
