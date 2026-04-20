@@ -13,6 +13,7 @@ class TermSeeder extends CsvSeeder
         $this->file = '/database/seeds/csvs/terms.csv';
         $this->delimiter = ',';
         $this->tablename = 'terms';
+        $this->truncate = false;
         $this->mapping = ['id', 'name'];
     }
 

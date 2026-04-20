@@ -13,6 +13,7 @@ class LocationSeeder extends CsvSeeder
         $this->file = '/database/seeds/csvs/locations.csv';
         $this->delimiter = ',';
         $this->tablename = 'locations';
+        $this->truncate = false;
         $this->mapping = ['id', 'name'];
     }
 

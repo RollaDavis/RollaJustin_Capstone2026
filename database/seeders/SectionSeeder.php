@@ -13,6 +13,7 @@ class SectionSeeder extends CsvSeeder
         $this->file = '/database/seeds/csvs/sections.csv';
         $this->delimiter = ',';
         $this->tablename = 'sections';
+        $this->truncate = false;
         $this->mapping = ['id', 'name', 'course_id', 'active'];
     }
 

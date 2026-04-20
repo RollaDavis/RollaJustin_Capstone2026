@@ -13,6 +13,7 @@ class TimeslotSeeder extends CsvSeeder
         $this->file = '/database/seeds/csvs/timeslots.csv';
         $this->delimiter = ',';
         $this->tablename = 'timeslots';
+        $this->truncate = false;
         $this->mapping = ['id', 'days', 'start_time', 'duration', 'location_id'];
         $this->parsers = ['start_time' => function ($value) { 
             return substr_replace($value, ':', 2, 0);

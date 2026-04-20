@@ -13,6 +13,7 @@ class RoomSeeder extends CsvSeeder
         $this->file = '/database/seeds/csvs/rooms.csv';
         $this->delimiter = ',';
         $this->tablename = 'rooms';
+        $this->truncate = false;
         $this->mapping = ['id', 'name', 'active'];
     }
 
