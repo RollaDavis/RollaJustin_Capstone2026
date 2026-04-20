@@ -8,6 +8,10 @@ import { initializeUnscheduledCourseDnd } from './unscheduled-course-dnd';
 import { showEventDetailsModal } from './event-details-modal';
 import { showBlockoffCreationModal } from './blockoff-creation-modal';
 import './dropdown.js';
+import './calendarEvents.js';
+import './dropdown.js';
+import './event-context-menu.js';
+import 'bootstrap'; 
 
 const DAY_TO_INDEX = {
     U: 0,
