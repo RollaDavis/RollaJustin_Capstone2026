@@ -16,9 +16,10 @@
 
 
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @vite(['resources/sass/app.scss'])
     <link rel="stylesheet" href="{{ asset('css/light-mode.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
+    <script src="{{ asset('js/app.js') }}" type="module"></script>
     <script src="{{ asset('js/dropdown.js') }}" type="module"></script>
     <script src="{{ asset('js/event-context-menu.js') }}" type="module"></script>
     <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css' rel='stylesheet'>
@@ -134,9 +135,5 @@
         </main>
     </div>
 </body>
-<script src="{{ asset('js/calendarEvents.js') }}"></script>
-<script src="{{ asset('js/unscheduled-course-dnd.js') }}"></script>
-<script src="{{ asset('js/eventDetailModal.js') }}"></script>
-<script src="{{ asset('js/blockoff-creation-modal.js') }}"></script>
 
 </html>
