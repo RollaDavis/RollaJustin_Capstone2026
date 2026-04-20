@@ -134,5 +134,9 @@
         </main>
     </div>
 </body>
+<script src="{{ asset('js/calendarEvents.js') }}"></script>
+<script src="{{ asset('js/unscheduled-course-dnd.js') }}"></script>
+<script src="{{ asset('js/eventDetailModal.js') }}"></script>
+<script src="{{ asset('js/blockoff-creation-modal.js') }}"></script>
 
 </html>
