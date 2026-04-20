@@ -17,7 +17,7 @@
 
     <!-- Scripts -->
     @vite(['resources/sass/app.scss'])
-    <link rel="stylesheet" href="{{ asset('build/assets/light-mode.css') }}">
+    <link rel="stylesheet" href="{{ asset('public/css/light-mode.css') }}">
     <link rel="stylesheet" href="{{ asset('build/assets/dark-mode.css') }}">
     <script src="{{ asset('build/assets/app.js') }}" type="module"></script>
     <script src="{{ asset('build/assets/dropdown.js') }}" type="module"></script>
