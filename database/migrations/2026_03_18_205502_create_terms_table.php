@@ -16,6 +16,10 @@ return new class extends Migration
             $table->string('name');
             $table->timestamps();
         });
+
+        Schema::table('program_assignments', function (Blueprint $table) {
+            $table->foreign('term_id')->references('id')->on('terms')->onDelete('cascade');
+        });
     }
 
     /**
@@ -23,6 +27,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('program_assignments', function (Blueprint $table) {
+            $table->dropForeign(['term_id']);
+        });
+
         Schema::dropIfExists('terms');
     }
 };

@@ -16,6 +16,10 @@ return new class extends Migration
             $table->string('name')->unique();
             $table->timestamps();
         });
+
+        Schema::table('timeslots', function (Blueprint $table) {
+            $table->foreign('location_id')->references('id')->on('locations')->onDelete('cascade');
+        });
     }
 
     /**
@@ -23,6 +27,10 @@ return new class extends Migration
      */
     public function down(): void
     {
+        Schema::table('timeslots', function (Blueprint $table) {
+            $table->dropForeign(['location_id']);
+        });
+
         Schema::dropIfExists('locations');
     }
 };
