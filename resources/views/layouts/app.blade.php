@@ -17,8 +17,8 @@
 
     <!-- Scripts -->
     {{-- @vite(['resources/sass/app.scss', 'resources/js/app.js']) --}}
-    <link href="/build/assets/css/app-C8pPhopy.css">
-    <script src="build/assets/app-Dl6olWsf.js"></script>
+    <link href="/build/assets/app-C8pPhopy.css">
+    <script src="/build/assets/app-Dl6olWsf.js"></script>
     <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css' rel='stylesheet'>
     <link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'>
 </head>
