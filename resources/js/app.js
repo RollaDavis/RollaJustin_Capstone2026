@@ -3,6 +3,10 @@ import interactionPlugin from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
+import { buildCalendarEventsFromCourses } from './calendarEvents';
+import { initializeUnscheduledCourseDnd } from './unscheduled-course-dnd';
+import { showEventDetailsModal } from './event-details-modal';
+import { showBlockoffCreationModal } from './blockoff-creation-modal';
 
 const DAY_TO_INDEX = {
     U: 0,

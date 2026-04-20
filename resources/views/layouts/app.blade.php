@@ -16,12 +16,7 @@
 
 
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss'])
-    <link rel="stylesheet" href="{{ asset('css/light-mode.css') }}">
-    <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
-    <script src="{{ asset('js/app.js') }}" type="module"></script>
-    <script src="{{ asset('js/dropdown.js') }}" type="module"></script>
-    <script src="{{ asset('js/event-context-menu.js') }}" type="module"></script>
+    @vite(['resources/sass/app.scss', 'resources/css/light-mode.css', 'resources/css/dark-mode.css', 'resources/js/app.js', 'resources/js/dropdown.js', 'resources/js/event-context-menu.js'])
     <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css' rel='stylesheet'>
     <link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'>
 </head>
@@ -77,12 +72,10 @@
                                             data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
                                             Select an option
                                         </button>
-                                        <div id="scheduleValueDropdownMenu"
-                                            class="dropdown-menu p-2 dropdown-schedule-value-menu">
+                                        <div id="scheduleValueDropdownMenu" class="dropdown-menu p-2 dropdown-schedule-value-menu">
                                             <input id="scheduleValueSearch" type="search" class="form-control mb-2"
                                                 placeholder="Search instructors" aria-label="Search instructors">
-                                            <div id="scheduleValueOptions"
-                                                class="d-flex flex-column dropdown-schedule-value-options"></div>
+                                            <div id="scheduleValueOptions" class="d-flex flex-column dropdown-schedule-value-options"></div>
                                         </div>
                                     </div>
 
@@ -114,9 +107,8 @@
                                 </a>
 
                                 <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
-                                    <a class="dropdown-item" href="{{ route('logout') }}"
-                                        onclick="event.preventDefault();
-                                                                             document.getElementById('logout-form').submit();">
+                                    <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();
+                                                                         document.getElementById('logout-form').submit();">
                                         {{ __('Logout') }}
                                     </a>
                                     <form id="logout-form" action="{{ route('logout') }}" method="POST" class="d-none">
