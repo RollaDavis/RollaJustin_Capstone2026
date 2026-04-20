@@ -16,7 +16,7 @@
 
 
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js', 'resources/js/bootstrap.js'])
+    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
     <link rel="stylesheet" href="{{ asset('css/light-mode.css') }}">
     <link rel="stylesheet" href="{{ asset('css/dark-mode.css') }}">
     <script src="{{ asset('js/dropdown.js') }}" type="module"></script>
