@@ -8,6 +8,7 @@ use App\Http\Resources\AssignmentResource;
 use App\Http\Resources\InstructorResource;
 use App\Http\Resources\ProgramResource;
 use App\Http\Resources\RoomResource;
+use App\Http\Resources\OptionResource;
 use App\Models\Assignment;
 use App\Models\Instructor;
 use App\Models\Program;
@@ -16,6 +17,7 @@ use App\Models\Room;
 use App\Models\Term;
 use App\Models\Timeslot;
 use Illuminate\Http\Request;
+use Termwind\Components\Ol;
 
 class AssignmentController extends Controller
 {
@@ -155,7 +157,7 @@ class AssignmentController extends Controller
         $duration = $request->input('data.attributes.duration');
         $start_times = ['08:00', '9:10', '10:20', '11:30', '12:40', '1:50', '3:00'];
         $options = [];
-        $failures = [];
+        $fakeID = 0;
 
         foreach ($start_times as $start_time) {
             $timeslot = $this->timeslotsForOptions($days, $duration, $start_time);
@@ -165,7 +167,9 @@ class AssignmentController extends Controller
             $conflicts = $this->checkAssignmentConflicts($testAssignment);
 
             if ($conflicts['has_conflict']) {
-                $failures[] = [
+                $options[] = [
+                    'id' => $fakeID++,
+                    'conflicting' => true,
                     'timeslot_id' => $timeslot->id,
                     'days' => $days,
                     'start_time' => $start_time,
@@ -174,15 +178,18 @@ class AssignmentController extends Controller
                 ];
             } else {
                 $options[] = [
+                    'id' => $fakeID++,
+                    'conflicting' => false,
                     'timeslot_id' => $timeslot->id,
                     'days' => $days,
                     'start_time' => $start_time,
                     'duration' => $duration,
+                    'conflicts' => []
                 ];
             }
 
         }
-        return ['options' => $options, 'failures' => $failures];
+        return OptionResource::collection($options);
     }
 
     public function checkAssignmentConflicts(Assignment $assignment)
