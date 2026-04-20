@@ -1,4 +1,4 @@
-import './bootstrap';
+import '../../resources/js/bootstrap';
 
 document.addEventListener('DOMContentLoaded', () => {
     const scheduleBySelect = document.getElementById('scheduleBySelect');
