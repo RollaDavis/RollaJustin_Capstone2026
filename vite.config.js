@@ -14,4 +14,8 @@ export default defineConfig({
             refresh: true,
         }),
     ],
+    input: [
+        'resources/css/app.css',
+        'resources/css/light-mode.css',
+    ]
 });
