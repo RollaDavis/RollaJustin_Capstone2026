@@ -1,5 +1,4 @@
 import './setup-csrf.js';
-import './ajax-forms.js';
 import { Calendar } from '@fullcalendar/core';
 import interactionPlugin from '@fullcalendar/interaction';
 import dayGridPlugin from '@fullcalendar/daygrid';
