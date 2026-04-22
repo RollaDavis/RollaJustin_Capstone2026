@@ -375,22 +375,34 @@ const bindActions = () => {
             setSubmitState(true);
 
 
-            // Get CSRF token from XSRF-TOKEN cookie (Laravel expects this for AJAX)
+            // Resolve CSRF token: prefer XSRF-TOKEN cookie (for Laravel/Sanctum),
+            // fallback to the meta csrf token rendered into the page.
             function getCookie(name) {
                 const value = `; ${document.cookie}`;
                 const parts = value.split(`; ${name}=`);
                 if (parts.length === 2) return parts.pop().split(';').shift();
                 return null;
             }
-            const csrfToken = getCookie('XSRF-TOKEN') ? decodeURIComponent(getCookie('XSRF-TOKEN')) : null;
+
+            const cookieToken = getCookie('XSRF-TOKEN') ? decodeURIComponent(getCookie('XSRF-TOKEN')) : null;
+            const metaEl = document.querySelector('meta[name="csrf-token"]');
+            const metaToken = metaEl?.getAttribute('content') || null;
+            const csrfToken = cookieToken || metaToken || null;
+
+            const headers = {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+            };
+
+            if (csrfToken) {
+                // include both header names to be safe
+                headers['X-CSRF-TOKEN'] = csrfToken;
+                headers['X-XSRF-TOKEN'] = csrfToken;
+            }
 
             const response = await fetch(requestData.endpoint, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Accept': 'application/json',
-                    ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {})
-                },
+                headers,
                 credentials: 'same-origin',
                 body: JSON.stringify(requestData.payload)
             });
