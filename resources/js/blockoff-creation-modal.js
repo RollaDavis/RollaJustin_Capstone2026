@@ -382,25 +382,14 @@ const bindActions = () => {
                 if (parts.length === 2) return parts.pop().split(';').shift();
                 return null;
             }
-            // Laravel's XSRF-TOKEN cookie is base64 encoded, decode it
-            let csrfToken = getCookie('XSRF-TOKEN');
-            if (csrfToken) {
-                try {
-                    csrfToken = decodeURIComponent(csrfToken);
-                    csrfToken = atob(csrfToken);
-                } catch (e) {
-                    // fallback to decoded only
-                }
-            } else {
-                csrfToken = null;
-            }
+            const csrfToken = getCookie('XSRF-TOKEN') ? decodeURIComponent(getCookie('XSRF-TOKEN')) : null;
 
             const response = await fetch(requestData.endpoint, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                     'Accept': 'application/json',
-                    ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken, 'X-XSRF-TOKEN': csrfToken } : {})
+                    ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {})
                 },
                 credentials: 'same-origin',
                 body: JSON.stringify(requestData.payload)
