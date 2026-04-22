@@ -226,6 +226,7 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <form id="blockoffCreationForm" class="modal-body blockoff-creation-body">
+                    @csrf
                     <div id="blockoffCreationFormBody">
                         <div class="blockoff-creation-target mb-3">
                             <p class="blockoff-creation-target-label mb-1">Current Target</p>
