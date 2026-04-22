@@ -374,8 +374,15 @@ const bindActions = () => {
         try {
             setSubmitState(true);
 
-            // Get CSRF token from meta tag
-            const csrfToken = document.querySelector('meta[name="csrf-token"]')?.getAttribute('content');
+
+            // Get CSRF token from XSRF-TOKEN cookie (Laravel expects this for AJAX)
+            function getCookie(name) {
+                const value = `; ${document.cookie}`;
+                const parts = value.split(`; ${name}=`);
+                if (parts.length === 2) return parts.pop().split(';').shift();
+                return null;
+            }
+            const csrfToken = getCookie('XSRF-TOKEN') ? decodeURIComponent(getCookie('XSRF-TOKEN')) : null;
 
             const response = await fetch(requestData.endpoint, {
                 method: 'POST',
@@ -384,6 +391,7 @@ const bindActions = () => {
                     'Accept': 'application/json',
                     ...(csrfToken ? { 'X-CSRF-TOKEN': csrfToken } : {})
                 },
+                credentials: 'same-origin',
                 body: JSON.stringify(requestData.payload)
             });
 
