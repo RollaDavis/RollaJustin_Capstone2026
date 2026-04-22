@@ -373,10 +373,6 @@ const bindActions = () => {
 
         try {
             setSubmitState(true);
-
-
-            // Resolve CSRF token: prefer XSRF-TOKEN cookie (for Laravel/Sanctum),
-            // fallback to the meta csrf token rendered into the page.
             function getCookie(name) {
                 const value = `; ${document.cookie}`;
                 const parts = value.split(`; ${name}=`);
@@ -395,19 +391,8 @@ const bindActions = () => {
             };
 
             if (csrfToken) {
-                // include both header names to be safe
                 headers['X-CSRF-TOKEN'] = csrfToken;
-                headers['X-XSRF-TOKEN'] = csrfToken;
             }
-
-            // Debugging: expose token and headers to console to verify they're sent
-            // Remove these logs after debugging
-            // eslint-disable-next-line no-console
-            console.debug('Blockoff CSRF cookieToken:', cookieToken);
-            // eslint-disable-next-line no-console
-            console.debug('Blockoff CSRF metaToken:', metaToken);
-            // eslint-disable-next-line no-console
-            console.debug('Blockoff request headers:', headers);
 
             const response = await fetch(requestData.endpoint, {
                 method: 'POST',

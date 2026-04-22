@@ -1,12 +1,10 @@
-// Ensure CSRF token and headers are attached to AJAX requests.
-const tokenMeta = typeof document !== 'undefined' ? document.head.querySelector('meta[name="csrf-token"]') : null;
+const tokenMeta = document.head.querySelector('meta[name="csrf-token"]');
 const CSRF_TOKEN = tokenMeta ? tokenMeta.content : null;
 window.csrfToken = CSRF_TOKEN;
 
 (function attachCsrf() {
     if (typeof window === 'undefined') return;
 
-    // Patch fetch to include CSRF token, Accept header, and credentials by default
     if (window.fetch) {
         try {
             const originalFetch = window.fetch.bind(window);
@@ -33,11 +31,10 @@ window.csrfToken = CSRF_TOKEN;
                 return originalFetch(input, init);
             };
         } catch (e) {
-            // noop
+            //
         }
     }
 
-    // If axios is present, set default headers
     try {
         if (window.axios) {
             if (CSRF_TOKEN) {
@@ -46,10 +43,9 @@ window.csrfToken = CSRF_TOKEN;
             window.axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         }
     } catch (e) {
-        // noop
+
     }
 
-    // If jQuery is present, configure ajaxSetup
     try {
         if (window.jQuery) {
             window.jQuery.ajaxSetup({
@@ -63,6 +59,6 @@ window.csrfToken = CSRF_TOKEN;
             });
         }
     } catch (e) {
-        // noop
+     
     }
 })();
