@@ -286,4 +286,74 @@
             </div>
         </div>
     </div>
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const submitBtn = document.getElementById('blockoffCreateSubmit');
+    const errorDiv = document.getElementById('blockoffCreationError');
+    const successDiv = document.getElementById('blockoffCreationSuccess');
+    submitBtn?.addEventListener('click', async function () {
+        errorDiv.classList.add('d-none');
+        successDiv.classList.add('d-none');
+        // Collect selected days
+        const days = Array.from(document.querySelectorAll('input[name="blockoffDays"]:checked')).map(cb => cb.value);
+        const startTime = document.getElementById('blockoffStartTime').value;
+        const endTime = document.getElementById('blockoffEndTime').value;
+        const target = document.getElementById('blockoffCreationTargetSummary').textContent.trim();
+
+        // Simple validation
+        if (!target || target === 'No target selected') {
+            errorDiv.textContent = 'Please select a target.';
+            errorDiv.classList.remove('d-none');
+            return;
+        }
+        if (days.length === 0) {
+            errorDiv.textContent = 'Please select at least one day.';
+            errorDiv.classList.remove('d-none');
+            return;
+        }
+        if (!startTime || !endTime) {
+            errorDiv.textContent = 'Please enter both start and end times.';
+            errorDiv.classList.remove('d-none');
+            return;
+        }
+        if (startTime >= endTime) {
+            errorDiv.textContent = 'Start time must be before end time.';
+            errorDiv.classList.remove('d-none');
+            return;
+        }
+
+        // Prepare data (adjust keys as needed for your backend)
+        const data = {
+            target,
+            days,
+            start_time: startTime,
+            end_time: endTime
+        };
+
+        try {
+            const response = await fetch('/blockoffs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
+                },
+                body: JSON.stringify(data)
+            });
+            const result = await response.json();
+            if (!response.ok) {
+                throw new Error(result.message || 'Failed to create blockoff.');
+            }
+            successDiv.textContent = 'Blockoff created successfully!';
+            successDiv.classList.remove('d-none');
+            // Optionally, reset fields or close modal here
+        } catch (err) {
+            errorDiv.textContent = err.message;
+            errorDiv.classList.remove('d-none');
+        }
+    });
+});
+</script>
+@endpush
 @endsection
