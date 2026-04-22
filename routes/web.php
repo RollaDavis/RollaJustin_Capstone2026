@@ -3,6 +3,8 @@
 use Illuminate\Support\Facades\Route;
 use Illuminate\Validation\ValidationException;
 use App\Models\User;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 
 Auth::routes();
 
@@ -32,5 +34,19 @@ Route::post('/login/token', function (Request $request) {
     $tokenText = $user->createToken($request->device_name)->plainTextToken;
     return ['token' => $tokenText];
 });
+
+
+if (config('app.debug')) {
+    Route::get('/_debug-csrf', function (Request $request) {
+        return response()->json([
+            'app_debug' => config('app.debug'),
+            'session_id' => session()->getId(),
+            'csrf_token' => csrf_token(),
+            'session_token' => $request->session()->token(),
+            'cookies' => $request->cookies->all(),
+            'headers' => $request->headers->all(),
+        ]);
+    });
+}
 
 
