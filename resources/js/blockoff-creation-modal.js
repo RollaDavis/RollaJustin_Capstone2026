@@ -400,6 +400,15 @@ const bindActions = () => {
                 headers['X-XSRF-TOKEN'] = csrfToken;
             }
 
+            // Debugging: expose token and headers to console to verify they're sent
+            // Remove these logs after debugging
+            // eslint-disable-next-line no-console
+            console.debug('Blockoff CSRF cookieToken:', cookieToken);
+            // eslint-disable-next-line no-console
+            console.debug('Blockoff CSRF metaToken:', metaToken);
+            // eslint-disable-next-line no-console
+            console.debug('Blockoff request headers:', headers);
+
             const response = await fetch(requestData.endpoint, {
                 method: 'POST',
                 headers,
