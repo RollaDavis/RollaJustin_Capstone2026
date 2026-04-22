@@ -225,7 +225,8 @@
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div id="blockoffCreationForm" data-ajax-form data-action="{{ route('home') }}" data-method="POST" class="modal-body blockoff-creation-body">
+                <form id="blockoffCreationForm" class="modal-body blockoff-creation-body">
+                    @csrf
                     <div id="blockoffCreationFormBody">
                         <div class="blockoff-creation-target mb-3">
                             <p class="blockoff-creation-target-label mb-1">Current Target</p>
@@ -280,9 +281,9 @@
 
                     <div class="d-flex justify-content-end gap-2 mt-2">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="button" id="blockoffCreateSubmit" data-ajax-submit class="btn btn-primary">Create Blockoff</button>
+                        <button type="submit" id="blockoffCreateSubmit" class="btn btn-primary">Create Blockoff</button>
                     </div>
-                </div>
+                </form>
             </div>
         </div>
     </div>
