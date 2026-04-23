@@ -152,7 +152,7 @@ class AssignmentController extends Controller
 
     public function showAssignmentOptions(Term $term, Assignment $assignment, Request $request)
     {
-        $testAssignment = $assignment->replicate();
+        $testAssignment = clone $assignment;
         $days = $request->query('days', $request->input('data.attributes.days'));
         $duration = $request->query('duration', $request->input('data.attributes.duration'));
 
@@ -216,8 +216,10 @@ class AssignmentController extends Controller
             $hasConflict = true;
         }
 
-        if ($this->checkTermProgramConflicts($assignment)['all_program_years_have_valid_schedule'] === false) {
-            foreach ($this->checkTermProgramConflicts($assignment)['invalid_program_years'] as $invalidProgramYear) {
+        $programConflicts = $this->checkTermProgramConflicts($assignment);
+
+        if ($programConflicts['all_program_years_have_valid_schedule'] === false) {
+            foreach ($programConflicts['invalid_program_years'] as $invalidProgramYear) {
                 $conflicts[] = 'Program ' . $invalidProgramYear['program_name'] . ' Year ' . $invalidProgramYear['year'] . ' does not have a valid schedule with this assignment.';
                 $hasConflict = true;
             }
@@ -329,7 +331,7 @@ class AssignmentController extends Controller
                 && ! $courseSectionOptions->contains(function (array $option) {
                     return $option['sections']->isEmpty();
                 })
-                && $this->hasValidProgramYearSectionPermutation($courseSectionOptions->all(), $assignment->term_id);
+                && $this->hasValidProgramYearSectionPermutation($courseSectionOptions->all(), $assignment->term_id, $assignment);
 
             return [
                 'program_id' => $programYearCombination['program_id'],
@@ -352,7 +354,7 @@ class AssignmentController extends Controller
         ];
     }
 
-    private function hasValidProgramYearSectionPermutation(array $courseSectionOptions, int $termId, int $index = 0, array $chosenTimeslots = []): bool
+    private function hasValidProgramYearSectionPermutation(array $courseSectionOptions, int $termId, Assignment $candidateAssignment, int $index = 0, array $chosenTimeslots = []): bool
     {
         if ($index === count($courseSectionOptions)) {
             return true;
@@ -361,7 +363,7 @@ class AssignmentController extends Controller
         $courseOption = $courseSectionOptions[$index];
 
         foreach ($courseOption['sections'] as $section) {
-            $sectionTimeslotsForTerm = $this->getSectionTimeslotsForTerm($section, $termId);
+            $sectionTimeslotsForTerm = $this->getSectionTimeslotsForTerm($section, $termId, $candidateAssignment);
 
             if ($this->timeslotsConflictWithChosenTimeslots($sectionTimeslotsForTerm, $chosenTimeslots)) {
                 continue;
@@ -370,6 +372,7 @@ class AssignmentController extends Controller
             if ($this->hasValidProgramYearSectionPermutation(
                 $courseSectionOptions,
                 $termId,
+                $candidateAssignment,
                 $index + 1,
                 array_merge($chosenTimeslots, $sectionTimeslotsForTerm)
             )) {
@@ -380,11 +383,17 @@ class AssignmentController extends Controller
         return false;
     }
 
-    private function getSectionTimeslotsForTerm($section, int $termId): array
+    private function getSectionTimeslotsForTerm($section, int $termId, Assignment $candidateAssignment): array
     {
         return $section->assignments
             ->where('term_id', $termId)
-            ->pluck('timeslot')
+            ->map(function (Assignment $sectionAssignment) use ($candidateAssignment) {
+                if ($candidateAssignment->id !== null && $sectionAssignment->id === $candidateAssignment->id) {
+                    return $candidateAssignment->timeslot;
+                }
+
+                return $sectionAssignment->timeslot;
+            })
             ->filter()
             ->values()
             ->all();
