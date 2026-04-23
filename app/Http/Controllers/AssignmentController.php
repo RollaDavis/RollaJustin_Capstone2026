@@ -38,7 +38,7 @@ class AssignmentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreAssignmentRequest $request)
+    public function store(StoreAssignmentRequest $request, Term $term)
     {
         $attributes = $request->validated()['data']['attributes'];
 
@@ -50,7 +50,7 @@ class AssignmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Assignment $assignment)
+    public function show(Term $term, Assignment $assignment)
     {
         return new AssignmentResource($assignment);
     }
@@ -59,7 +59,7 @@ class AssignmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateAssignmentRequest $request, Assignment $assignment)
+    public function update(UpdateAssignmentRequest $request, Term $term, Assignment $assignment)
     {
         $attributes = $request->validated()['data']['attributes'];
 
@@ -71,7 +71,7 @@ class AssignmentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Assignment $assignment)
+    public function destroy(Term $term, Assignment $assignment)
     {
         $assignment->delete();
 
@@ -150,11 +150,19 @@ class AssignmentController extends Controller
     }
 
 
-    public function showAssignmentOptions(Assignment $assignment, Request $request)
+    public function showAssignmentOptions(Term $term, Assignment $assignment, Request $request)
     {
-        $testAssignment = $assignment->copy();
-        $days = $request->input('data.attributes.days');
-        $duration = $request->input('data.attributes.duration');
+        $testAssignment = $assignment->replicate();
+        $days = $request->query('days', $request->input('data.attributes.days'));
+        $duration = $request->query('duration', $request->input('data.attributes.duration'));
+
+        if ($days === null || $duration === null) {
+            return response()->json([
+                'message' => 'The days and duration values are required.',
+            ], 422);
+        }
+
+        $duration = (int) $duration;
         $start_times = ['08:00', '9:10', '10:20', '11:30', '12:40', '1:50', '3:00'];
         $options = [];
         $fakeID = 0;
@@ -163,6 +171,7 @@ class AssignmentController extends Controller
             $timeslot = $this->timeslotsForOptions($days, $duration, $start_time);
 
             $testAssignment->timeslot_id = $timeslot->id;
+            $testAssignment->setRelation('timeslot', $timeslot);
 
             $conflicts = $this->checkAssignmentConflicts($testAssignment);
 
@@ -239,7 +248,7 @@ class AssignmentController extends Controller
             }
         
     
-            if ($this->checkInstructorTimeBlockConflict($assignment->timeslot, $assignment->instructor_id)) {
+            if (app(TimeslotController::class)->checkInstructorTimeBlockConflict($assignment->timeslot, $assignment->instructor_id)) {
                 $conflict = true;
             }
 
@@ -268,7 +277,7 @@ class AssignmentController extends Controller
             }
         
     
-            if ($this->checkRoomTimeBlockConflict($assignment->timeslot, $assignment->room_id)) {
+            if (app(TimeslotController::class)->checkRoomTimeBlockConflict($assignment->timeslot, $assignment->room_id)) {
                 $conflict = true;
             }
 
