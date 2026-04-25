@@ -372,31 +372,17 @@ const bindActions = () => {
 
         try {
             setSubmitState(true);
-            function getCookie(name) {
-                const value = `; ${document.cookie}`;
-                const parts = value.split(`; ${name}=`);
-                if (parts.length === 2) return parts.pop().split(';').shift();
-                return null;
-            }
-
-            const cookieToken = getCookie('XSRF-TOKEN') ? decodeURIComponent(getCookie('XSRF-TOKEN')) : null;
-            const metaEl = document.querySelector('meta[name="csrf-token"]');
-            const metaToken = metaEl?.getAttribute('content') || null;
-            const csrfToken = cookieToken || metaToken || null;
-
+            // Do not use or send any CSRF tokens or related headers per configuration.
             const headers = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'
             };
 
-            if (csrfToken) {
-                headers['X-CSRF-TOKEN'] = csrfToken;
-            }
-
             const response = await fetch(requestData.endpoint, {
                 method: 'POST',
                 headers,
-                credentials: 'same-origin',
+                // include credentials so session cookie (if used) is sent, but do not send CSRF headers
+                credentials: 'include',
                 body: JSON.stringify(requestData.payload)
             });
 
