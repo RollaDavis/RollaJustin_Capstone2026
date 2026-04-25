@@ -222,6 +222,19 @@
     opacity: 0.96;
 }
 
+/* Fix: ensure calendar fills the vertical space and remove extra bottom gap */
+.calendar-pane {
+    padding-bottom: 0 !important;
+    min-height: 0;
+}
+
+#calendar.calendar-surface {
+    height: 100% !important;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+}
+
 .fc .fc-timegrid-event.is-selected,
 .fc .fc-list-event.is-selected {
     filter: brightness(0.75) !important;
