@@ -213,7 +213,26 @@ const applySelectionDefaults = (selection = {}, clickedDate = null) => {
         if (end instanceof Date && start instanceof Date && end > start) {
             endTimeEl.value = formatTimeHHMM(end);
         } else if (start instanceof Date) {
-            const defaultEnd = new Date(start.getTime() + (60 * 60 * 1000));
+            // Use calendar slot duration for a sensible default end time (fallback to 10 minutes)
+            let slotMinutes = 10;
+
+            try {
+                const slotDurationOpt = blockoffState.calendar?.getOption
+                    ? blockoffState.calendar.getOption('slotDuration')
+                    : null;
+
+                if (typeof slotDurationOpt === 'string') {
+                    const parts = slotDurationOpt.split(':').map((p) => Number(p));
+
+                    if (parts.length >= 2 && parts.every((n) => Number.isFinite(n))) {
+                        slotMinutes = (Number(parts[0]) * 60) + Number(parts[1]);
+                    }
+                }
+            } catch (err) {
+                // ignore and fall back to 10 minutes
+            }
+
+            const defaultEnd = new Date(start.getTime() + (slotMinutes * 60 * 1000));
             endTimeEl.value = formatTimeHHMM(defaultEnd);
         } else {
             endTimeEl.value = '';
