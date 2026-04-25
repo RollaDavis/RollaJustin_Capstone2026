@@ -258,6 +258,25 @@ main[class*="flex-grow-1"][class*="flex-column"] {
     padding-bottom: 0 !important;
 }
 
+/* Ensure the layout root and #app fill the viewport and main uses full height */
+html, body {
+    height: 100%;
+}
+
+#app {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+#app > main {
+    flex: 1 1 auto !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    display: flex;
+    flex-direction: column;
+}
+
 .fc .fc-timegrid-event.is-selected,
 .fc .fc-list-event.is-selected {
     filter: brightness(0.75) !important;
