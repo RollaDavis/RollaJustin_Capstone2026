@@ -250,6 +250,14 @@
     margin-bottom: 0 !important;
 }
 
+/* Target the main flex container used on the home route to remove extra gap */
+main.flex-grow-1.d-flex.flex-column,
+main[class*="flex-grow-1"][class*="flex-column"] {
+    min-height: 0 !important;
+    margin-bottom: 0 !important;
+    padding-bottom: 0 !important;
+}
+
 .fc .fc-timegrid-event.is-selected,
 .fc .fc-list-event.is-selected {
     filter: brightness(0.75) !important;
