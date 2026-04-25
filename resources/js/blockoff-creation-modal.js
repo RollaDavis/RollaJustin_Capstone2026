@@ -381,7 +381,6 @@ const bindActions = () => {
             const response = await fetch(requestData.endpoint, {
                 method: 'POST',
                 headers,
-                // include credentials so session cookie (if used) is sent, but do not send CSRF headers
                 credentials: 'include',
                 body: JSON.stringify(requestData.payload)
             });
