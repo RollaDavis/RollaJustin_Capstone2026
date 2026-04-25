@@ -96,11 +96,15 @@
     flex: 1 1 auto;
     overflow: visible;
     background-color: #ebeaea;
+    /* allow children to shrink properly inside the flex container */
+    min-height: 0;
 }
 
 .calendar-surface {
     flex: 1 1 auto;
     background-color: #fff;
+    /* ensure the calendar can size to the parent's flex height */
+    min-height: 0;
 }
 
 .event-context-menu {
