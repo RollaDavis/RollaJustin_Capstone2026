@@ -38,7 +38,7 @@ class AssignmentController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(StoreAssignmentRequest $request)
+    public function store(StoreAssignmentRequest $request, Term $term)
     {
         $attributes = $request->validated()['data']['attributes'];
 
@@ -50,7 +50,7 @@ class AssignmentController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(Assignment $assignment)
+    public function show(Term $term, Assignment $assignment)
     {
         return new AssignmentResource($assignment);
     }
@@ -59,7 +59,7 @@ class AssignmentController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(UpdateAssignmentRequest $request, Assignment $assignment)
+    public function update(UpdateAssignmentRequest $request, Term $term, Assignment $assignment)
     {
         $attributes = $request->validated()['data']['attributes'];
 
@@ -71,7 +71,7 @@ class AssignmentController extends Controller
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(Assignment $assignment)
+    public function destroy(Term $term, Assignment $assignment)
     {
         $assignment->delete();
 
@@ -150,11 +150,19 @@ class AssignmentController extends Controller
     }
 
 
-    public function showAssignmentOptions(Assignment $assignment, Request $request)
+    public function showAssignmentOptions(Term $term, Assignment $assignment, Request $request)
     {
-        $testAssignment = $assignment->copy();
-        $days = $request->input('data.attributes.days');
-        $duration = $request->input('data.attributes.duration');
+        $testAssignment = clone $assignment;
+        $days = $request->query('days', $request->input('data.attributes.days'));
+        $duration = $request->query('duration', $request->input('data.attributes.duration'));
+
+        if ($days === null || $duration === null) {
+            return response()->json([
+                'message' => 'The days and duration values are required.',
+            ], 422);
+        }
+
+        $duration = (int) $duration;
         $start_times = ['08:00', '9:10', '10:20', '11:30', '12:40', '1:50', '3:00'];
         $options = [];
         $fakeID = 0;
@@ -163,6 +171,7 @@ class AssignmentController extends Controller
             $timeslot = $this->timeslotsForOptions($days, $duration, $start_time);
 
             $testAssignment->timeslot_id = $timeslot->id;
+            $testAssignment->setRelation('timeslot', $timeslot);
 
             $conflicts = $this->checkAssignmentConflicts($testAssignment);
 
@@ -207,8 +216,10 @@ class AssignmentController extends Controller
             $hasConflict = true;
         }
 
-        if ($this->checkTermProgramConflicts($assignment)['all_program_years_have_valid_schedule'] === false) {
-            foreach ($this->checkTermProgramConflicts($assignment)['invalid_program_years'] as $invalidProgramYear) {
+        $programConflicts = $this->checkTermProgramConflicts($assignment);
+
+        if ($programConflicts['all_program_years_have_valid_schedule'] === false) {
+            foreach ($programConflicts['invalid_program_years'] as $invalidProgramYear) {
                 $conflicts[] = 'Program ' . $invalidProgramYear['program_name'] . ' Year ' . $invalidProgramYear['year'] . ' does not have a valid schedule with this assignment.';
                 $hasConflict = true;
             }
@@ -239,7 +250,7 @@ class AssignmentController extends Controller
             }
         
     
-            if ($this->checkInstructorTimeBlockConflict($assignment->timeslot, $assignment->instructor_id)) {
+            if (app(TimeslotController::class)->checkInstructorTimeBlockConflict($assignment->timeslot, $assignment->instructor_id)) {
                 $conflict = true;
             }
 
@@ -268,7 +279,7 @@ class AssignmentController extends Controller
             }
         
     
-            if ($this->checkRoomTimeBlockConflict($assignment->timeslot, $assignment->room_id)) {
+            if (app(TimeslotController::class)->checkRoomTimeBlockConflict($assignment->timeslot, $assignment->room_id)) {
                 $conflict = true;
             }
 
@@ -320,7 +331,7 @@ class AssignmentController extends Controller
                 && ! $courseSectionOptions->contains(function (array $option) {
                     return $option['sections']->isEmpty();
                 })
-                && $this->hasValidProgramYearSectionPermutation($courseSectionOptions->all(), $assignment->term_id);
+                && $this->hasValidProgramYearSectionPermutation($courseSectionOptions->all(), $assignment->term_id, $assignment);
 
             return [
                 'program_id' => $programYearCombination['program_id'],
@@ -343,7 +354,7 @@ class AssignmentController extends Controller
         ];
     }
 
-    private function hasValidProgramYearSectionPermutation(array $courseSectionOptions, int $termId, int $index = 0, array $chosenTimeslots = []): bool
+    private function hasValidProgramYearSectionPermutation(array $courseSectionOptions, int $termId, Assignment $candidateAssignment, int $index = 0, array $chosenTimeslots = []): bool
     {
         if ($index === count($courseSectionOptions)) {
             return true;
@@ -352,7 +363,7 @@ class AssignmentController extends Controller
         $courseOption = $courseSectionOptions[$index];
 
         foreach ($courseOption['sections'] as $section) {
-            $sectionTimeslotsForTerm = $this->getSectionTimeslotsForTerm($section, $termId);
+            $sectionTimeslotsForTerm = $this->getSectionTimeslotsForTerm($section, $termId, $candidateAssignment);
 
             if ($this->timeslotsConflictWithChosenTimeslots($sectionTimeslotsForTerm, $chosenTimeslots)) {
                 continue;
@@ -361,6 +372,7 @@ class AssignmentController extends Controller
             if ($this->hasValidProgramYearSectionPermutation(
                 $courseSectionOptions,
                 $termId,
+                $candidateAssignment,
                 $index + 1,
                 array_merge($chosenTimeslots, $sectionTimeslotsForTerm)
             )) {
@@ -371,11 +383,17 @@ class AssignmentController extends Controller
         return false;
     }
 
-    private function getSectionTimeslotsForTerm($section, int $termId): array
+    private function getSectionTimeslotsForTerm($section, int $termId, Assignment $candidateAssignment): array
     {
         return $section->assignments
             ->where('term_id', $termId)
-            ->pluck('timeslot')
+            ->map(function (Assignment $sectionAssignment) use ($candidateAssignment) {
+                if ($candidateAssignment->id !== null && $sectionAssignment->id === $candidateAssignment->id) {
+                    return $candidateAssignment->timeslot;
+                }
+
+                return $sectionAssignment->timeslot;
+            })
             ->filter()
             ->values()
             ->all();

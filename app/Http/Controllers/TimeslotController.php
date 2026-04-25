@@ -77,9 +77,9 @@ class TimeslotController extends Controller
         $randomdate = " November 15 2025"; // Use a fixed date to compare times
         // Check if the time ranges overlap
         $start1 = strtotime($timeslot1->start_time.$randomdate);
-        $end1 = strtotime(date('H:i', strtotime($timeslot1->start_time)."+".$timeslot1->duration." hours").$randomdate);
+        $end1 = $start1 + (int) round(((float) $timeslot1->duration) * 3600);
         $start2 = strtotime($timeslot2->start_time.$randomdate);
-        $end2 = strtotime(date('H:i', strtotime($timeslot2->start_time)."+".$timeslot2->duration." hours").$randomdate);
+        $end2 = $start2 + (int) round(((float) $timeslot2->duration) * 3600);
 
         return ($start1 < $end2) && ($start2 < $end1); // Time ranges overlap if this condition is true
     }
