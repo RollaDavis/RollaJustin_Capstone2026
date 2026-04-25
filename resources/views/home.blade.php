@@ -225,8 +225,7 @@
                     </div>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <form id="blockoffCreationForm" class="modal-body blockoff-creation-body">
-                    @csrf
+                <div id="blockoffCreationForm" class="modal-body blockoff-creation-body">
                     <div id="blockoffCreationFormBody">
                         <div class="blockoff-creation-target mb-3">
                             <p class="blockoff-creation-target-label mb-1">Current Target</p>
@@ -281,9 +280,9 @@
 
                     <div class="d-flex justify-content-end gap-2 mt-2">
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                        <button type="submit" id="blockoffCreateSubmit" class="btn btn-primary">Create Blockoff</button>
+                        <button type="button" id="blockoffCreateSubmit" class="btn btn-primary">Create Blockoff</button>
                     </div>
-                </form>
+                </div>
             </div>
         </div>
     </div>

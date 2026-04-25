@@ -350,10 +350,9 @@ const bindActions = () => {
 
     const formEl = document.getElementById('blockoffCreationForm');
     const modalEl = document.getElementById('blockoffCreationModal');
+    const submitButton = document.getElementById('blockoffCreateSubmit');
 
-    formEl?.addEventListener('submit', async (submitEvent) => {
-        submitEvent.preventDefault();
-
+    const handleSubmit = async () => {
         setErrorMessage('');
         setSuccessMessage('');
 
@@ -418,6 +417,11 @@ const bindActions = () => {
         } finally {
             setSubmitState(false);
         }
+    };
+
+    submitButton?.addEventListener('click', (e) => {
+        e.preventDefault();
+        handleSubmit();
     });
 
     modalEl?.addEventListener('hidden.bs.modal', () => {
