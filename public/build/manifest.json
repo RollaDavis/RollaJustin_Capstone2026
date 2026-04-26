@@ -1,9 +1,12 @@
 {
   "resources/js/app.js": {
-    "file": "assets/app-D0BcaYt4.js",
+    "file": "assets/app-C1jtrpTZ.js",
     "name": "app",
     "src": "resources/js/app.js",
-    "isEntry": true
+    "isEntry": true,
+    "dynamicImports": [
+      "resources/js/app.js"
+    ]
   },
   "resources/sass/app.scss": {
     "file": "assets/app-C8pPhopy.css",
