@@ -7,6 +7,7 @@ import listPlugin from '@fullcalendar/list';
 import { buildCalendarEventsFromCourses } from './calendarEvents';
 import { initializeUnscheduledCourseDnd } from './unscheduled-course-dnd';
 import { showEventDetailsModal } from './event-details-modal';
+import { showRescheduleUnscheduledCourseModal } from './reschedule-unscheduled-course-modal';
 import { showBlockoffCreationModal } from './blockoff-creation-modal';
 import './dropdown.js';
 import './calendarEvents.js';
@@ -301,13 +302,32 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }));
 
+    
+
+    // allow short-lived suppression of clearing selection (used when opening details via context menus)
+    let _suppressClearUntil = 0;
+    document.addEventListener('schedule:preserve-selection', () => {
+        _suppressClearUntil = Date.now() + 200; // ms
+    });
+
+    // override click handler to respect suppression
     document.addEventListener('click', (event) => {
         const clickedInsideEvent = event.target instanceof Element
             && event.target.closest('.fc-timegrid-event, .fc-list-event');
 
-        if (!clickedInsideEvent) {
-            clearSelectedEventState(calendarEl);
+        const clickedInsideModal = event.target instanceof Element
+            && event.target.closest('.modal, .modal-dialog, #eventDetailsModal, #eventOptionsModal');
+
+        // don't clear selection if clicking inside a calendar event or inside any modal
+        if (clickedInsideEvent || clickedInsideModal) {
+            return;
         }
+
+        if (Date.now() < _suppressClearUntil) {
+            return;
+        }
+
+        clearSelectedEventState(calendarEl);
     });
 
     const renderSelectedCourses = async (detail = {}) => {
@@ -335,8 +355,20 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSelectedCourses(currentSelectionDetail);
     });
 
+
     document.addEventListener('schedule:open-event-details', (event) => {
-        showEventDetailsModal(event.detail || {}, calendar);
+        try {
+            console.log('app: schedule:open-event-details received', event && event.detail && (event.detail.unscheduledPayload ? 'contains unscheduledPayload' : 'regular detail'));
+        } catch (e) { /* ignore */ }
+        if (event.detail && event.detail.unscheduledPayload) {
+            showRescheduleUnscheduledCourseModal(event.detail.unscheduledPayload, (rescheduleData) => {
+                // TODO: Integrate with backend to save reschedule
+                // Example: send rescheduleData to API, then refresh calendar/events
+                console.log('Reschedule data to save:', rescheduleData);
+            });
+        } else {
+            showEventDetailsModal(event.detail || {}, calendar);
+        }
     });
 
     document.addEventListener('schedule:open-blockoff-creation', (event) => {

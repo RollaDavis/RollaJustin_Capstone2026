@@ -7,6 +7,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="current-user-id" content="{{ Auth::check() ? Auth::id() : '' }}">
 
     <title>{{ config('app.name', 'Capstone') }}</title>
 
@@ -124,6 +125,10 @@
         </nav>
 
         <main class="{{ request()->routeIs('home') ? 'flex-grow-1 d-flex flex-column' : 'py-4' }}">
+              <div id="globalBannerContainer" aria-live="polite" aria-atomic="true"
+                  class="position-fixed top-0 start-50 translate-middle-x p-3 d-flex justify-content-center"
+                  style="z-index: 1080; pointer-events: none; width: 90%; max-width: 900px;">
+              </div>
             @yield('content')
         </main>
     </div>

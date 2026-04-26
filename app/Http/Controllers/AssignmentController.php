@@ -155,6 +155,8 @@ class AssignmentController extends Controller
         $testAssignment = clone $assignment;
         $days = $request->query('days', $request->input('data.attributes.days'));
         $duration = $request->query('duration', $request->input('data.attributes.duration'));
+        $instructorId = $request->query('instructor_id', $request->input('data.attributes.instructor_id'));
+        $roomId = $request->query('room_id', $request->input('data.attributes.room_id'));
 
         if ($days === null || $duration === null) {
             return response()->json([
@@ -163,7 +165,23 @@ class AssignmentController extends Controller
         }
 
         $duration = (int) $duration;
-        $start_times = ['08:00', '9:10', '10:20', '11:30', '12:40', '1:50', '3:00'];
+        // If instructor/room overrides were provided, apply them to the test assignment
+        if ($instructorId !== null) {
+            $instructor = Instructor::find((int) $instructorId);
+            if ($instructor) {
+                $testAssignment->instructor_id = $instructor->id;
+                $testAssignment->setRelation('instructor', $instructor);
+            }
+        }
+
+        if ($roomId !== null) {
+            $room = Room::find((int) $roomId);
+            if ($room) {
+                $testAssignment->room_id = $room->id;
+                $testAssignment->setRelation('room', $room);
+            }
+        }
+        $start_times = ['08:00', '09:10', '10:20', '11:30', '12:40', '13:50', '15:00'];
         $options = [];
         $fakeID = 0;
 

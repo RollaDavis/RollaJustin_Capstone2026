@@ -1,6 +1,26 @@
 @extends('layouts.app')
 
 @section('content')
+    <style>
+        /* Highlight time card when pending */
+        .event-details-card--time.pending {
+            border: 1px solid #dc3545;
+            border-radius: 0.25rem;
+            padding: 0.5rem;
+        }
+
+        /* Make the pending button visually like the edit pen */
+        #eventDetailsTimePendingButton.event-details-edit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 30px;
+            height: 30px;
+            padding: 0;
+            color: #dc3545;
+            border-color: rgba(220,53,69,0.25);
+        }
+    </style>
     <div class="container-fluid px-0">
         <div class="d-flex home-layout-shell">
             <div
@@ -96,9 +116,16 @@
                         </div>
                         <div class="event-details-card event-details-card--time">
                             <p class="event-details-label">Time</p>
-                            <p class="event-details-value" id="eventDetailsTime">Not available</p>
+                            <div class="event-details-value-row">
+                                <p class="event-details-value" id="eventDetailsTime">Not available</p>
+                                <button id="eventDetailsTimePendingButton" type="button" class="btn btn-sm event-details-edit-btn d-none"
+                                    aria-label="Select time option" title="Select option">!
+                                </button>
+                            </div>
                         </div>
                     </div>
+
+                    <!-- options moved to separate modal -->
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
@@ -282,6 +309,24 @@
                         <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
                         <button type="button" id="blockoffCreateSubmit" class="btn btn-primary">Create Blockoff</button>
                     </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="eventOptionsModal" tabindex="-1" aria-labelledby="eventOptionsModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="eventOptionsModalLabel">Suggested Options</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div id="eventDetailsOptionsList" class="list-group"></div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="eventOptionsApplyButton">Apply Selected</button>
                 </div>
             </div>
         </div>

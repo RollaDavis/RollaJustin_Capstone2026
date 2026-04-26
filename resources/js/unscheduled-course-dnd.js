@@ -211,8 +211,11 @@ export const initializeUnscheduledCourseDnd = ({
             rescheduleBtn.className = 'event-context-menu__item';
             rescheduleBtn.textContent = 'Reschedule';
             rescheduleBtn.addEventListener('click', () => {
+                console.log('unscheduled: reschedule clicked for payload id', payload?.id);
+                document.dispatchEvent(new CustomEvent('schedule:preserve-selection'));
+                // open full details modal with the unscheduled payload (force full modal)
                 document.dispatchEvent(new CustomEvent('schedule:open-event-details', {
-                    detail: { eventId: payload.id }
+                    detail: { unscheduledPayload: payload, forceFullModal: true }
                 }));
                 menu.remove();
             });

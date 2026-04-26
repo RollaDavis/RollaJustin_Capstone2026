@@ -155,14 +155,35 @@ document.addEventListener('DOMContentLoaded', () => {
             const courses = Array.isArray(payload)
                 ? payload
                 : (Array.isArray(payload?.data) ? payload.data : []);
-
-            console.log(`Courses for ${selectedView} ${selectedName} (ID: ${selectedId}) in term ${selectedTermName}`, courses);
+            try {
+                console.log(`Courses for ${selectedView} ${selectedName} (ID: ${selectedId}) in term ${selectedTermName}`, JSON.parse(JSON.stringify(courses)));
+                console.log('Courses (raw JSON):\n', JSON.stringify(courses, null, 2));
+            } catch (e) {
+                console.log(`Courses for ${selectedView} ${selectedName} (ID: ${selectedId}) in term ${selectedTermName}`, courses);
+            }
             publishSelectedCourses(selectedView, selectedId, selectedName, courses);
         } catch (error) {
             console.error(`Unable to load courses for ${selectedView}`, error);
             publishSelectedCourses(selectedView, selectedId, selectedName, []);
         }
     };
+
+    // allow other modules to request a refresh of the current selection
+    document.addEventListener('schedule:refresh-selection', () => {
+        const selectedView = normalizeScheduleByValue(scheduleBySelect?.value || '');
+        const selectedId = Number(scheduleValueSelect?.value || '');
+        const selectedName = String(scheduleValueDropdownButton?.textContent || '').trim();
+
+        if (!selectedView || !Number.isInteger(selectedId) || selectedId <= 0) {
+            // nothing to refresh
+            return;
+        }
+
+        // re-fetch courses for the current selection and publish
+        fetchCoursesForSelection(selectedView, selectedId, selectedName).catch((e) => {
+            console.error('Failed to refresh current selection', e);
+        });
+    });
 
     const closeSecondaryDropdown = () => {
         if (!scheduleValueDropdownButton) {
