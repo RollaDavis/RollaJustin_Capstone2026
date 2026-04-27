@@ -49,6 +49,12 @@ class AssignmentResource extends JsonResource
                         'type' => 'timeslots',
                         'id' => $this->timeslot->id,
                     ]
+                ],
+                'term' => [
+                    'data' => [
+                        'type' => 'terms',
+                        'id' => $this->term->id,
+                    ]
                 ]
             ]
         ];
