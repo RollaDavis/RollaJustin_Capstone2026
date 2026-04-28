@@ -213,7 +213,7 @@ const applySelectionDefaults = (selection = {}, clickedDate = null) => {
         if (end instanceof Date && start instanceof Date && end > start) {
             endTimeEl.value = formatTimeHHMM(end);
         } else if (start instanceof Date) {
-            // Use calendar slot duration for a sensible default end time (fallback to 10 minutes)
+            // use calendar slot duration for a sensible default end time (fallback to 10 minutes)
             let slotMinutes = 10;
 
             try {
@@ -391,7 +391,7 @@ const bindActions = () => {
 
         try {
             setSubmitState(true);
-            // Do not use or send any CSRF tokens or related headers per configuration.
+            // do not use or send any csrf tokens or related headers per configuration.
             const headers = {
                 'Content-Type': 'application/json',
                 'Accept': 'application/json'

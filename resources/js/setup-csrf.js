@@ -1,3 +1,4 @@
+//left over from when the blockoff modal was a form... keeping here just in case, probably dont need
 const tokenMeta = document.head.querySelector('meta[name="csrf-token"]');
 const CSRF_TOKEN = tokenMeta ? tokenMeta.content : null;
 window.csrfToken = CSRF_TOKEN;

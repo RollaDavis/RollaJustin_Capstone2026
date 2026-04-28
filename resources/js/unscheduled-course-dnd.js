@@ -191,10 +191,10 @@ export const initializeUnscheduledCourseDnd = ({
         unscheduledByKey.set(key, item);
         updateUnscheduledEmptyState();
 
-        // Add context menu for unscheduled course item
+        // add context menu for unscheduled course item
         item.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-            // Remove any existing menu
+            // remove any existing menu
             document.querySelectorAll('.unscheduled-context-menu').forEach((el) => el.remove());
 
             const menu = document.createElement('div');
@@ -205,7 +205,7 @@ export const initializeUnscheduledCourseDnd = ({
             menu.style.top = `${e.clientY}px`;
             menu.setAttribute('role', 'menu');
 
-            // Reschedule (opens detail view)
+            // reschedule (opens detail view)
             const rescheduleBtn = document.createElement('button');
             rescheduleBtn.type = 'button';
             rescheduleBtn.className = 'event-context-menu__item';
@@ -222,7 +222,7 @@ export const initializeUnscheduledCourseDnd = ({
 
             menu.append(rescheduleBtn);
 
-            // Remove menu on click elsewhere
+            // remove menu on click elsewhere
             setTimeout(() => {
                 document.addEventListener('mousedown', function handler(ev) {
                     if (!menu.contains(ev.target)) {

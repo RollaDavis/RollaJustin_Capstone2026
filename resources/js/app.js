@@ -362,8 +362,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (e) { /* ignore */ }
         if (event.detail && event.detail.unscheduledPayload) {
             showRescheduleUnscheduledCourseModal(event.detail.unscheduledPayload, (rescheduleData) => {
-                // TODO: Integrate with backend to save reschedule
-                // Example: send rescheduleData to API, then refresh calendar/events
+                // todo: integrate with backend to save reschedule
+                // example: send rescheduledata to api, then refresh calendar/events
                 console.log('Reschedule data to save:', rescheduleData);
             });
         } else {
