@@ -727,7 +727,8 @@ const setDetailSelectorValues = ({
 
     const uniqueValues = toUniqueValues(values);
     const normalizedPreferred = String(preferredValue || '').trim();
-    const firstLabel = (normalizedPreferred && uniqueValues.includes(normalizedPreferred))
+    // prefer an explicit preferredValue when provided (keeps unscheduled labels visible)
+    const firstLabel = normalizedPreferred
         ? normalizedPreferred
         : (uniqueValues[0] || fallbackLabel);
 
@@ -874,17 +875,20 @@ const bindDetailActions = (root = null) => {
     };
 
     detailEls.instructorEditButton?.addEventListener('click', async () => {
-        await openSelectorModal(detailEls.instructorSelectModal, 'instructor');
+        const canonical = document.getElementById('eventDetailsInstructorSelectModal') || detailEls.instructorSelectModal;
+        await openSelectorModal(canonical, 'instructor');
     });
 
     detailEls.locationEditButton?.addEventListener('click', async () => {
-        await openSelectorModal(detailEls.locationSelectModal, 'location');
+        const canonical = document.getElementById('eventDetailsLocationSelectModal') || detailEls.locationSelectModal;
+        await openSelectorModal(canonical, 'location');
     });
 
     detailEls.daysEditButton?.addEventListener('click', () => {
         setSelectedDayCheckboxes(detailState.selectedDayIndexes);
         setDaysValidationState(false);
-        openSelectorModal(detailEls.daysSelectModal);
+        const canonical = document.getElementById('eventDetailsDaysSelectModal') || detailEls.daysSelectModal;
+        openSelectorModal(canonical);
     });
 
     detailEls.durationEditButton?.addEventListener('click', () => {
@@ -902,7 +906,8 @@ const bindDetailActions = (root = null) => {
         }
 
         setDurationValidationState(false);
-        openSelectorModal(detailEls.durationSelectModal);
+        const canonical = document.getElementById('eventDetailsDurationSelectModal') || detailEls.durationSelectModal;
+        openSelectorModal(canonical);
     });
 
     detailEls.daysApplyButton?.addEventListener('click', () => {
@@ -1395,6 +1400,9 @@ const getCoursesFromEventGroup = (event, relatedEvents = []) => {
 
 const getInstructorLabel = (course = {}) => {
     return course.instructor_name
+        || course.attributes?.instructor_name
+        || course.attributes?.instructor_full_name
+        || course.attributes?.instructor?.full_name
         || course.instructor?.name
         || course.instructor?.full_name
         || null;
@@ -1402,7 +1410,9 @@ const getInstructorLabel = (course = {}) => {
 
 const getLocationLabel = (course = {}) => {
     return course.location_name
+        || course.attributes?.location_name
         || course.room_name
+        || course.attributes?.room_name
         || course.room?.name
         || course.location?.name
         || null;
@@ -1483,32 +1493,36 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
 
     if (isUnscheduled) {
         // for unscheduled reschedules, autofill days/duration from the payload
-        // but keep the time blank/pending so user explicitly chooses an option.
+        // and show any known instructor/room labels from the payload.
+        const primary = primaryCourse || {};
+        const instructorLabel = getInstructorLabel(primary) || 'Not available';
+        const locationLabel = getLocationLabel(primary) || 'Not available';
+
         setDetailSelectorValues({
             valueEl: detailEls.instructorValue,
             searchEl: detailEls.instructorSearch,
             listEl: detailEls.instructorList,
             selectModalEl: detailEls.instructorSelectModal,
             values: [],
-            preferredValue: null,
-            fallbackLabel: '\u2014',
+            preferredValue: instructorLabel,
+            fallbackLabel: instructorLabel,
             root: root
         });
+
         setDetailSelectorValues({
             valueEl: detailEls.locationValue,
             searchEl: detailEls.locationSearch,
             listEl: detailEls.locationList,
             selectModalEl: detailEls.locationSelectModal,
             values: [],
-            preferredValue: null,
-            fallbackLabel: '\u2014',
+            preferredValue: locationLabel,
+            fallbackLabel: locationLabel,
             root: root
         });
 
-        detailEls.instructorValue && (detailEls.instructorValue.textContent = '\u2014');
-        detailEls.locationValue && (detailEls.locationValue.textContent = '\u2014');
-
-        const primary = primaryCourse || {};
+        // ensure visible values are set immediately
+        try { detailEls.instructorValue.textContent = instructorLabel; } catch (e) {}
+        try { detailEls.locationValue.textContent = locationLabel; } catch (e) {}
         const rawDays = primary.days || primary.timeslot_days || primary.attributes?.days || primary.attributes?.timeslot_days || null;
         const parsedDayIndexes = parseDaysToIndexes(rawDays);
 
@@ -1528,11 +1542,11 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
         } catch (e) { /* non-fatal */ }
 
         detailState.selectedDayIndexes = Array.isArray(parsedDayIndexes) ? parsedDayIndexes : [];
-        detailEls.days.textContent = detailState.selectedDayIndexes.length > 0 ? getDaysLabelFromIndexes(detailState.selectedDayIndexes) : '\u2014';
+        detailEls.days.textContent = detailState.selectedDayIndexes.length > 0 ? getDaysLabelFromIndexes(detailState.selectedDayIndexes) : 'Not available';
 
         detailState.selectedDurationMinutes = Number.isInteger(durationMinutes) && durationMinutes > 0 ? durationMinutes : null;
         if (detailEls.duration) {
-            detailEls.duration.textContent = detailState.selectedDurationMinutes ? formatDurationLabel(detailState.selectedDurationMinutes) : '\u2014';
+            detailEls.duration.textContent = detailState.selectedDurationMinutes ? formatDurationLabel(detailState.selectedDurationMinutes) : 'Not available';
         }
 
         // leave time blank/pending and allow user to fetch options
@@ -1583,6 +1597,13 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
     detailEls.days.textContent = getDaysLabelFromIndexes(detailState.selectedDayIndexes);
     if (detailEls.duration) {
         detailEls.duration.textContent = formatDurationLabel(detailState.selectedDurationMinutes);
+    }
+    // for unscheduled flows always show Not available for days/duration
+    if (isUnscheduled) {
+        try {
+            detailEls.days.textContent = 'Not available';
+            if (detailEls.duration) detailEls.duration.textContent = 'Not available';
+        } catch (e) { /* non-fatal */ }
     }
     detailEls.time.textContent = event ? getTimeLabel(event) : '\u2014';
     // store current assignment & term for use by save action
@@ -1637,7 +1658,7 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
                 listEl: detailEls.instructorList,
                 selectModalEl: detailEls.instructorSelectModal,
                 values: allInstructors,
-                preferredValue: eventInstructors[0] || null,
+                preferredValue: isUnscheduled ? (detailEls.instructorValue?.textContent?.trim() || null) : (eventInstructors[0] || null),
                 fallbackLabel: 'No instructors found',
                 root: root
             });
@@ -1648,7 +1669,7 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
                 listEl: detailEls.locationList,
                 selectModalEl: detailEls.locationSelectModal,
                 values: allRooms,
-                preferredValue: eventRooms[0] || null,
+                preferredValue: isUnscheduled ? (detailEls.locationValue?.textContent?.trim() || null) : (eventRooms[0] || null),
                 fallbackLabel: 'No rooms found',
                 root: root
             });
@@ -1666,7 +1687,7 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
                 listEl: detailEls.instructorList,
                 selectModalEl: detailEls.instructorSelectModal,
                 values: eventInstructors,
-                preferredValue: eventInstructors[0] || null,
+                preferredValue: isUnscheduled ? (detailEls.instructorValue?.textContent?.trim() || eventInstructors[0] || null) : (eventInstructors[0] || null),
                 fallbackLabel: 'Not available',
                 root: root
             });
@@ -1677,7 +1698,7 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
                 listEl: detailEls.locationList,
                 selectModalEl: detailEls.locationSelectModal,
                 values: eventRooms,
-                preferredValue: eventRooms[0] || null,
+                preferredValue: isUnscheduled ? (detailEls.locationValue?.textContent?.trim() || eventRooms[0] || null) : (eventRooms[0] || null),
                 fallbackLabel: 'Not available',
                 root: root
             });

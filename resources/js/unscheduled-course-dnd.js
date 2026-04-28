@@ -1,4 +1,6 @@
-﻿const toScheduleGroupKey = ({ id, groupId }) => String(groupId || id || '');
+﻿import { DEFAULT_EVENT_COLOR_PALETTE } from './eventColorPalette';
+
+const toScheduleGroupKey = ({ id, groupId }) => String(groupId || id || '');
 
 const formatDurationLabel = (durationHours) => {
     if (!Number.isFinite(durationHours) || durationHours <= 0) {
@@ -78,9 +80,9 @@ const toUnscheduledPayload = (calendarEvent) => {
         id: calendarEvent.id,
         title: calendarEvent.title,
         groupId: calendarEvent.groupId || null,
-        backgroundColor: calendarEvent.backgroundColor || null,
-        borderColor: calendarEvent.borderColor || null,
-        textColor: calendarEvent.textColor || null,
+        backgroundColor: calendarEvent.backgroundColor || (DEFAULT_EVENT_COLOR_PALETTE[0] && DEFAULT_EVENT_COLOR_PALETTE[0].backgroundColor) || null,
+        borderColor: calendarEvent.borderColor || (DEFAULT_EVENT_COLOR_PALETTE[0] && DEFAULT_EVENT_COLOR_PALETTE[0].borderColor) || null,
+        textColor: calendarEvent.textColor || (DEFAULT_EVENT_COLOR_PALETTE[0] && DEFAULT_EVENT_COLOR_PALETTE[0].borderColor) || null,
         durationHours: Number.isFinite(durationHours) ? durationHours : null,
         extendedProps: {
             ...calendarEvent.extendedProps
@@ -125,11 +127,23 @@ export const initializeUnscheduledCourseDnd = ({
     }
 
     const updateUnscheduledEmptyState = () => {
-        if (!unscheduledEmptyState) {
+        if (!unscheduledEmptyState) return;
+
+        if (unscheduledByKey.size > 0) {
+            unscheduledEmptyState.classList.add('d-none');
             return;
         }
 
-        unscheduledEmptyState.classList.toggle('d-none', unscheduledByKey.size > 0);
+        // no unscheduled items — show contextual message depending on term selection
+        const termButton = document.getElementById('termDropdownButton');
+        const termId = Number(termButton?.dataset?.termId || '');
+
+        unscheduledEmptyState.classList.remove('d-none');
+        if (!Number.isInteger(termId) || termId <= 0) {
+            unscheduledEmptyState.textContent = 'Fill out the dropdowns to view your unscheduled courses.';
+        } else {
+            unscheduledEmptyState.textContent = 'No unscheduled courses for this term.';
+        }
     };
 
     const removeUnscheduledItemByKey = (key) => {
@@ -183,9 +197,44 @@ export const initializeUnscheduledCourseDnd = ({
         const title = document.createElement('div');
         title.className = 'fc-event-title unscheduled-course-item__title';
         title.textContent = payload.title || 'Untitled Course';
+        // instructor / room labels (prefer payload.extendedProps.courses[0] then top-level keys)
+        const instructorLabel = payload.extendedProps?.courses?.[0]?.instructor_name
+            || payload.extendedProps?.instructor_name
+            || payload.extendedProps?.attributes?.instructor_name
+            || payload.extendedProps?.attributes?.instructor_full_name
+            || '';
+
+        const roomLabel = payload.extendedProps?.courses?.[0]?.room_name
+            || payload.extendedProps?.room_name
+            || payload.extendedProps?.attributes?.room_name
+            || '';
+
+        // If this payload was created by moving an existing calendar event to unscheduled
+        // (payload.originalEventId present), do not display instructor/room labels in the pane.
+        const showLabels = !payload.originalEventId;
 
         meta.append(time);
-        mainFrame.append(meta, divider, title);
+
+        if (showLabels && (instructorLabel || roomLabel)) {
+            const labelsWrap = document.createElement('div');
+            labelsWrap.className = 'unscheduled-course-item__labels small text-muted';
+            if (instructorLabel) {
+                const instrEl = document.createElement('div');
+                instrEl.className = 'unscheduled-course-item__instructor';
+                instrEl.textContent = instructorLabel;
+                labelsWrap.appendChild(instrEl);
+            }
+            if (roomLabel) {
+                const roomEl = document.createElement('div');
+                roomEl.className = 'unscheduled-course-item__room';
+                roomEl.textContent = roomLabel;
+                labelsWrap.appendChild(roomEl);
+            }
+
+            mainFrame.append(meta, divider, title, labelsWrap);
+        } else {
+            mainFrame.append(meta, divider, title);
+        }
         item.append(mainFrame);
         unscheduledEventsContainer.append(item);
         unscheduledByKey.set(key, item);
@@ -253,15 +302,125 @@ export const initializeUnscheduledCourseDnd = ({
             : [calendarEvent];
 
         const payload = toUnscheduledPayload(calendarEvent);
+        // treat moved-to-unscheduled items the same as initially-unscheduled: do not
+        // expose an original schedule so the details modal shows "Time TBD" and
+        // "Not available" for days/duration. keep originalEventId for trace.
         payload.originalEventId = calendarEvent.id;
-        payload.originalSchedule = deriveOriginalSchedule(calendarEvent, relatedEvents);
+        payload.originalSchedule = null;
         payload.extendedProps = {
             ...payload.extendedProps,
-            originalSchedule: payload.originalSchedule
+            originalSchedule: null
         };
 
         upsertUnscheduledItem(payload);
         relatedEvents.forEach((event) => event.remove());
+
+        // persist unscheduled state to backend: set assignment.timeslot_id = null
+        (async () => {
+            try {
+                // derive assignment id and term id from the calendar event where possible
+                let assignmentId = Number(
+                    calendarEvent.extendedProps?.assignment_id ||
+                    calendarEvent.extendedProps?.assignmentId ||
+                    calendarEvent.extendedProps?.assignment?.id ||
+                    payload.extendedProps?.assignment_id ||
+                    payload.extendedProps?.assignmentId ||
+                    payload.id || ''
+                );
+
+                const termId = Number(
+                    calendarEvent.extendedProps?.term_id ||
+                    calendarEvent.extendedProps?.termId ||
+                    calendarEvent.extendedProps?.term?.id ||
+                    payload.extendedProps?.term_id ||
+                    payload.extendedProps?.term?.id ||
+                    document.getElementById('termDropdownButton')?.dataset?.termId || ''
+                );
+
+                console.log('unschedule persistence: derived ids', { assignmentId, termId });
+
+                // if assignmentId not found, attempt to parse from calendarEvent.id or payload.originalEventId
+                if (!Number.isInteger(assignmentId) || assignmentId <= 0) {
+                    console.log('unschedule persistence: attempting to parse assignment id from event identifiers', { eventId: calendarEvent.id, originalEventId: payload.originalEventId, payloadExtended: payload.extendedProps });
+                    const idCandidates = [calendarEvent.id, payload.originalEventId, payload.extendedProps?.assignment_id, payload.extendedProps?.assignmentId, payload.extendedProps?.assignment?.id];
+                    for (const cand of idCandidates) {
+                        if (!cand) continue;
+                        const asNum = Number(String(cand).replace(/^assignment[-:]?/i, '').replace(/[^0-9]+/g, ''));
+                        if (Number.isInteger(asNum) && asNum > 0) {
+                            assignmentId = asNum;
+                            console.log('unschedule persistence: parsed assignmentId from candidate', { cand, assignmentId });
+                            break;
+                        }
+                    }
+                }
+
+                console.log('unschedule persistence: ids after parsing attempt', { assignmentId, termId });
+
+                if (!Number.isInteger(assignmentId) || assignmentId <= 0 || !Number.isInteger(termId) || termId <= 0) {
+                    console.warn('unschedule persistence: missing assignmentId/termId, aborting PATCH', { assignmentId, termId });
+                    return;
+                }
+
+                console.log(`unschedule persistence: fetching assignment /api/v1/terms/${termId}/assignments/${assignmentId}`);
+                const getResp = await fetch(`/api/v1/terms/${termId}/assignments/${assignmentId}`, { headers: { 'Accept': 'application/json' } });
+
+                if (!getResp.ok) {
+                    console.warn(`Failed to load assignment for unschedule persistence: ${getResp.status}`);
+                    return;
+                }
+
+                const getJson = await getResp.json();
+                const existingAttrs = getJson?.data?.attributes || {};
+                const existingRels = getJson?.data?.relationships || {};
+
+                const d = {};
+                d.assignment_id = Number(existingAttrs.assignment_id || assignmentId);
+                d.term_id = Number(existingAttrs.term_id || termId);
+
+                let userId = Number(existingAttrs.user_id || existingAttrs.userId || existingRels?.user?.data?.id || 0);
+                if (!Number.isInteger(userId) || userId <= 0) {
+                    const metaUser = document.querySelector('meta[name="current-user-id"]')?.getAttribute('content') || '';
+                    const metaNum = Number(metaUser || '0');
+                    if (Number.isInteger(metaNum) && metaNum > 0) userId = metaNum;
+                }
+                if (Number.isInteger(userId) && userId > 0) d.user_id = userId;
+
+                const instr = Number(payload.extendedProps?.instructor_id || existingAttrs.instructor_id || existingAttrs.instructorId || existingRels?.instructor?.data?.id || 0);
+                if (Number.isInteger(instr) && instr > 0) d.instructor_id = instr;
+
+                const sect = Number(payload.extendedProps?.section_id || existingAttrs.section_id || existingAttrs.sectionId || existingRels?.section?.data?.id || 0);
+                if (Number.isInteger(sect) && sect > 0) d.section_id = sect;
+
+                const room = Number(payload.extendedProps?.room_id || existingAttrs.room_id || existingAttrs.roomId || existingRels?.room?.data?.id || 0);
+                if (Number.isInteger(room) && room > 0) d.room_id = room;
+
+                // explicitly set timeslot_id to null to mark unscheduled
+                d.timeslot_id = null;
+
+                console.log('unschedule persistence: patching assignment to set timeslot_id=null', { assignmentId, termId, payload: d });
+                const patchResp = await fetch(`/api/v1/terms/${termId}/assignments/${assignmentId}`, {
+                    method: 'PATCH',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ data: { type: 'assignments', id: String(assignmentId), attributes: d } })
+                });
+
+                const patchText = await patchResp.text();
+                try {
+                    console.log('unschedule persistence: PATCH response', { status: patchResp.status, body: JSON.parse(patchText) });
+                } catch (e) {
+                    console.log('unschedule persistence: PATCH response (text)', { status: patchResp.status, bodyText: patchText });
+                }
+
+                if (!patchResp.ok) {
+                    console.warn(`Failed to persist unscheduled assignment: ${patchResp.status}`, patchText);
+                }
+            } catch (e) {
+                console.error('Error persisting unscheduled assignment', e);
+            }
+        })();
 
         return true;
     };
@@ -292,6 +451,8 @@ export const initializeUnscheduledCourseDnd = ({
     return {
         moveEventToUnscheduled,
         handleExternalEventReceive,
-        clear
+        clear,
+        // allow programmatic insertion of unscheduled payloads (e.g., on page load)
+        addUnscheduledPayload: (payload) => upsertUnscheduledItem(payload)
     };
 };
