@@ -9,7 +9,7 @@
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <meta name="current-user-id" content="{{ Auth::check() ? Auth::id() : '' }}">
 
-    <title>{{ config('app.name', 'Capstone') }}</title>
+    <title>{{ config('Capstone') }}</title>
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.bunny.net">
