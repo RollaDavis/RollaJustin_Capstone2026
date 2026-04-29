@@ -234,11 +234,6 @@
     background: var(--lm-border);
 }
 
-
-.dropdown-term-options, .dropdown-schedule-by-options, .dropdown-schedule-value-options{
-    max-height: 320px;
-    overflow: auto;
-}
 .dropdown-schedule-value-menu .form-control{ margin-bottom: 0.5rem; }
 
 

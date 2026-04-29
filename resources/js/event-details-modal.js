@@ -957,6 +957,17 @@ const setDetailSelectorValues = ({
     }
 
     renderList();
+    // Try to preselect the preferred value in the list for scheduled courses
+    try {
+        const rootIsUnscheduled = root && root instanceof Element && String(root.dataset.isUnscheduled || '').toLowerCase() === 'true';
+        if (normalizedPreferred && !rootIsUnscheduled) {
+            const candidate = [...listEl.children].find((ch) => ch instanceof Element && String(ch.textContent || '').trim() === normalizedPreferred);
+            if (candidate) {
+                candidate.classList.add('active');
+                try { candidate.scrollIntoView({ block: 'nearest' }); } catch (e) { }
+            }
+        }
+    } catch (e) { }
 };
 
 const bindDetailActions = (root = null) => {
@@ -1676,6 +1687,7 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
     const eventGroupKey = event ? toGroupKey(event) : (usedUnscheduled?.groupId || toGroupKey({ id: usedUnscheduled?.id }));
     const primaryCourse = event ? getPrimaryCourse(event) : (usedUnscheduled?.extendedProps?.courses?.[0] || {});
     const isUnscheduled = !!usedUnscheduled;
+    try { if (root && root instanceof Element) root.dataset.isUnscheduled = isUnscheduled ? 'true' : 'false'; } catch (e) { }
     try { console.log('details: derived primaryCourse:', primaryCourse); } catch (e) { }
     const relatedCourses = event ? getCoursesFromEventGroup(event, relatedEvents) : (primaryCourse ? [primaryCourse] : []);
     const courseTitle = event ? (event.title || primaryCourse.course_name || primaryCourse.section_name || 'Untitled Course') : (primaryCourse.course_name || primaryCourse.section_name || 'Untitled Course');
