@@ -311,7 +311,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             
             currentSelectionDetail = { termId: initialTermId, courses: [] };
-            renderSelectedCourses(currentSelectionDetail);
+            refreshBlockoffEvents(currentSelectionDetail);
         }
     } catch (e) {  }
 
@@ -453,8 +453,18 @@ document.addEventListener('DOMContentLoaded', () => {
         renderSelectedCourses(currentSelectionDetail);
     });
 
+    const refreshBlockoffEvents = async (detail = {}) => {
+        try {
+            const blockoffEvents = await fetchTimeblocksForSelection(detail);
+            calendar.getEvents().filter((e) => e.extendedProps?.isBlockoff).forEach((e) => e.remove());
+            (blockoffEvents || []).forEach((ev) => calendar.addEvent(ev));
+        } catch (e) {
+            console.error('Failed to refresh blockoff events', e);
+        }
+    };
+
     document.addEventListener('schedule:blockoff-created', () => {
-        renderSelectedCourses(currentSelectionDetail);
+        refreshBlockoffEvents(currentSelectionDetail);
     });
 
 
@@ -526,7 +536,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 throw new Error(`Unable to remove blockoff (${response.status}).`);
             }
 
-            renderSelectedCourses(currentSelectionDetail);
+            refreshBlockoffEvents(currentSelectionDetail);
         } catch (error) {
             const message = error instanceof Error ? error.message : 'Unable to remove blockoff.';
             window.alert(message);
