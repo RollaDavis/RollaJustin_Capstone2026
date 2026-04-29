@@ -18,6 +18,7 @@ use App\Models\Term;
 use App\Models\Timeslot;
 use Illuminate\Http\Request;
 use Termwind\Components\Ol;
+use Illuminate\Support\Facades\Log;
 
 class AssignmentController extends Controller
 {
@@ -250,6 +251,12 @@ class AssignmentController extends Controller
     {
         $conflict = false;
 
+        Log::info('checkInstructorConflict start', [
+            'assignment_id' => $assignment->id,
+            'instructor_id' => $assignment->instructor_id,
+            'timeslot_id' => $assignment->timeslot ? $assignment->timeslot->id : null,
+        ]);
+
         $assignments = Assignment::query()
             ->with(['section.course', 'timeslot', 'room', 'instructor'])
             ->where('term_id', $assignment->term_id)
@@ -260,8 +267,19 @@ class AssignmentController extends Controller
                 if ($existingAssignment->id === $assignment->id) {
                     continue; // Skip the same assignment
                 }
+                Log::info('checkInstructorConflict considering existing assignment', [
+                    'existing_assignment_id' => $existingAssignment->id,
+                    'existing_timeslot_id' => $existingAssignment->timeslot ? $existingAssignment->timeslot->id : null,
+                ]);
+
+                // skip assignments that are unscheduled (no timeslot)
+                if (! $existingAssignment->timeslot) {
+                    Log::info('checkInstructorConflict skipping unscheduled existing assignment', ['existing_assignment_id' => $existingAssignment->id]);
+                    continue;
+                }
 
                 if ($this->timeslotsConflict($assignment->timeslot, $existingAssignment->timeslot)) {
+                    Log::info('checkInstructorConflict detected conflict with existing assignment', ['existing_assignment_id' => $existingAssignment->id]);
                     $conflict = true;
                     break;
                 }
@@ -269,6 +287,7 @@ class AssignmentController extends Controller
         
     
             if (app(TimeslotController::class)->checkInstructorTimeBlockConflict($assignment->timeslot, $assignment->instructor_id)) {
+                Log::info('checkInstructorConflict: instructor time block conflict', ['instructor_id' => $assignment->instructor_id]);
                 $conflict = true;
             }
 
@@ -278,6 +297,12 @@ class AssignmentController extends Controller
     public function checkRoomConflict(Assignment $assignment)
     {
         $conflict = false;
+
+        Log::info('checkRoomConflict start', [
+            'assignment_id' => $assignment->id,
+            'room_id' => $assignment->room_id,
+            'timeslot_id' => $assignment->timeslot ? $assignment->timeslot->id : null,
+        ]);
 
         $assignments = Assignment::query()
             ->with(['section.course', 'timeslot', 'room', 'instructor'])
@@ -289,8 +314,19 @@ class AssignmentController extends Controller
                 if ($existingAssignment->id === $assignment->id) {
                     continue; // Skip the same assignment
                 }
+                Log::info('checkRoomConflict considering existing assignment', [
+                    'existing_assignment_id' => $existingAssignment->id,
+                    'existing_timeslot_id' => $existingAssignment->timeslot ? $existingAssignment->timeslot->id : null,
+                ]);
+
+                // skip assignments that are unscheduled (no timeslot)
+                if (! $existingAssignment->timeslot) {
+                    Log::info('checkRoomConflict skipping unscheduled existing assignment', ['existing_assignment_id' => $existingAssignment->id]);
+                    continue;
+                }
 
                 if ($this->timeslotsConflict($assignment->timeslot, $existingAssignment->timeslot)) {
+                    Log::info('checkRoomConflict detected conflict with existing assignment', ['existing_assignment_id' => $existingAssignment->id]);
                     $conflict = true;
                     break;
                 }
@@ -298,6 +334,7 @@ class AssignmentController extends Controller
         
     
             if (app(TimeslotController::class)->checkRoomTimeBlockConflict($assignment->timeslot, $assignment->room_id)) {
+                Log::info('checkRoomConflict: room time block conflict', ['room_id' => $assignment->room_id]);
                 $conflict = true;
             }
 

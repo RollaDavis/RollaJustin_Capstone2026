@@ -18,42 +18,42 @@ class AssignmentResource extends JsonResource
             'type' => 'assignments',
             'id' => $this->id,
             'attributes' => [
-                'course_name' => $this->section->course->name,
-                'days' => $this->timeslot->days,
-                'room_name' => $this->room->name,
-                'instructor_name' => $this->instructor->name,
-                'start_time' => $this->timeslot->start_time,
-                'duration' => $this->timeslot->duration,
+                'course_name' => $this->section && $this->section->course ? $this->section->course->name : null,
+                'days' => $this->timeslot ? $this->timeslot->days : null,
+                'room_name' => $this->room ? $this->room->name : null,
+                'instructor_name' => $this->instructor ? $this->instructor->name : null,
+                'start_time' => $this->timeslot ? $this->timeslot->start_time : null,
+                'duration' => $this->timeslot ? $this->timeslot->duration : null,
             ],
             'relationships' => [
                 'section' => [
                     'data' => [
                         'type' => 'sections',
-                        'id' => $this->section->id,
+                        'id' => $this->section ? $this->section->id : null,
                     ]
                 ],
                 'room' => [
                     'data' => [
                         'type' => 'rooms',
-                        'id' => $this->room->id,
+                        'id' => $this->room ? $this->room->id : null,
                     ]
                 ],
                 'instructor' => [
                     'data' => [
                         'type' => 'instructors',
-                        'id' => $this->instructor->id,
+                        'id' => $this->instructor ? $this->instructor->id : null,
                     ]
                 ],
                 'timeslot' => [
                     'data' => [
                         'type' => 'timeslots',
-                        'id' => $this->timeslot->id,
+                        'id' => $this->timeslot ? $this->timeslot->id : null,
                     ]
                 ],
                 'term' => [
                     'data' => [
                         'type' => 'terms',
-                        'id' => $this->term->id,
+                        'id' => $this->term ? $this->term->id : null,
                     ]
                 ]
             ]

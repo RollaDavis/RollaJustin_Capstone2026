@@ -1,4 +1,4 @@
-import { Modal } from 'bootstrap';
+import { Modal, Dropdown } from 'bootstrap';
 
 const DAY_LABELS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
 const detailState = {
@@ -17,7 +17,7 @@ const detailState = {
     actionsBound: false
 };
 
-// show a simple, temporary modal styled like the details modal for unscheduled reschedule
+
 const showLightweightDetailsModal = (unscheduledPayload = {}) => {
     try { console.log('details: showLightweightDetailsModal payload', unscheduledPayload); } catch (e) { }
 
@@ -40,7 +40,7 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
             <div class="modal-content border-0 shadow event-details-modal">
                 <div class="modal-header event-details-header">
                     <div class="event-details-title-wrap">
-                        <h5 class="modal-title event-details-title">Course Details</h5>
+                        <h5 class="modal-title event-details-title">${escapeHtml(courseTitle)}</h5>
                         <p class="event-details-subtitle mb-0">Unscheduled — Reschedule</p>
                     </div>
                     <button type="button" class="btn-close" aria-label="Close"></button>
@@ -49,30 +49,23 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
                     <div class="event-details-grid px-2">
                         <div class="event-details-card event-details-card--instructor mb-2">
                             <p class="event-details-label mb-1">Instructor</p>
-                            <input id="lwInstructorInput" class="form-control form-control-sm" type="text" placeholder="
-                            <p class="event-details-value mb-0">${durationHours > 0 ? durationHours + 'h' : '—'}</p>
+                            <input id="lwInstructorInput" class="form-control form-control-sm" type="text" placeholder="">
                         </div>
                         <div class="event-details-card event-details-card--room mb-2">
                             <p class="event-details-label mb-1">Room</p>
-                            <input id="lwRoomInput" class="form-control form-control-sm" type="text" placeholder="
-                        </div>
+                            <input id="lwRoomInput" class="form-control form-control-sm" type="text" placeholder="">
                         </div>
                         <div class="event-details-card event-details-card--days mb-2">
                             <p class="event-details-label mb-1">Days</p>
-                            <input id="lwDaysInput" class="form-control form-control-sm" type="text" placeholder="
-                        <div class="event-details-card event-details-card--time mb-2">
-                        </div>
-                        <div class="event-details-card event-details-card--duration mb-2">
-                            <p class="event-details-label mb-1">Duration (hours)</p>
-                            <input id="lwDurationInput" class="form-control form-control-sm" type="number" min="0" step="0.25" placeholder="
-                            <p class="event-details-label mb-1">Time</p>
+                            <input id="lwDaysInput" class="form-control form-control-sm" type="text" placeholder="">
                         </div>
                         <div class="event-details-card event-details-card--time mb-2">
                             <p class="event-details-label mb-1">Start Time</p>
-                            <input id="lwTimeInput" class="form-control form-control-sm" type="text" placeholder="
-                            <p class="event-details-value mb-0">${escapeHtml(timeLabel)}</p>
+                            <input id="lwTimeInput" class="form-control form-control-sm" type="text" placeholder="">
                         </div>
-                    </div>
+                        <div class="event-details-card event-details-card--duration mb-2">
+                            <p class="event-details-label mb-1">Duration (hours)</p>
+                            <input id="lwDurationInput" class="form-control form-control-sm" type="number" min="0" step="0.25" placeholder="">
                         </div>
                     </div>
                 </div>
@@ -96,7 +89,7 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
         console.error('details: creating/showing bsModal failed', err);
     }
 
-    // short fallback: if not visible, force visual display + backdrop
+    
     setTimeout(() => {
         try {
             const isShown = wrapper.classList.contains('show');
@@ -120,7 +113,7 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
         } catch (e) { }
     }, 40);
 
-    // initialize inputs to em-dash and wire focus/blur to clear/restore
+    
     const EMDASH = '\u2014';
     const instructorInput = wrapper.querySelector('#lwInstructorInput');
     const roomInput = wrapper.querySelector('#lwRoomInput');
@@ -130,7 +123,7 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
 
     const inputs = [instructorInput, roomInput, daysInput, durationInput, timeInput].filter(Boolean);
 
-    // Helper to set initial visual em dash when value empty
+    
     inputs.forEach((inp) => {
         if (!inp) return;
         const initial = (inp === durationInput && durationHours) ? String(durationHours) : (inp === timeInput && startLabel) ? startLabel : '';
@@ -142,13 +135,42 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
 
         inp.addEventListener('focus', () => {
             if (inp.value === EMDASH) inp.value = '';
+            
+            try { updateLWEmptyStates(); } catch (e) { }
         });
         inp.addEventListener('blur', () => {
             if (!String(inp.value || '').trim()) inp.value = EMDASH;
+            
+            try { updateLWEmptyStates(); } catch (e) { }
         });
     });
 
-    // cleanup on hide
+    
+    const updateLWEmptyStates = () => {
+        const mappings = [
+            { card: '.event-details-card--instructor', input: instructorInput },
+            { card: '.event-details-card--room', input: roomInput },
+            { card: '.event-details-card--days', input: daysInput },
+            { card: '.event-details-card--duration', input: durationInput },
+            { card: '.event-details-card--time', input: timeInput }
+        ];
+
+        mappings.forEach(({ card, input }) => {
+            try {
+                const cardEl = wrapper.querySelector(card);
+                if (!cardEl) return;
+                const val = input ? String(input.value || '').trim() : '';
+                const isEmptyField = val === EMDASH || val === '';
+                cardEl.classList.toggle('field-empty', isEmptyField);
+                try { console.debug && console.debug('updateLWEmptyStates:', card, 'value:', val, 'field-empty:', isEmptyField); } catch (e) { }
+            } catch (e) {  }
+        });
+    };
+
+    
+    try { updateLWEmptyStates(); } catch (e) { }
+
+    
     const removeAll = () => {
         try { bsModal.hide(); } catch (e) {}
         try { wrapper.remove(); } catch (e) {}
@@ -156,12 +178,12 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
         if (backdrop) backdrop.remove();
     };
 
-    // close buttons
+    
     wrapper.querySelectorAll('.btn-close, [data-bs-dismiss="modal"]').forEach((btn) => {
         btn.addEventListener('click', (e) => { e.preventDefault(); removeAll(); });
     });
 
-    // Save handler: read values, treat em-dash as null
+    
     const saveBtn = wrapper.querySelector('#lightweightSaveBtn');
     if (saveBtn) saveBtn.addEventListener('click', () => {
         const read = (inp) => {
@@ -185,7 +207,7 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
     });
 };
 
-// small helper to escape HTML in inserted strings
+
 const escapeHtml = (str) => String(str || '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 
 const formatClockTime = (date) => {
@@ -250,13 +272,13 @@ const getDetailElements = (root = null) => {
     };
 };
 
-// option rendering / selection helpers
+
 const clearOptionsList = (root = null) => {
     detailState.currentOptions = [];
     detailState.selectedOption = null;
-    const listEl = root ? root.querySelector('#eventDetailsOptionsList') : document.getElementById('eventDetailsOptionsList');
+    const listEl = document.getElementById('eventDetailsOptionsList');
     if (listEl) listEl.innerHTML = '';
-    // disable save when options cleared
+    
     try { disableSaveButton(root); } catch (e) { }
 };
 
@@ -271,14 +293,16 @@ function disableSaveButton(root = null) {
 }
 
 const renderOptionsList = (payload, root = null) => {
-    const listEl = root ? root.querySelector('#eventDetailsOptionsList') : document.getElementById('eventDetailsOptionsList');
+    
+    
+    const listEl = document.getElementById('eventDetailsOptionsList');
 
     if (!listEl) {
         console.warn('Options list element not found');
         return;
     }
 
-    // normalize payload
+    
     let options = [];
     if (Array.isArray(payload)) {
         options = payload;
@@ -290,7 +314,7 @@ const renderOptionsList = (payload, root = null) => {
     detailState.selectedOption = null;
     listEl.innerHTML = '';
 
-    // split into non-conflicting (selectable) and conflicting (not selectable)
+    
     const selectable = options.filter((o) => {
         const a = o.attributes || o;
         return !a.conflicting && !(Array.isArray(a.conflicts) && a.conflicts.length > 0);
@@ -335,8 +359,21 @@ const renderOptionsList = (payload, root = null) => {
 
         if (conflictsList.length > 0) {
             const conflictDiv = document.createElement('div');
-            conflictDiv.className = 'small text-danger';
-            conflictDiv.textContent = conflictsList.join('; ');
+            conflictDiv.className = 'small text-danger conflict-reasons';
+
+            conflictsList.forEach((reason, ri) => {
+                const reasonWrap = document.createElement('div');
+                reasonWrap.className = 'conflict-reason';
+                reasonWrap.textContent = reason;
+                conflictDiv.appendChild(reasonWrap);
+
+                if (ri < conflictsList.length - 1) {
+                    const hr = document.createElement('hr');
+                    hr.className = 'conflict-reason-divider';
+                    conflictDiv.appendChild(hr);
+                }
+            });
+
             left.appendChild(conflictDiv);
         }
 
@@ -354,18 +391,18 @@ const renderOptionsList = (payload, root = null) => {
                 item.classList.add('active');
                 detailState.selectedOption = opt;
                 console.log('Selected option:', opt);
-                try { applySelectedOptionToTime(opt); } catch (e) { /* ignore */ }
+                try { applySelectedOptionToTime(opt, root); } catch (e) {  }
             });
         }
 
         listEl.appendChild(item);
     };
 
-    // render selectable first
+    
     selectable.forEach((opt, i) => renderItem(opt, i, true));
 
     if (conflicts.length > 0) {
-        // separator
+        
         const separator = document.createElement('div');
         separator.className = 'list-group-item small text-muted';
         separator.textContent = 'Conflicts';
@@ -375,7 +412,7 @@ const renderOptionsList = (payload, root = null) => {
     }
 };
 
-// apply button handler for options modal
+
 document.addEventListener('DOMContentLoaded', () => {
     const applyBtn = document.getElementById('eventOptionsApplyButton');
     applyBtn?.addEventListener('click', () => {
@@ -386,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // darken details modal when options modal is shown
+    
     const optionsModalEl = document.getElementById('eventOptionsModal');
     const detailsModalEl = document.getElementById('eventDetailsModal');
 
@@ -400,24 +437,66 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // pending time button opens options
+    
     const pendingBtn = document.getElementById('eventDetailsTimePendingButton');
     pendingBtn?.addEventListener('click', async () => {
-        try { await fetchAndShowOptions(); } catch (err) { console.error(err); }
+        try {
+            if (animateMissingRequiredFields()) return;
+            await fetchAndShowOptions();
+        } catch (err) { console.error(err); }
     });
 
-    // make the whole time card act as the options button only when pending
+    
+    
+    
+    
+    document.addEventListener('click', (ev) => {
+        try {
+            const btn = ev.target.closest && ev.target.closest('.event-details-edit-btn');
+            if (!btn) return;
+            if (btn.dataset && btn.dataset.detailBound === 'true') return; 
+
+            const id = btn.id || '';
+            let modalId = null;
+            let type = null;
+
+            if (id === 'eventDetailsInstructorEditButton') {
+                modalId = 'eventDetailsInstructorSelectModal';
+                type = 'instructor';
+            } else if (id === 'eventDetailsLocationEditButton') {
+                modalId = 'eventDetailsLocationSelectModal';
+                type = 'location';
+            } else if (id === 'eventDetailsDaysEditButton') {
+                modalId = 'eventDetailsDaysSelectModal';
+            } else if (id === 'eventDetailsDurationEditButton') {
+                modalId = 'eventDetailsDurationSelectModal';
+            }
+
+            if (!modalId) return;
+
+            const modalEl = document.getElementById(modalId);
+            if (modalEl) {
+                ev.preventDefault();
+                ev.stopPropagation();
+                Modal.getOrCreateInstance(modalEl).show();
+            }
+        } catch (e) {  }
+    });
+
+    
     const timeCard = document.querySelector('.event-details-card--time');
     if (timeCard) {
-        // handlers always present but only active when the card has the 'pending' class
+        
         timeCard.addEventListener('click', async (e) => {
             if (!timeCard.classList.contains('pending')) return;
+            if (animateMissingRequiredFields()) return;
             try { await fetchAndShowOptions(); } catch (err) { console.error(err); }
         });
         timeCard.addEventListener('keydown', async (e) => {
             if (!timeCard.classList.contains('pending')) return;
             if (e.key === 'Enter' || e.key === ' ') {
                 e.preventDefault();
+                if (animateMissingRequiredFields()) return;
                 try { await fetchAndShowOptions(); } catch (err) { console.error(err); }
             }
         });
@@ -428,7 +507,7 @@ const formatDurationLabel = (durationMinutes) => {
     const roundedMinutes = Math.round(Number(durationMinutes));
 
     if (!Number.isInteger(roundedMinutes) || roundedMinutes <= 0) {
-        return 'Not available';
+        return '\u2014';
     }
 
     const hours = Math.floor(roundedMinutes / 60);
@@ -443,6 +522,17 @@ const formatDurationLabel = (durationMinutes) => {
     }
 
     return `${minutes}m`;
+};
+
+
+const parseDaysToIndexes = (days) => {
+    if (!days) return [];
+    if (Array.isArray(days)) return toUniqueSortedDayIndexes(days.map((d) => Number(d)).filter((n) => Number.isInteger(n)));
+    const s = String(days || '').replace(/[^A-Za-z]/g, '').toUpperCase();
+    if (!s) return [];
+    const map = { U:0, M:1, T:2, W:3, R:4, F:5, S:6 };
+    const indexes = [...new Set([...s].map((ch) => map[ch] ).filter((i) => Number.isInteger(i)))];
+    return toUniqueSortedDayIndexes(indexes);
 };
 
 const toValidDurationMinutes = (hoursValue, minutesValue) => {
@@ -514,7 +604,7 @@ const getDaysLabelFromIndexes = (dayIndexes = []) => {
     const normalizedDayIndexes = toUniqueSortedDayIndexes(dayIndexes);
 
     if (normalizedDayIndexes.length === 0) {
-        return 'Not available';
+        return '\u2014';
     }
 
     return normalizedDayIndexes
@@ -527,41 +617,47 @@ const toUniqueValues = (values = []) => {
     return [...new Set(values.map((value) => String(value || '').trim()).filter(Boolean))];
 };
 
-// mark the details time as pending (em dash) and clear any options
-function markTimePending() {
-    const els = getDetailElements();
+
+function markTimePending(root = null) {
+    const els = getDetailElements(root);
     if (els.time) {
         els.time.textContent = '\u2014';
     }
-    clearOptionsList();
-    // disable save while pending
-    try { disableSaveButton(); } catch (e) { }
+    clearOptionsList(root);
+    
+    try { disableSaveButton(root); } catch (e) { }
 
-    // show the pending button next to the time and outline the time card
-    const pendingBtn = document.getElementById('eventDetailsTimePendingButton');
+    
+    const scope = root || document;
+    const pendingBtn = scope.querySelector('#eventDetailsTimePendingButton');
     if (pendingBtn) {
         pendingBtn.classList.remove('d-none');
     }
 
-    const timeCard = document.querySelector('.event-details-card--time');
+    const timeCard = scope.querySelector('.event-details-card--time');
     if (timeCard) {
         timeCard.classList.add('pending');
-        try { enableTimeCardInteraction(); } catch (e) { }
+        try { enableTimeCardInteraction(root); } catch (e) { }
     }
+    try { updateTimeEmptyState(root); } catch (e) {  }
+    try { updateEmptyFieldStates(root); } catch (e) {  }
+    try { updateEmptyFieldStates(root); } catch (e) {  }
 }
 
-// helper to enable interactive affordances on the time card
-function enableTimeCardInteraction() {
-    const timeCard = document.querySelector('.event-details-card--time');
+
+function enableTimeCardInteraction(root = null) {
+    const scope = root || document;
+    const timeCard = scope.querySelector('.event-details-card--time');
     if (!timeCard) return;
     timeCard.setAttribute('role', 'button');
     timeCard.tabIndex = 0;
     timeCard.style.cursor = 'pointer';
 }
 
-// helper to remove interactive affordances from the time card
-function disableTimeCardInteraction() {
-    const timeCard = document.querySelector('.event-details-card--time');
+
+function disableTimeCardInteraction(root = null) {
+    const scope = root || document;
+    const timeCard = scope.querySelector('.event-details-card--time');
     if (!timeCard) return;
     timeCard.removeAttribute('role');
     timeCard.tabIndex = -1;
@@ -617,7 +713,36 @@ async function fetchAndShowOptions(root = null) {
         clearOptionsList(root);
         renderOptionsList(payload, root);
         const optsModal = document.getElementById('eventOptionsModal');
-        if (optsModal) Modal.getOrCreateInstance(optsModal).show();
+        if (optsModal) {
+            
+            
+            if (root) {
+                try {
+                    root.classList.add('event-details-modal-behind-selector');
+                    if (root.id !== 'eventDetailsModal') {
+                        root.dataset._prevZ = root.style.zIndex || '';
+                        root.style.zIndex = '1040';
+                    }
+                } catch (e) {  }
+
+                
+                optsModal.addEventListener('hidden.bs.modal', () => {
+                    try {
+                        root.classList.remove('event-details-modal-behind-selector');
+                        if (root.id !== 'eventDetailsModal') {
+                            if (root.dataset._prevZ !== undefined) {
+                                root.style.zIndex = root.dataset._prevZ;
+                                delete root.dataset._prevZ;
+                            } else {
+                                root.style.zIndex = '';
+                            }
+                        }
+                    } catch (e) {  }
+                }, { once: true });
+            }
+
+            Modal.getOrCreateInstance(optsModal).show();
+        }
     } catch (err) {
         console.error('Failed to load assignment options', err);
         clearOptionsList(root);
@@ -638,7 +763,7 @@ function addMinutesToTimeString(timeString, minutesToAdd) {
     return `${String(endH).padStart(2, '0')}:${String(endM).padStart(2, '0')}`;
 }
 
-function applySelectedOptionToTime(opt) {
+function applySelectedOptionToTime(opt, root = null) {
     if (!opt) return;
     const attrs = opt.attributes || opt;
     const start = attrs.start_time || attrs.startTime || null;
@@ -650,18 +775,117 @@ function applySelectedOptionToTime(opt) {
     const startLabel = formatClockTimeFromString(start);
     const endTime = addMinutesToTimeString(start, Math.round(duration * 60));
     const endLabel = formatClockTimeFromString(endTime);
-    const els = getDetailElements();
+    const els = getDetailElements(root);
     if (els.time) {
         els.time.textContent = (startLabel && endLabel) ? `${startLabel} - ${endLabel}` : '\u2014';
     }
-    // hide pending button if present and enable save; remove pending outline
-    const pendingBtn = document.getElementById('eventDetailsTimePendingButton');
+    
+    const scope = root || document;
+    const pendingBtn = scope.querySelector('#eventDetailsTimePendingButton');
     if (pendingBtn) pendingBtn.classList.add('d-none');
-    const timeCard = document.querySelector('.event-details-card--time');
+    const timeCard = scope.querySelector('.event-details-card--time');
     if (timeCard) timeCard.classList.remove('pending');
-    try { enableSaveButton(); } catch (e) { }
-    // remove interactive affordances when not pending
-    try { disableTimeCardInteraction(); } catch (e) { }
+    try { enableSaveButton(root); } catch (e) { }
+    
+    try { updateTimeEmptyState(root); } catch (e) {  }
+    try { updateEmptyFieldStates(root); } catch (e) {  }
+    
+    try { disableTimeCardInteraction(root); } catch (e) { }
+}
+
+
+function updateTimeEmptyState(root = null) {
+    const els = getDetailElements(root);
+    const scope = root || document;
+    const timeCard = scope.querySelector('.event-details-card--time');
+    if (!timeCard || !els.time) return;
+    const isEmpty = String(els.time.textContent || '').trim() === '\u2014';
+    timeCard.classList.toggle('time-empty', isEmpty);
+}
+
+
+function updateEmptyFieldStates(root = null) {
+    const els = getDetailElements(root);
+    const scope = root || document;
+
+    const mappings = [
+        { card: '.event-details-card--instructor', el: 'instructorValue' },
+        { card: '.event-details-card--room', el: 'locationValue' },
+        { card: '.event-details-card--days', el: 'days' },
+        { card: '.event-details-card--duration', el: 'duration' }
+    ];
+
+    mappings.forEach(({ card, el }) => {
+        try {
+            const cardEl = scope.querySelector(card);
+            const valueEl = els[el];
+            if (!cardEl || !valueEl) return;
+            const txt = String(valueEl.textContent || '').trim();
+            const isEmptyField = txt === '\u2014' || txt === '' || /^(Not available)$/i.test(txt);
+            cardEl.classList.toggle('field-empty', isEmptyField);
+            try { console.debug && console.debug('updateEmptyFieldStates:', card, 'value:', txt, 'field-empty:', isEmptyField); } catch (e) { }
+            
+            try {
+                const btn = cardEl.querySelector('.event-details-edit-btn');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.setAttribute('aria-disabled', 'false');
+                    btn.tabIndex = 0;
+                }
+            } catch (e) {  }
+        } catch (e) {  }
+    });
+}
+
+
+
+function animateMissingRequiredFields(root = null) {
+    const els = getDetailElements(root);
+    const scope = root || document;
+    const required = [
+        { el: 'instructorValue' },
+        { el: 'locationValue' },
+        { el: 'days' },
+        { el: 'duration' }
+    ];
+
+    let anyMissing = false;
+
+        required.forEach((r) => {
+            try {
+                const valueEl = els[r.el];
+                if (!valueEl) return;
+                const txt = String(valueEl.textContent || '').trim();
+                const isMissing = txt === '\u2014' || txt === '' || /^(Not available)$/i.test(txt);
+                if (isMissing) {
+                    anyMissing = true;
+                    
+                    const animateEl = (el) => {
+                        if (!el) return;
+                        try {
+                            el.classList.remove('wiggle');
+                            void el.offsetWidth;
+                            el.classList.add('wiggle');
+                            setTimeout(() => { try { el.classList.remove('wiggle'); } catch (e) {} }, 700);
+                        } catch (e) {  }
+                    };
+                    animateEl(valueEl);
+                    
+                    
+                    const card = valueEl.closest('.event-details-card');
+                    if (card) {
+                        
+                        try { card.classList.add('field-empty'); } catch (e) { }
+                        card.classList.add('wiggle-highlight');
+                        setTimeout(() => {
+                            try { card.classList.remove('wiggle-highlight'); } catch (e) { }
+                        }, 800);
+                    }
+                }
+            } catch (e) {  }
+        });
+
+    return anyMissing;
 }
 
 const setDetailSelectorValues = ({
@@ -671,8 +895,9 @@ const setDetailSelectorValues = ({
     selectModalEl,
     values = [],
     preferredValue = null,
-    fallbackLabel = 'Not available',
+    fallbackLabel = '\u2014',
     emptyListMessage = 'No options available'
+    , root = null
 }) => {
     if (!valueEl || !listEl) {
         return;
@@ -680,11 +905,13 @@ const setDetailSelectorValues = ({
 
     const uniqueValues = toUniqueValues(values);
     const normalizedPreferred = String(preferredValue || '').trim();
-    const firstLabel = (normalizedPreferred && uniqueValues.includes(normalizedPreferred))
+    
+    const firstLabel = normalizedPreferred
         ? normalizedPreferred
         : (uniqueValues[0] || fallbackLabel);
 
     valueEl.textContent = firstLabel;
+    try { updateEmptyFieldStates(root); } catch (e) {  }
 
     const renderList = (query = '') => {
         const normalizedQuery = String(query).trim().toLowerCase();
@@ -707,10 +934,14 @@ const setDetailSelectorValues = ({
             item.textContent = value;
             item.addEventListener('click', () => {
                 valueEl.textContent = value;
-                // mark time pending when a selector value changes
-                try { markTimePending(); } catch (e) { /* ignore */ }
+                
+                try { markTimePending(root); } catch (e) {  }
+                try { updateEmptyFieldStates(root); } catch (e) {  }
                 if (selectModalEl) {
-                    Modal.getOrCreateInstance(selectModalEl).hide();
+                    try {
+                        const canonical = (selectModalEl.id && document.getElementById(selectModalEl.id)) || selectModalEl;
+                        Modal.getOrCreateInstance(canonical).hide();
+                    } catch (e) {  }
                 }
             });
             listEl.append(item);
@@ -726,17 +957,28 @@ const setDetailSelectorValues = ({
     }
 
     renderList();
+    // Try to preselect the preferred value in the list for scheduled courses
+    try {
+        const rootIsUnscheduled = root && root instanceof Element && String(root.dataset.isUnscheduled || '').toLowerCase() === 'true';
+        if (normalizedPreferred && !rootIsUnscheduled) {
+            const candidate = [...listEl.children].find((ch) => ch instanceof Element && String(ch.textContent || '').trim() === normalizedPreferred);
+            if (candidate) {
+                candidate.classList.add('active');
+                try { candidate.scrollIntoView({ block: 'nearest' }); } catch (e) { }
+            }
+        }
+    } catch (e) { }
 };
 
 const bindDetailActions = (root = null) => {
     const scope = root || document;
 
-    // prevent double-binding for the main modal
+    
     if (!root && detailState.actionsBound) {
         return;
     }
 
-    // for cloned roots, mark on the element to avoid rebinding
+    
     if (root && root.__eventDetailsActionsBound) {
         return;
     }
@@ -751,8 +993,8 @@ const bindDetailActions = (root = null) => {
 
         detailModalRoot.classList.toggle('event-details-modal-behind-selector', behind);
 
-        // When using a cloned modal the CSS rule targeting #eventDetailsModal won't match.
-        // For clones, apply a temporary inline z-index so the selector modal appears on top.
+        
+        
         try {
             if (detailModalRoot.id !== 'eventDetailsModal') {
                 if (behind) {
@@ -767,7 +1009,7 @@ const bindDetailActions = (root = null) => {
                     }
                 }
             }
-        } catch (e) { /* non-fatal */ }
+        } catch (e) {  }
     };
 
     const openSelectorModal = async (selectorModalEl, type = null) => {
@@ -777,7 +1019,7 @@ const bindDetailActions = (root = null) => {
 
         setDetailModalBehindSelector(true);
 
-        // Ensure selector lists are populated with term-wide options when possible.
+        
         try {
             const termId = await resolveSelectedTermId();
             if (termId) {
@@ -790,7 +1032,8 @@ const bindDetailActions = (root = null) => {
                         selectModalEl: detailEls.instructorSelectModal,
                         values: all,
                         preferredValue: detailEls.instructorValue?.textContent?.trim() || null,
-                        fallbackLabel: 'No instructors found'
+                        fallbackLabel: 'No instructors found',
+                        root: root
                     });
                 } else if (type === 'location') {
                     const all = await getAllRoomLabelsByTerm(termId);
@@ -801,30 +1044,46 @@ const bindDetailActions = (root = null) => {
                         selectModalEl: detailEls.locationSelectModal,
                         values: all,
                         preferredValue: detailEls.locationValue?.textContent?.trim() || null,
-                        fallbackLabel: 'No rooms found'
+                        fallbackLabel: 'No rooms found',
+                        root: root
                     });
                 }
             }
         } catch (e) {
-            // non-fatal: fallback to existing values already rendered
+            
         }
 
-        Modal.getOrCreateInstance(selectorModalEl).show();
+        
+        let targetModal = selectorModalEl;
+        try {
+            if (selectorModalEl && selectorModalEl.id) {
+                const byId = document.getElementById(selectorModalEl.id);
+                if (byId) targetModal = byId;
+            }
+        } catch (e) {  }
+
+        Modal.getOrCreateInstance(targetModal).show();
     };
 
     detailEls.instructorEditButton?.addEventListener('click', async () => {
-        await openSelectorModal(detailEls.instructorSelectModal, 'instructor');
+        const canonical = document.getElementById('eventDetailsInstructorSelectModal') || detailEls.instructorSelectModal;
+        await openSelectorModal(canonical, 'instructor');
     });
+    try { if (detailEls.instructorEditButton) detailEls.instructorEditButton.dataset.detailBound = 'true'; } catch (e) {}
 
     detailEls.locationEditButton?.addEventListener('click', async () => {
-        await openSelectorModal(detailEls.locationSelectModal, 'location');
+        const canonical = document.getElementById('eventDetailsLocationSelectModal') || detailEls.locationSelectModal;
+        await openSelectorModal(canonical, 'location');
     });
+    try { if (detailEls.locationEditButton) detailEls.locationEditButton.dataset.detailBound = 'true'; } catch (e) {}
 
     detailEls.daysEditButton?.addEventListener('click', () => {
         setSelectedDayCheckboxes(detailState.selectedDayIndexes);
         setDaysValidationState(false);
-        openSelectorModal(detailEls.daysSelectModal);
+        const canonical = document.getElementById('eventDetailsDaysSelectModal') || detailEls.daysSelectModal;
+        openSelectorModal(canonical);
     });
+    try { if (detailEls.daysEditButton) detailEls.daysEditButton.dataset.detailBound = 'true'; } catch (e) {}
 
     detailEls.durationEditButton?.addEventListener('click', () => {
         const durationMinutes = Number(detailState.selectedDurationMinutes || 0);
@@ -841,10 +1100,12 @@ const bindDetailActions = (root = null) => {
         }
 
         setDurationValidationState(false);
-        openSelectorModal(detailEls.durationSelectModal);
+        const canonical = document.getElementById('eventDetailsDurationSelectModal') || detailEls.durationSelectModal;
+        openSelectorModal(canonical);
     });
+    try { if (detailEls.durationEditButton) detailEls.durationEditButton.dataset.detailBound = 'true'; } catch (e) {}
 
-    detailEls.daysApplyButton?.addEventListener('click', () => {
+    detailEls.daysApplyButton?.addEventListener('click', async () => {
         const selectedDayIndexes = getSelectedDayIndexesFromCheckboxes();
 
         if (selectedDayIndexes.length === 0) {
@@ -864,15 +1125,18 @@ const bindDetailActions = (root = null) => {
 
         setDaysValidationState(false);
 
-        // mark time pending when days change
-        try { markTimePending(); } catch (e) { /* ignore */ }
+        
+        try { markTimePending(root); } catch (e) {  }
 
         if (detailEls.daysSelectModal) {
             Modal.getOrCreateInstance(detailEls.daysSelectModal).hide();
         }
+
+        
+        
     });
 
-    detailEls.durationApplyButton?.addEventListener('click', () => {
+    detailEls.durationApplyButton?.addEventListener('click', async () => {
         const selectedDurationMinutes = toValidDurationMinutes(
             detailEls.durationHoursInput?.value,
             detailEls.durationMinutesInput?.value
@@ -895,12 +1159,15 @@ const bindDetailActions = (root = null) => {
 
         setDurationValidationState(false);
 
-        // mark time pending when duration changes
-        try { markTimePending(); } catch (e) { /* ignore */ }
+        
+        try { markTimePending(root); } catch (e) {  }
 
         if (detailEls.durationSelectModal) {
             Modal.getOrCreateInstance(detailEls.durationSelectModal).hide();
         }
+
+        
+        
     });
 
     detailEls.instructorSelectModal?.addEventListener('hidden.bs.modal', () => {
@@ -921,7 +1188,35 @@ const bindDetailActions = (root = null) => {
         setDurationValidationState(false);
     });
 
-    // Save changes button - request options and log them for now
+    
+    if (root) {
+        const pendingBtnScoped = scope.querySelector('#eventDetailsTimePendingButton');
+        pendingBtnScoped?.addEventListener('click', async () => {
+            try {
+                if (animateMissingRequiredFields(root)) return;
+                await fetchAndShowOptions(root);
+            } catch (err) { console.error(err); }
+        });
+
+        const timeCardScoped = scope.querySelector('.event-details-card--time');
+        if (timeCardScoped) {
+            timeCardScoped.addEventListener('click', async (e) => {
+                if (!timeCardScoped.classList.contains('pending')) return;
+                if (animateMissingRequiredFields(root)) return;
+                try { await fetchAndShowOptions(root); } catch (err) { console.error(err); }
+            });
+            timeCardScoped.addEventListener('keydown', async (e) => {
+                if (!timeCardScoped.classList.contains('pending')) return;
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    if (animateMissingRequiredFields(root)) return;
+                    try { await fetchAndShowOptions(root); } catch (err) { console.error(err); }
+                }
+            });
+        }
+    }
+
+    
     const saveButton = scope.querySelector('#eventDetailsSaveChangesButton');
     saveButton?.addEventListener('click', async () => {
         const current = detailState.currentAssignment || {};
@@ -933,14 +1228,14 @@ const bindDetailActions = (root = null) => {
             return;
         }
 
-        // Only proceed if an option has been selected and applied to the details time
+        
         if (!detailState.selectedOption) {
             console.warn('No option selected. Click the red ! next to the time to choose an option first.');
             return;
         }
 
         const detailEls = getDetailElements(root);
-        // resolve instructor/room ids from cached term objects
+        
         let instructorId = null;
         let roomId = null;
 
@@ -961,7 +1256,7 @@ const bindDetailActions = (root = null) => {
         }
 
         try {
-            // fetch current assignment to get required attributes
+            
             const getResp = await fetch(`/api/v1/terms/${termId}/assignments/${assignmentId}`, { headers: { 'Accept': 'application/json' } });
             if (!getResp.ok) throw new Error(`Failed to load assignment: ${getResp.status}`);
             const getPayload = await getResp.json();
@@ -971,7 +1266,7 @@ const bindDetailActions = (root = null) => {
             const selected = detailState.selectedOption;
             const timeslotId = (selected?.relationships?.timeslot?.data?.id) || selected?.timeslot_id || selected?.attributes?.timeslot_id || null;
 
-            // Build attributes but only include valid positive integer IDs to avoid validation errors
+            
             const updateAttrs = {};
             updateAttrs.assignment_id = Number(existingAttrs.assignment_id || assignmentId);
             updateAttrs.term_id = Number(existingAttrs.term_id || termId);
@@ -989,7 +1284,7 @@ const bindDetailActions = (root = null) => {
                 updateAttrs.user_id = resolvedUserId;
             }
 
-            // instructor: prefer explicit override from UI, fall back to existing attribute/relationship
+            
             const resolvedInstructorId = Number(instructorId || existingAttrs.instructor_id || existingAttrs.instructorId || existingRels?.instructor?.data?.id || 0);
             if (Number.isInteger(resolvedInstructorId) && resolvedInstructorId > 0) {
                 updateAttrs.instructor_id = resolvedInstructorId;
@@ -1032,7 +1327,7 @@ const bindDetailActions = (root = null) => {
 
             console.log('Assignment updated successfully');
 
-            // fetch the updated assignment from server for inspection
+            
             try {
                 const verifyResp = await fetch(`/api/v1/terms/${termId}/assignments/${assignmentId}`, { headers: { 'Accept': 'application/json' } });
                 const verifyText = await verifyResp.text();
@@ -1045,9 +1340,9 @@ const bindDetailActions = (root = null) => {
                 console.error('Failed to fetch updated assignment for verification', e);
             }
 
-            // show a transient banner with View action
-            try {
-                const detailElsAfter = getDetailElements();
+            
+                try {
+                const detailElsAfter = getDetailElements(root);
                 const existingInstructorId = Number(existingAttrs.instructor_id || existingAttrs.instructorId || existingRels?.instructor?.data?.id || 0);
                 const existingRoomId = Number(existingAttrs.room_id || existingAttrs.roomId || existingRels?.room?.data?.id || 0);
 
@@ -1072,16 +1367,19 @@ const bindDetailActions = (root = null) => {
                     showChangeBanner({ message, target: changedTarget, id: changedId, name: changedName });
                 }
             } catch (e) {
-                // non-fatal
+                
             }
 
-            // close options and details modals
+            
             const optionsModalEl = document.getElementById('eventOptionsModal');
             try { if (optionsModalEl) Modal.getOrCreateInstance(optionsModalEl).hide(); } catch (e) {}
-            const detailsModalEl2 = document.getElementById('eventDetailsModal');
-            try { if (detailsModalEl2) Modal.getOrCreateInstance(detailsModalEl2).hide(); } catch (e) {}
 
-            // trigger calendar refresh: re-fetch current selection and then re-render
+            
+            
+            const detailsTarget = root || document.getElementById('eventDetailsModal');
+            try { if (detailsTarget) Modal.getOrCreateInstance(detailsTarget).hide(); } catch (e) {}
+
+            
             document.dispatchEvent(new CustomEvent('schedule:refresh-selection'));
             document.dispatchEvent(new CustomEvent('schedule:blockoff-created'));
         } catch (err) {
@@ -1230,7 +1528,7 @@ const getDayIndexes = (event, relatedEvents = []) => {
         return toUniqueSortedDayIndexes(dayIndexesFromDates);
     }
 
-    const originalDays = event.extendedProps?.originalSchedule?.daysOfWeek;
+    const originalDays = event?.extendedProps?.originalSchedule?.daysOfWeek;
 
     if (Array.isArray(originalDays) && originalDays.length > 0) {
         return toUniqueSortedDayIndexes(originalDays);
@@ -1255,7 +1553,7 @@ const getTimeLabel = (event) => {
         return `${scheduleStart} - ${scheduleEnd}`;
     }
 
-    return 'Not available';
+    return '\u2014';
 };
 
 const getDurationMinutes = (event) => {
@@ -1308,6 +1606,9 @@ const getCoursesFromEventGroup = (event, relatedEvents = []) => {
 
 const getInstructorLabel = (course = {}) => {
     return course.instructor_name
+        || course.attributes?.instructor_name
+        || course.attributes?.instructor_full_name
+        || course.attributes?.instructor?.full_name
         || course.instructor?.name
         || course.instructor?.full_name
         || null;
@@ -1315,7 +1616,9 @@ const getInstructorLabel = (course = {}) => {
 
 const getLocationLabel = (course = {}) => {
     return course.location_name
+        || course.attributes?.location_name
         || course.room_name
+        || course.attributes?.room_name
         || course.room?.name
         || course.location?.name
         || null;
@@ -1352,6 +1655,7 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
             selectModalEl: detailEls.instructorSelectModal,
             values: [],
             fallbackLabel: '\u2014'
+        , root: root
         });
         setDetailSelectorValues({
             valueEl: detailEls.locationValue,
@@ -1360,14 +1664,16 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
             selectModalEl: detailEls.locationSelectModal,
             values: [],
             fallbackLabel: '\u2014'
+        , root: root
         });
         detailEls.days.textContent = '\u2014';
         if (detailEls.duration) {
             detailEls.duration.textContent = '\u2014';
         }
         detailEls.time.textContent = '\u2014';
-        // clear any previously rendered options
-        clearOptionsList();
+        try { updateTimeEmptyState(root); } catch (e) {  }
+        
+        clearOptionsList(root);
         if (detailEls.daysEditButton) {
             detailEls.daysEditButton.disabled = true;
         }
@@ -1381,6 +1687,7 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
     const eventGroupKey = event ? toGroupKey(event) : (usedUnscheduled?.groupId || toGroupKey({ id: usedUnscheduled?.id }));
     const primaryCourse = event ? getPrimaryCourse(event) : (usedUnscheduled?.extendedProps?.courses?.[0] || {});
     const isUnscheduled = !!usedUnscheduled;
+    try { if (root && root instanceof Element) root.dataset.isUnscheduled = isUnscheduled ? 'true' : 'false'; } catch (e) { }
     try { console.log('details: derived primaryCourse:', primaryCourse); } catch (e) { }
     const relatedCourses = event ? getCoursesFromEventGroup(event, relatedEvents) : (primaryCourse ? [primaryCourse] : []);
     const courseTitle = event ? (event.title || primaryCourse.course_name || primaryCourse.section_name || 'Untitled Course') : (primaryCourse.course_name || primaryCourse.section_name || 'Untitled Course');
@@ -1393,36 +1700,71 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
     const eventRooms = toUniqueValues(relatedCourses.map((course) => getLocationLabel(course)));
 
     if (isUnscheduled) {
-        // For unscheduled reschedules we do NOT prefill instructor/room/days/duration.
-        // Show em dash placeholders and leave selector lists empty so user chooses.
+        
+        
+        const primary = primaryCourse || {};
+            const instructorLabel = getInstructorLabel(primary) || '\u2014';
+            const locationLabel = getLocationLabel(primary) || '\u2014';
+
         setDetailSelectorValues({
             valueEl: detailEls.instructorValue,
             searchEl: detailEls.instructorSearch,
             listEl: detailEls.instructorList,
             selectModalEl: detailEls.instructorSelectModal,
             values: [],
-            preferredValue: null,
-            fallbackLabel: '\u2014'
+            preferredValue: instructorLabel,
+            fallbackLabel: instructorLabel,
+            root: root
         });
+
         setDetailSelectorValues({
             valueEl: detailEls.locationValue,
             searchEl: detailEls.locationSearch,
             listEl: detailEls.locationList,
             selectModalEl: detailEls.locationSelectModal,
             values: [],
-            preferredValue: null,
-            fallbackLabel: '\u2014'
+            preferredValue: locationLabel,
+            fallbackLabel: locationLabel,
+            root: root
         });
 
-        detailEls.instructorValue && (detailEls.instructorValue.textContent = '\u2014');
-        detailEls.locationValue && (detailEls.locationValue.textContent = '\u2014');
-        detailEls.days.textContent = '\u2014';
-        if (detailEls.duration) {
-            detailEls.duration.textContent = '\u2014';
-        }
-        detailEls.time.textContent = '\u2014';
+        
+        try { detailEls.instructorValue.textContent = instructorLabel; } catch (e) {}
+        try { detailEls.locationValue.textContent = locationLabel; } catch (e) {}
+        const rawDays = primary.days || primary.timeslot_days || primary.attributes?.days || primary.attributes?.timeslot_days || null;
+        const parsedDayIndexes = parseDaysToIndexes(rawDays);
 
-        // ensure edit buttons are enabled so user can choose values
+        const durationHours = Number(primary.duration || primary.timeslot_duration_hours || primary.attributes?.duration || 0);
+        const durationMinutes = Number.isFinite(durationHours) && durationHours > 0 ? Math.round(durationHours * 60) : null;
+
+        
+        
+        
+        const existingDaySelection = eventGroupKey ? detailState.daySelectionsByGroup.get(eventGroupKey) : null;
+        const existingDurationSelection = eventGroupKey ? detailState.durationSelectionsByGroup.get(eventGroupKey) : null;
+
+        if (Array.isArray(existingDaySelection) && existingDaySelection.length > 0) {
+            detailState.selectedDayIndexes = existingDaySelection;
+        } else {
+            detailState.selectedDayIndexes = [];
+        }
+
+        detailEls.days.textContent = detailState.selectedDayIndexes.length > 0 ? getDaysLabelFromIndexes(detailState.selectedDayIndexes) : '\u2014';
+
+        if (Number.isInteger(existingDurationSelection) && existingDurationSelection > 0) {
+            detailState.selectedDurationMinutes = existingDurationSelection;
+        } else {
+            detailState.selectedDurationMinutes = null;
+        }
+
+        if (detailEls.duration) {
+            detailEls.duration.textContent = detailState.selectedDurationMinutes ? formatDurationLabel(detailState.selectedDurationMinutes) : '\u2014';
+        }
+
+        
+        detailEls.time.textContent = '\u2014';
+        try { markTimePending(root); } catch (e) {  }
+
         if (detailEls.daysEditButton) detailEls.daysEditButton.disabled = false;
         if (detailEls.durationEditButton) detailEls.durationEditButton.disabled = false;
     } else {
@@ -1434,6 +1776,7 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
             values: eventInstructors,
             preferredValue: eventInstructors[0] || null,
             fallbackLabel: 'Loading instructors...'
+        , root: root
         });
         setDetailSelectorValues({
             valueEl: detailEls.locationValue,
@@ -1443,15 +1786,16 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
             values: eventRooms,
             preferredValue: eventRooms[0] || null,
             fallbackLabel: 'Loading rooms...'
+        , root: root
         });
     }
     detailState.selectedEventGroupKey = eventGroupKey;
-    const defaultSelectedDayIndexes = getDayIndexes(event, relatedEvents);
+    const defaultSelectedDayIndexes = event ? getDayIndexes(event, relatedEvents) : [];
     const persistedSelectedDayIndexes = detailState.daySelectionsByGroup.get(eventGroupKey);
     detailState.selectedDayIndexes = Array.isArray(persistedSelectedDayIndexes)
         ? toUniqueSortedDayIndexes(persistedSelectedDayIndexes)
         : defaultSelectedDayIndexes;
-    const defaultDurationMinutes = getDurationMinutes(event);
+    const defaultDurationMinutes = event ? getDurationMinutes(event) : null;
     const persistedDurationMinutes = detailState.durationSelectionsByGroup.get(eventGroupKey);
     detailState.selectedDurationMinutes = Number.isInteger(persistedDurationMinutes) && persistedDurationMinutes > 0
         ? persistedDurationMinutes
@@ -1466,27 +1810,42 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
     if (detailEls.duration) {
         detailEls.duration.textContent = formatDurationLabel(detailState.selectedDurationMinutes);
     }
-    detailEls.time.textContent = getTimeLabel(event);
-    // store current assignment & term for use by save action
+    
+    if (isUnscheduled) {
+        try {
+            detailEls.days.textContent = '\u2014';
+            if (detailEls.duration) detailEls.duration.textContent = '\u2014';
+        } catch (e) {  }
+    }
+    detailEls.time.textContent = event ? getTimeLabel(event) : '\u2014';
+    try { updateTimeEmptyState(root); } catch (e) {  }
+    
     detailState.currentAssignment = {
         assignmentId: Number(primaryCourse.assignment_id || primaryCourse.id || primaryCourse.assignmentId || ''),
         termId: Number(primaryCourse.term_id || primaryCourse.term?.id || detailState.selectedTermId || '')
     };
     try { console.log('details: currentAssignment set to', detailState.currentAssignment); } catch (e) { }
 
-    // enable save if a concrete time exists, otherwise disable and ensure pending UI state
+    
+    
     const timeText = String(detailEls.time.textContent || '').trim();
-    const pendingBtn = document.getElementById('eventDetailsTimePendingButton');
-    if (pendingBtn) pendingBtn.classList.add('d-none');
-    const timeCard = document.querySelector('.event-details-card--time');
-    if (timeText && timeText !== 'Not available' && timeText !== '\u2014') {
+    const scope = root || document;
+    const pendingBtn = scope.querySelector('#eventDetailsTimePendingButton');
+    const timeCard = scope.querySelector('.event-details-card--time');
+
+    if (isUnscheduled) {
+        
+        try { markTimePending(root); } catch (e) {  }
+    } else if (timeText && timeText !== '\u2014') {
+        if (pendingBtn) pendingBtn.classList.add('d-none');
         if (timeCard) timeCard.classList.remove('pending');
-        try { enableSaveButton(); } catch (e) { }
-        try { disableTimeCardInteraction(); } catch (e) { }
+        try { enableSaveButton(root); } catch (e) { }
+        try { disableTimeCardInteraction(root); } catch (e) { }
     } else {
+        if (pendingBtn) pendingBtn.classList.add('d-none');
         if (timeCard) timeCard.classList.remove('pending');
-        try { disableSaveButton(); } catch (e) { }
-        try { disableTimeCardInteraction(); } catch (e) { }
+        try { disableSaveButton(root); } catch (e) { }
+        try { disableTimeCardInteraction(root); } catch (e) { }
     }
 
     const requestToken = ++detailState.activeRequestToken;
@@ -1512,8 +1871,9 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
                 listEl: detailEls.instructorList,
                 selectModalEl: detailEls.instructorSelectModal,
                 values: allInstructors,
-                preferredValue: eventInstructors[0] || null,
-                fallbackLabel: 'No instructors found'
+                preferredValue: isUnscheduled ? (detailEls.instructorValue?.textContent?.trim() || null) : (eventInstructors[0] || null),
+                fallbackLabel: 'No instructors found',
+                root: root
             });
 
             setDetailSelectorValues({
@@ -1522,8 +1882,9 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
                 listEl: detailEls.locationList,
                 selectModalEl: detailEls.locationSelectModal,
                 values: allRooms,
-                preferredValue: eventRooms[0] || null,
-                fallbackLabel: 'No rooms found'
+                preferredValue: isUnscheduled ? (detailEls.locationValue?.textContent?.trim() || null) : (eventRooms[0] || null),
+                fallbackLabel: 'No rooms found',
+                root: root
             });
         })
         .catch((error) => {
@@ -1539,8 +1900,9 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
                 listEl: detailEls.instructorList,
                 selectModalEl: detailEls.instructorSelectModal,
                 values: eventInstructors,
-                preferredValue: eventInstructors[0] || null,
-                fallbackLabel: 'Not available'
+                preferredValue: isUnscheduled ? (detailEls.instructorValue?.textContent?.trim() || eventInstructors[0] || null) : (eventInstructors[0] || null),
+                fallbackLabel: '\u2014',
+                root: root
             });
 
             setDetailSelectorValues({
@@ -1549,11 +1911,14 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
                 listEl: detailEls.locationList,
                 selectModalEl: detailEls.locationSelectModal,
                 values: eventRooms,
-                preferredValue: eventRooms[0] || null,
-                fallbackLabel: 'Not available'
+                preferredValue: isUnscheduled ? (detailEls.locationValue?.textContent?.trim() || eventRooms[0] || null) : (eventRooms[0] || null),
+                fallbackLabel: '\u2014',
+                root: root
             });
         });
 };
+
+export { bindDetailActions, populateEventDetails };
 
 document.addEventListener('schedule:term-selected', (event) => {
     const selectedTermId = Number(event?.detail?.termId || '');
@@ -1569,36 +1934,36 @@ export const showEventDetailsModal = (detail = {}, calendar = null) => {
 
     try {
         console.log('details: showEventDetailsModal called', !!detail, detail && (detail.unscheduledPayload ? 'has unscheduledPayload' : 'no unscheduledPayload'));
-    } catch (e) { /* ignore */ }
+    } catch (e) {  }
 
     if (detail && detail.unscheduledPayload) {
         try {
             console.log('details: unscheduledPayload contents:', detail.unscheduledPayload);
-        } catch (e) { /* ignore */ }
+        } catch (e) {  }
     }
 
-    // If this is an unscheduled reschedule, show a lightweight modal styled like the details modal
-    // unless the caller explicitly requests the full details modal via `forceFullModal`.
+    
+    
     if (detail && detail.unscheduledPayload && !detail.forceFullModal) {
         try { console.log('details: showing lightweight styled modal for unscheduled reschedule'); } catch (e) { }
         showLightweightDetailsModal(detail.unscheduledPayload);
         return;
     }
 
-    // If caller requested the full details modal for an unscheduled payload, clone
-    // the existing details modal, bind actions scoped to the clone, populate it,
-    // show it, and remove the clone when closed.
+    
+    
+    
     if (detail && detail.unscheduledPayload && detail.forceFullModal) {
         try { console.log('details: opening a cloned full details modal for unscheduled reschedule'); } catch (e) {}
 
-        // clone modal markup
+        
         const clone = modalEl.cloneNode(true);
-        // ensure unique id so bootstrap and queries won't confuse instances
+        
         const cloneId = `eventDetailsModalClone_${Date.now()}`;
         clone.id = cloneId;
         document.body.appendChild(clone);
 
-        // bind actions scoped to clone and populate details into it
+        
         try {
             bindDetailActions(clone);
         } catch (e) { console.error('details: bindDetailActions(clone) failed', e); }
@@ -1614,7 +1979,7 @@ export const showEventDetailsModal = (detail = {}, calendar = null) => {
             console.error('details: showing cloned modal failed', e);
         }
 
-        // remove clone on hide
+        
         clone.addEventListener('hidden.bs.modal', () => {
             try { inst.hide(); } catch (e) {}
             try { clone.remove(); } catch (e) {}
@@ -1625,7 +1990,7 @@ export const showEventDetailsModal = (detail = {}, calendar = null) => {
         return;
     }
 
-    // Normal (scheduled) flow uses the existing modal and binds actions once
+    
     bindDetailActions();
 
     populateEventDetails({
@@ -1646,7 +2011,7 @@ export const showEventDetailsModal = (detail = {}, calendar = null) => {
 
     try { console.log('details: modal show requested, immediate classList.contains("show")=', modalEl.classList.contains('show')); } catch (e) { }
 
-    // check again after a tick to see if bootstrap actually displayed it and apply a minimal fallback
+    
     setTimeout(() => {
         try {
             const isShown = modalEl.classList.contains('show');
@@ -1676,16 +2041,41 @@ export const showEventDetailsModal = (detail = {}, calendar = null) => {
     }, 50);
 };
 
-// show a transient banner in the global banner container
+
 function showChangeBanner({ message = 'Updated', target = 'instructor', id = null, name = null } = {}) {
     try {
+        
+        
+        
+        
+        const setDropdownButtonLabel = (button, text) => {
+            if (!button) return;
+            const safeText = String(text || '').trim();
+            const labelSpan = button.querySelector('.schedule-value-label') || button.querySelector('.schedule-label');
+            if (labelSpan) {
+                labelSpan.textContent = safeText;
+                return;
+            }
+
+            
+            for (let node of Array.from(button.childNodes)) {
+                if (node.nodeType === Node.TEXT_NODE) {
+                    node.nodeValue = safeText;
+                    return;
+                }
+            }
+            
+            const tn = document.createTextNode(safeText);
+            button.insertBefore(tn, button.firstChild);
+        };
+
         const container = document.getElementById('globalBannerContainer');
         if (!container) return;
 
         const wrapper = document.createElement('div');
         wrapper.style.pointerEvents = 'auto';
         wrapper.className = 'toast align-items-center text-white bg-success border-0 show';
-        // make banner span the full available width of the container and be visually wider
+        
         wrapper.style.width = '100%';
         wrapper.style.maxWidth = '900px';
         wrapper.style.borderRadius = '0.25rem';
@@ -1715,16 +2105,81 @@ function showChangeBanner({ message = 'Updated', target = 'instructor', id = nul
                 const scheduleBySelect = document.getElementById('scheduleBySelect');
                 const scheduleValueSelect = document.getElementById('scheduleValueSelect');
                 const scheduleValueDropdownButton = document.getElementById('scheduleValueDropdownButton');
-
                 if (!scheduleBySelect || !scheduleValueSelect || !scheduleValueDropdownButton) return;
 
-                scheduleBySelect.value = target === 'room' ? 'room' : 'instructor';
-                scheduleValueSelect.value = String(id || '');
-                scheduleValueDropdownButton.textContent = name || scheduleValueDropdownButton.textContent;
+                const stopShowOnce = (ev) => {
+                    try {
+                        const tgt = ev.target;
+                        if (tgt === scheduleValueDropdownButton || (tgt instanceof Element && tgt.contains && tgt.contains(scheduleValueDropdownButton))) {
+                            ev.preventDefault();
+                            try {
+                                Dropdown.getOrCreateInstance(scheduleValueDropdownButton).hide();
+                            } catch (inner) {  }
+                        }
+                    } catch (e) {  }
+                };
 
-                // request dropdown to refresh and re-render calendar
-                document.dispatchEvent(new CustomEvent('schedule:refresh-selection'));
-                document.dispatchEvent(new CustomEvent('schedule:blockoff-created'));
+                document.addEventListener('show.bs.dropdown', stopShowOnce, { capture: true, once: true });
+
+                scheduleBySelect.value = target === 'room' ? 'room' : 'instructor';
+                scheduleBySelect.dispatchEvent(new Event('change'));
+
+                
+                const trySetSecondary = (attemptsLeft = 10) => {
+                    try {
+                        
+                        if (!scheduleValueDropdownButton.disabled) {
+                            scheduleValueSelect.value = String(id || '');
+
+                            
+                            
+                            
+                            const menu = scheduleValueDropdownButton ? scheduleValueDropdownButton.nextElementSibling : null;
+                            const prevMenuDisplay = menu ? menu.style.display : null;
+                            const prevPointer = scheduleValueDropdownButton ? scheduleValueDropdownButton.style.pointerEvents : null;
+
+                            try {
+                                if (menu) menu.style.display = 'none';
+                                if (scheduleValueDropdownButton) scheduleValueDropdownButton.style.pointerEvents = 'none';
+                            } catch (e) {  }
+
+                            
+                            try {
+                                setDropdownButtonLabel(scheduleValueDropdownButton, name || String(scheduleValueDropdownButton.textContent || '').trim());
+                            } catch (e) {  }
+
+                            
+                            document.dispatchEvent(new CustomEvent('schedule:refresh-selection'));
+                            document.dispatchEvent(new CustomEvent('schedule:blockoff-created'));
+
+                            
+                            try {
+                                Dropdown.getOrCreateInstance(scheduleValueDropdownButton).hide();
+                            } catch (inner) {
+                                try {
+                                    scheduleValueDropdownButton.setAttribute('aria-expanded', 'false');
+                                    if (menu && menu.classList.contains('show')) menu.classList.remove('show');
+                                } catch (e) {  }
+                            }
+
+                            
+                            requestAnimationFrame(() => {
+                                try {
+                                    if (menu) menu.style.display = prevMenuDisplay || '';
+                                    if (scheduleValueDropdownButton) scheduleValueDropdownButton.style.pointerEvents = prevPointer || '';
+                                } catch (e) {  }
+                            });
+
+                            return true;
+                        }
+                    } catch (e) {  }
+
+                    if (attemptsLeft <= 0) return false;
+                    setTimeout(() => trySetSecondary(attemptsLeft - 1), 120);
+                    return false;
+                };
+
+                trySetSecondary();
             } catch (e) {
                 console.error('Failed to navigate to changed target', e);
             }
@@ -1744,7 +2199,7 @@ function showChangeBanner({ message = 'Updated', target = 'instructor', id = nul
         wrapper.appendChild(inner);
 
         container.appendChild(wrapper);
-        // add a bottom progress bar that shrinks leftwards over the lifetime
+        
         const lifeMs = 6000;
         const progressWrap = document.createElement('div');
         progressWrap.style.position = 'absolute';
@@ -1761,19 +2216,19 @@ function showChangeBanner({ message = 'Updated', target = 'instructor', id = nul
         progress.style.width = '100%';
         progress.style.background = 'linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6))';
         progress.style.transition = `width ${lifeMs}ms linear`;
-        // transform-origin right so it appears to run leftwards
+        
         progress.style.transformOrigin = 'right';
 
         progressWrap.appendChild(progress);
         wrapper.style.position = 'relative';
         wrapper.appendChild(progressWrap);
 
-        // start the shrink on next tick
+        
         requestAnimationFrame(() => {
             progress.style.width = '0%';
         });
 
-        // fade + remove helper
+        
         function fadeOutAndRemove(el) {
             try {
                 el.style.transition = 'opacity 300ms ease, transform 300ms ease';
@@ -1785,7 +2240,7 @@ function showChangeBanner({ message = 'Updated', target = 'instructor', id = nul
             }
         }
 
-        // auto-remove after lifeMs with fade
+        
         setTimeout(() => {
             fadeOutAndRemove(wrapper);
         }, lifeMs);

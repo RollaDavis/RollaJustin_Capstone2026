@@ -2,14 +2,6 @@
 
 @section('content')
     <style>
-        /* Highlight time card when pending */
-        .event-details-card--time.pending {
-            border: 1px solid #dc3545;
-            border-radius: 0.25rem;
-            padding: 0.5rem;
-        }
-
-        /* Make the pending button visually like the edit pen */
         #eventDetailsTimePendingButton.event-details-edit-btn {
             display: inline-flex;
             align-items: center;
@@ -18,7 +10,7 @@
             height: 30px;
             padding: 0;
             color: #dc3545;
-            border-color: rgba(220,53,69,0.25);
+            border-color: rgba(220, 53, 69, 0.25);
         }
     </style>
     <div class="container-fluid px-0">
@@ -30,7 +22,8 @@
                     <hr>
                     <div class="unscheduled-events position-relative unscheduled-events-body">
                         <p
-                            class="text-muted fw-semibold mb-0 position-absolute top-50 start-50 translate-middle unscheduled-empty-state">No
+                            class="text-muted fw-semibold mb-0 position-absolute top-50 start-50 translate-middle unscheduled-empty-state">
+                            No
                             Unscheduled Courses...</p>
                     </div>
                 </div>
@@ -38,10 +31,11 @@
             <section class="calendar-pane px-3 pb-3 pt-0 d-flex flex-column calendar-pane-shell">
                 <div id="calendar" class="mt-3 calendar-surface"></div>
             </section>
-            {{-- <div class="course-details-pane bg-white border-start d-flex align-items-start justify-content-center text-center px-3 pt-3 flex-shrink-0"
+            {{-- <div
+                class="course-details-pane bg-white border-start d-flex align-items-start justify-content-center text-center px-3 pt-3 flex-shrink-0"
                 class="details-pane">
                 <div class="w-100 position-relative full-height">
-                    
+
                 </div>
             </div> --}}
         </div>
@@ -62,7 +56,8 @@
                         <div>
                             <p class="event-details-eyebrow mb-1">Selected Course</p>
                             <h4 class="event-details-course mb-1" id="eventDetailsCourse">No course selected</h4>
-                            <p class="event-details-meta mb-0" id="eventDetailsMeta">Right-click an event and choose Course Details.</p>
+                            <p class="event-details-meta mb-0" id="eventDetailsMeta">Right-click an event and choose Course
+                                Details.</p>
                         </div>
                         <span class="event-details-hero-icon" aria-hidden="true">
                             <i class="bi bi-journal-bookmark"></i>
@@ -73,10 +68,10 @@
                         <div class="event-details-card event-details-card--instructor">
                             <p class="event-details-label mb-1">Instructor</p>
                             <div class="event-details-value-row">
-                                <p class="event-details-value mb-0" id="eventDetailsInstructorValue">Not available</p>
+                                <p class="event-details-value mb-0" id="eventDetailsInstructorValue"></p>
                                 <button id="eventDetailsInstructorEditButton" type="button"
-                                    class="btn btn-sm event-details-edit-btn"
-                                    aria-label="Edit instructor" title="Edit instructor">
+                                    class="btn btn-sm event-details-edit-btn" aria-label="Edit instructor"
+                                    title="Edit instructor">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                             </div>
@@ -84,10 +79,9 @@
                         <div class="event-details-card event-details-card--room">
                             <p class="event-details-label mb-1">Room</p>
                             <div class="event-details-value-row">
-                                <p class="event-details-value mb-0" id="eventDetailsLocationValue">Not available</p>
+                                <p class="event-details-value mb-0" id="eventDetailsLocationValue"></p>
                                 <button id="eventDetailsLocationEditButton" type="button"
-                                    class="btn btn-sm event-details-edit-btn"
-                                    aria-label="Edit room" title="Edit room">
+                                    class="btn btn-sm event-details-edit-btn" aria-label="Edit room" title="Edit room">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                             </div>
@@ -95,10 +89,9 @@
                         <div class="event-details-card event-details-card--days">
                             <p class="event-details-label mb-1">Days</p>
                             <div class="event-details-value-row">
-                                <p class="event-details-value mb-0" id="eventDetailsDays">Not available</p>
+                                <p class="event-details-value mb-0" id="eventDetailsDays"></p>
                                 <button id="eventDetailsDaysEditButton" type="button"
-                                    class="btn btn-sm event-details-edit-btn"
-                                    aria-label="Edit days" title="Edit days">
+                                    class="btn btn-sm event-details-edit-btn" aria-label="Edit days" title="Edit days">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                             </div>
@@ -106,10 +99,10 @@
                         <div class="event-details-card event-details-card--duration">
                             <p class="event-details-label mb-1">Duration</p>
                             <div class="event-details-value-row">
-                                <p class="event-details-value mb-0" id="eventDetailsDuration">Not available</p>
+                                <p class="event-details-value mb-0" id="eventDetailsDuration"></p>
                                 <button id="eventDetailsDurationEditButton" type="button"
-                                    class="btn btn-sm event-details-edit-btn"
-                                    aria-label="Edit duration" title="Edit duration">
+                                    class="btn btn-sm event-details-edit-btn" aria-label="Edit duration"
+                                    title="Edit duration">
                                     <i class="bi bi-pencil"></i>
                                 </button>
                             </div>
@@ -117,9 +110,10 @@
                         <div class="event-details-card event-details-card--time">
                             <p class="event-details-label">Time</p>
                             <div class="event-details-value-row">
-                                <p class="event-details-value" id="eventDetailsTime">Not available</p>
-                                <button id="eventDetailsTimePendingButton" type="button" class="btn btn-sm event-details-edit-btn d-none"
-                                    aria-label="Select time option" title="Select option">!
+                                <p class="event-details-value" id="eventDetailsTime"></p>
+                                <button id="eventDetailsTimePendingButton" type="button"
+                                    class="btn btn-sm event-details-edit-btn d-none" aria-label="Select time option"
+                                    title="Select option">!
                                 </button>
                             </div>
                         </div>
@@ -180,23 +174,28 @@
                 <div class="modal-body">
                     <div class="event-details-days-grid mb-3" id="eventDetailsDaysCheckboxGrid">
                         <div class="event-details-day-option">
-                            <input class="event-details-day-input" type="checkbox" value="1" id="eventDetailsDayMon" name="eventDetailsDays">
+                            <input class="event-details-day-input" type="checkbox" value="1" id="eventDetailsDayMon"
+                                name="eventDetailsDays">
                             <label class="event-details-day-chip" for="eventDetailsDayMon">Mon</label>
                         </div>
                         <div class="event-details-day-option">
-                            <input class="event-details-day-input" type="checkbox" value="2" id="eventDetailsDayTue" name="eventDetailsDays">
+                            <input class="event-details-day-input" type="checkbox" value="2" id="eventDetailsDayTue"
+                                name="eventDetailsDays">
                             <label class="event-details-day-chip" for="eventDetailsDayTue">Tue</label>
                         </div>
                         <div class="event-details-day-option">
-                            <input class="event-details-day-input" type="checkbox" value="3" id="eventDetailsDayWed" name="eventDetailsDays">
+                            <input class="event-details-day-input" type="checkbox" value="3" id="eventDetailsDayWed"
+                                name="eventDetailsDays">
                             <label class="event-details-day-chip" for="eventDetailsDayWed">Wed</label>
                         </div>
                         <div class="event-details-day-option">
-                            <input class="event-details-day-input" type="checkbox" value="4" id="eventDetailsDayThu" name="eventDetailsDays">
+                            <input class="event-details-day-input" type="checkbox" value="4" id="eventDetailsDayThu"
+                                name="eventDetailsDays">
                             <label class="event-details-day-chip" for="eventDetailsDayThu">Thu</label>
                         </div>
                         <div class="event-details-day-option">
-                            <input class="event-details-day-input" type="checkbox" value="5" id="eventDetailsDayFri" name="eventDetailsDays">
+                            <input class="event-details-day-input" type="checkbox" value="5" id="eventDetailsDayFri"
+                                name="eventDetailsDays">
                             <label class="event-details-day-chip" for="eventDetailsDayFri">Fri</label>
                         </div>
                     </div>
@@ -222,20 +221,22 @@
                     <div class="row g-2">
                         <div class="col-6">
                             <label for="eventDetailsDurationHoursInput" class="form-label mb-1">Hours</label>
-                            <input id="eventDetailsDurationHoursInput" type="number" min="0" max="12" step="1" class="form-control"
-                                placeholder="0">
+                            <input id="eventDetailsDurationHoursInput" type="number" min="0" max="12" step="1"
+                                class="form-control" placeholder="0">
                         </div>
                         <div class="col-6">
                             <label for="eventDetailsDurationMinutesInput" class="form-label mb-1">Minutes</label>
-                            <input id="eventDetailsDurationMinutesInput" type="number" min="0" max="55" step="5" class="form-control"
-                                placeholder="0">
+                            <input id="eventDetailsDurationMinutesInput" type="number" min="0" max="55" step="5"
+                                class="form-control" placeholder="0">
                         </div>
                     </div>
-                    <p id="eventDetailsDurationValidation" class="small text-danger d-none mt-2 mb-0">Enter a valid duration greater than 0 in 5-minute increments.</p>
+                    <p id="eventDetailsDurationValidation" class="small text-danger d-none mt-2 mb-0">Enter a valid duration
+                        greater than 0 in 5-minute increments.</p>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="button" class="btn btn-primary" id="eventDetailsDurationApplyButton">Apply Changes</button>
+                    <button type="button" class="btn btn-primary" id="eventDetailsDurationApplyButton">Apply
+                        Changes</button>
                 </div>
             </div>
         </div>
@@ -314,7 +315,8 @@
         </div>
     </div>
 
-    <div class="modal fade" id="eventOptionsModal" tabindex="-1" aria-labelledby="eventOptionsModalLabel" aria-hidden="true">
+    <div class="modal fade" id="eventOptionsModal" tabindex="-1" aria-labelledby="eventOptionsModalLabel"
+        aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-md">
             <div class="modal-content border-0 shadow">
                 <div class="modal-header">

@@ -5,6 +5,7 @@ import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import listPlugin from '@fullcalendar/list';
 import { buildCalendarEventsFromCourses } from './calendarEvents';
+import { DEFAULT_EVENT_COLOR_PALETTE } from './eventColorPalette';
 import { initializeUnscheduledCourseDnd } from './unscheduled-course-dnd';
 import { showEventDetailsModal } from './event-details-modal';
 import { showRescheduleUnscheduledCourseModal } from './reschedule-unscheduled-course-modal';
@@ -303,14 +304,26 @@ document.addEventListener('DOMContentLoaded', () => {
     }));
 
     
+    try {
+        const termButton = document.getElementById('termDropdownButton');
+        const initialTermId = Number(termButton?.dataset?.termId || '');
+        if (Number.isInteger(initialTermId) && initialTermId > 0) {
+            
+            
+            currentSelectionDetail = { termId: initialTermId, courses: [] };
+            renderSelectedCourses(currentSelectionDetail);
+        }
+    } catch (e) {  }
 
-    // allow short-lived suppression of clearing selection (used when opening details via context menus)
+    
+
+    
     let _suppressClearUntil = 0;
     document.addEventListener('schedule:preserve-selection', () => {
-        _suppressClearUntil = Date.now() + 200; // ms
+        _suppressClearUntil = Date.now() + 200; 
     });
 
-    // override click handler to respect suppression
+    
     document.addEventListener('click', (event) => {
         const clickedInsideEvent = event.target instanceof Element
             && event.target.closest('.fc-timegrid-event, .fc-list-event');
@@ -318,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const clickedInsideModal = event.target instanceof Element
             && event.target.closest('.modal, .modal-dialog, #eventDetailsModal, #eventOptionsModal');
 
-        // don't clear selection if clicking inside a calendar event or inside any modal
+        
         if (clickedInsideEvent || clickedInsideModal) {
             return;
         }
@@ -339,10 +352,99 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        
         calendar.removeAllEvents();
+        unscheduledCourseDnd?.clear();
+
+        
         [...courseEvents, ...blockoffEvents].forEach((event) => {
             calendar.addEvent(event);
         });
+
+        
+        try {
+            const courses = Array.isArray(detail.courses) ? detail.courses : (Array.isArray(detail.courses?.data) ? detail.courses.data : []);
+
+            (courses || []).forEach((course) => {
+                const hasTimeslot = !!(course.relationships?.timeslot?.data?.id || course.timeslot || course.attributes?.start_time || course.attributes?.days);
+
+                if (!hasTimeslot) {
+                    
+                    const assignmentId = course.id || course.assignment_id || (course.attributes && course.attributes.assignment_id) || null;
+                    const title = course.attributes?.course_name || course.course_name || course.section_name || 'Untitled Course';
+                    const paletteColor = DEFAULT_EVENT_COLOR_PALETTE[0] || { backgroundColor: 'rgba(147, 197, 253, 0.72)', borderColor: '#1d4ed8' };
+                    const payload = {
+                        id: assignmentId ? `assignment-${assignmentId}` : `unscheduled-${Math.random().toString(36).slice(2,8)}`,
+                        title: title,
+                        backgroundColor: course.attributes?.backgroundColor || paletteColor.backgroundColor,
+                        borderColor: course.attributes?.borderColor || paletteColor.borderColor,
+                        textColor: course.attributes?.textColor || paletteColor.borderColor,
+                        extendedProps: {
+                            assignment_id: assignmentId,
+                            term_id: course.relationships?.term?.data?.id || course.term_id || null,
+                            instructor_id: course.relationships?.instructor?.data?.id || course.instructor_id || null,
+                            room_id: course.relationships?.room?.data?.id || course.room_id || null,
+                            courses: [course],
+                            originalSchedule: null
+                        }
+                    };
+
+                    try {
+                        unscheduledCourseDnd?.addUnscheduledPayload(payload);
+                    } catch (e) {
+                        console.warn('Failed to add unscheduled payload to pane', e, payload);
+                    }
+                }
+            });
+        } catch (e) {
+            console.warn('Error while populating unscheduled pane from courses', e);
+        }
+
+        
+        
+        try {
+            const termButton = document.getElementById('termDropdownButton');
+            const termId = Number(termButton?.dataset?.termId || detail.termId || detail.selectedTermId || '');
+
+            if (Number.isInteger(termId) && termId > 0) {
+                (async () => {
+                    try {
+                        const resp = await fetch(`/api/v1/terms/${termId}/assignments`, { headers: { 'Accept': 'application/json' } });
+                        if (!resp.ok) return;
+                        const payload = await resp.json();
+                        const assignments = Array.isArray(payload) ? payload : (Array.isArray(payload?.data) ? payload.data : []);
+
+                        (assignments || []).forEach((assignment) => {
+                            const hasTimeslot = !!(assignment.relationships?.timeslot?.data?.id || assignment.timeslot || assignment.attributes?.start_time || assignment.attributes?.days);
+                            if (!hasTimeslot) {
+                                const assignmentId = assignment.id || assignment.assignment_id || assignment.attributes?.assignment_id || null;
+                                const title = assignment.attributes?.course_name || assignment.course_name || assignment.section_name || 'Untitled Course';
+                                const palette = DEFAULT_EVENT_COLOR_PALETTE[0] || { backgroundColor: 'rgba(147, 197, 253, 0.72)', borderColor: '#1d4ed8' };
+                                const payload = {
+                                    id: assignmentId ? `assignment-${assignmentId}` : `unscheduled-${Math.random().toString(36).slice(2,8)}`,
+                                    title: title,
+                                    backgroundColor: assignment.attributes?.backgroundColor || palette.backgroundColor,
+                                    borderColor: assignment.attributes?.borderColor || palette.borderColor,
+                                    textColor: assignment.attributes?.textColor || palette.borderColor,
+                                    extendedProps: {
+                                        assignment_id: assignmentId,
+                                        term_id: termId,
+                                        instructor_id: assignment.relationships?.instructor?.data?.id || assignment.attributes?.instructor_id || null,
+                                        room_id: assignment.relationships?.room?.data?.id || assignment.attributes?.room_id || null,
+                                        courses: [assignment],
+                                        originalSchedule: null
+                                    }
+                                };
+
+                                try { unscheduledCourseDnd?.addUnscheduledPayload(payload); } catch (e) {  }
+                            }
+                        });
+                    } catch (e) {  }
+                })();
+            }
+        } catch (e) {
+            
+        }
     };
 
     document.addEventListener('schedule:courses-selected', (event) => {
@@ -359,11 +461,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('schedule:open-event-details', (event) => {
         try {
             console.log('app: schedule:open-event-details received', event && event.detail && (event.detail.unscheduledPayload ? 'contains unscheduledPayload' : 'regular detail'));
-        } catch (e) { /* ignore */ }
+        } catch (e) {  }
         if (event.detail && event.detail.unscheduledPayload) {
             showRescheduleUnscheduledCourseModal(event.detail.unscheduledPayload, (rescheduleData) => {
-                // TODO: Integrate with backend to save reschedule
-                // Example: send rescheduleData to API, then refresh calendar/events
+                
+                
                 console.log('Reschedule data to save:', rescheduleData);
             });
         } else {

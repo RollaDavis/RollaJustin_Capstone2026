@@ -2,9 +2,9 @@
 import { Modal } from 'bootstrap';
 import { showEventDetailsModal } from './event-details-modal';
 
-// Show a reschedule modal for an unscheduled course, styled identically to the detail modal
+
 export const showRescheduleUnscheduledCourseModal = (unscheduledPayload = {}, onSave = null) => {
-    // Clone the detail modal markup and use the same binding logic for pixel-perfect styling
+    
     const modalEl = document.getElementById('eventDetailsModal');
     if (!modalEl) return;
 
@@ -14,9 +14,9 @@ export const showRescheduleUnscheduledCourseModal = (unscheduledPayload = {}, on
     document.body.appendChild(clone);
 
 
-    // Do NOT clone selector modals. Use the originals in the DOM.
+    
 
-    // Patch the title/subtitle for clarity
+    
     const titleWrap = clone.querySelector('.event-details-title-wrap');
     if (titleWrap) {
         const h5 = titleWrap.querySelector('h5');
@@ -25,12 +25,12 @@ export const showRescheduleUnscheduledCourseModal = (unscheduledPayload = {}, on
         if (p) p.textContent = 'Unscheduled — Reschedule';
     }
 
-    // Use the same logic as the full details modal for unscheduled courses
+    
     import('./event-details-modal').then(({ bindDetailActions, populateEventDetails }) => {
         try { bindDetailActions(clone); } catch (e) { console.error('bindDetailActions(clone) failed', e); }
         try { populateEventDetails({ unscheduledPayload }, clone); } catch (e) { console.error('populateEventDetails for clone failed', e); }
 
-        // Ensure course name is set for unscheduled
+        
         if (unscheduledPayload) {
             const primary = unscheduledPayload?.extendedProps?.courses?.[0] || {};
             const courseTitle = primary.course_name || primary.attributes?.course_name || unscheduledPayload.title || 'Course';
@@ -38,11 +38,11 @@ export const showRescheduleUnscheduledCourseModal = (unscheduledPayload = {}, on
             if (courseEl) courseEl.textContent = courseTitle;
         }
 
-        // Only show the modal after actions are bound and content is ready
+        
         const inst = Modal.getOrCreateInstance(clone);
         try { inst.show(); } catch (e) { console.error('showing cloned modal failed', e); }
 
-        // Remove clone on hide
+        
         clone.addEventListener('hidden.bs.modal', () => {
             try { inst.hide(); } catch (e) {}
             try { clone.remove(); } catch (e) {}

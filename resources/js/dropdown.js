@@ -60,6 +60,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const labelSpan = scheduleValueDropdownButton.querySelector('.schedule-value-label');
+        if (labelSpan) {
+            labelSpan.textContent = text;
+            return;
+        }
+
+        
         scheduleValueDropdownButton.textContent = text;
     };
 
@@ -168,18 +175,18 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     };
 
-    // allow other modules to request a refresh of the current selection
+    
     document.addEventListener('schedule:refresh-selection', () => {
         const selectedView = normalizeScheduleByValue(scheduleBySelect?.value || '');
         const selectedId = Number(scheduleValueSelect?.value || '');
         const selectedName = String(scheduleValueDropdownButton?.textContent || '').trim();
 
         if (!selectedView || !Number.isInteger(selectedId) || selectedId <= 0) {
-            // nothing to refresh
+            
             return;
         }
 
-        // re-fetch courses for the current selection and publish
+        
         fetchCoursesForSelection(selectedView, selectedId, selectedName).catch((e) => {
             console.error('Failed to refresh current selection', e);
         });
