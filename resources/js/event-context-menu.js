@@ -66,7 +66,7 @@ const runMenuAction = (action, payload = {}) => {
     const eventId = payload.eventId || null;
 
     if (action === 'details' && eventId) {
-        // preserve selection briefly so the document click handler doesn't clear it
+        
         document.dispatchEvent(new CustomEvent('schedule:preserve-selection'));
         document.dispatchEvent(new CustomEvent('schedule:open-event-details', {
             detail: { eventId }

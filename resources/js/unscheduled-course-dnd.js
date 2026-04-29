@@ -134,7 +134,7 @@ export const initializeUnscheduledCourseDnd = ({
             return;
         }
 
-        // no unscheduled items — show contextual message depending on term selection
+        
         const termButton = document.getElementById('termDropdownButton');
         const termId = Number(termButton?.dataset?.termId || '');
 
@@ -197,7 +197,7 @@ export const initializeUnscheduledCourseDnd = ({
         const title = document.createElement('div');
         title.className = 'fc-event-title unscheduled-course-item__title';
         title.textContent = payload.title || 'Untitled Course';
-        // instructor / room labels (prefer payload.extendedProps.courses[0] then top-level keys)
+        
         const instructorLabel = payload.extendedProps?.courses?.[0]?.instructor_name
             || payload.extendedProps?.instructor_name
             || payload.extendedProps?.attributes?.instructor_name
@@ -209,8 +209,8 @@ export const initializeUnscheduledCourseDnd = ({
             || payload.extendedProps?.attributes?.room_name
             || '';
 
-        // If this payload was created by moving an existing calendar event to unscheduled
-        // (payload.originalEventId present), do not display instructor/room labels in the pane.
+        
+        
         const showLabels = !payload.originalEventId;
 
         meta.append(time);
@@ -240,10 +240,10 @@ export const initializeUnscheduledCourseDnd = ({
         unscheduledByKey.set(key, item);
         updateUnscheduledEmptyState();
 
-        // add context menu for unscheduled course item
+        
         item.addEventListener('contextmenu', (e) => {
             e.preventDefault();
-            // remove any existing menu
+            
             document.querySelectorAll('.unscheduled-context-menu').forEach((el) => el.remove());
 
             const menu = document.createElement('div');
@@ -254,7 +254,7 @@ export const initializeUnscheduledCourseDnd = ({
             menu.style.top = `${e.clientY}px`;
             menu.setAttribute('role', 'menu');
 
-            // reschedule (opens detail view)
+            
             const rescheduleBtn = document.createElement('button');
             rescheduleBtn.type = 'button';
             rescheduleBtn.className = 'event-context-menu__item';
@@ -262,7 +262,7 @@ export const initializeUnscheduledCourseDnd = ({
             rescheduleBtn.addEventListener('click', () => {
                 console.log('unscheduled: reschedule clicked for payload id', payload?.id);
                 document.dispatchEvent(new CustomEvent('schedule:preserve-selection'));
-                // open full details modal with the unscheduled payload (force full modal)
+                
                 document.dispatchEvent(new CustomEvent('schedule:open-event-details', {
                     detail: { unscheduledPayload: payload, forceFullModal: true }
                 }));
@@ -271,7 +271,7 @@ export const initializeUnscheduledCourseDnd = ({
 
             menu.append(rescheduleBtn);
 
-            // remove menu on click elsewhere
+            
             setTimeout(() => {
                 document.addEventListener('mousedown', function handler(ev) {
                     if (!menu.contains(ev.target)) {
@@ -302,9 +302,9 @@ export const initializeUnscheduledCourseDnd = ({
             : [calendarEvent];
 
         const payload = toUnscheduledPayload(calendarEvent);
-        // treat moved-to-unscheduled items the same as initially-unscheduled: do not
-        // expose an original schedule so the details modal shows "Time TBD" and
-        // "Not available" for days/duration. keep originalEventId for trace.
+        
+        
+        
         payload.originalEventId = calendarEvent.id;
         payload.originalSchedule = null;
         payload.extendedProps = {
@@ -315,10 +315,10 @@ export const initializeUnscheduledCourseDnd = ({
         upsertUnscheduledItem(payload);
         relatedEvents.forEach((event) => event.remove());
 
-        // persist unscheduled state to backend: set assignment.timeslot_id = null
+        
         (async () => {
             try {
-                // derive assignment id and term id from the calendar event where possible
+                
                 let assignmentId = Number(
                     calendarEvent.extendedProps?.assignment_id ||
                     calendarEvent.extendedProps?.assignmentId ||
@@ -339,7 +339,7 @@ export const initializeUnscheduledCourseDnd = ({
 
                 console.log('unschedule persistence: derived ids', { assignmentId, termId });
 
-                // if assignmentId not found, attempt to parse from calendarEvent.id or payload.originalEventId
+                
                 if (!Number.isInteger(assignmentId) || assignmentId <= 0) {
                     console.log('unschedule persistence: attempting to parse assignment id from event identifiers', { eventId: calendarEvent.id, originalEventId: payload.originalEventId, payloadExtended: payload.extendedProps });
                     const idCandidates = [calendarEvent.id, payload.originalEventId, payload.extendedProps?.assignment_id, payload.extendedProps?.assignmentId, payload.extendedProps?.assignment?.id];
@@ -394,7 +394,7 @@ export const initializeUnscheduledCourseDnd = ({
                 const room = Number(payload.extendedProps?.room_id || existingAttrs.room_id || existingAttrs.roomId || existingRels?.room?.data?.id || 0);
                 if (Number.isInteger(room) && room > 0) d.room_id = room;
 
-                // explicitly set timeslot_id to null to mark unscheduled
+                
                 d.timeslot_id = null;
 
                 console.log('unschedule persistence: patching assignment to set timeslot_id=null', { assignmentId, termId, payload: d });
@@ -452,7 +452,7 @@ export const initializeUnscheduledCourseDnd = ({
         moveEventToUnscheduled,
         handleExternalEventReceive,
         clear,
-        // allow programmatic insertion of unscheduled payloads (e.g., on page load)
+        
         addUnscheduledPayload: (payload) => upsertUnscheduledItem(payload)
     };
 };

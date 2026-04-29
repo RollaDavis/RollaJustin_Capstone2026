@@ -1,6 +1,4 @@
-/* Custom lightweight modifications to avoid default Bootstrap styling
-   Focused overrides for modals, buttons, form controls, badges and lists
-*/
+
 :root{
     --lm-bg: #ffffff;
     --lm-panel: #fbfdff;
@@ -10,7 +8,7 @@
     --lm-btn-color: #ffffff;
 }
 
-/* Modal tweaks for event details */
+
 .modal-content.event-details-modal{
     background: var(--lm-bg);
     border-radius: 0.5rem;
@@ -24,7 +22,7 @@
 .event-details-title{ color:#0b2545; font-weight:600; }
 .event-details-subtitle{ color:#4b5563; }
 
-/* Card-like fields inside details */
+
 .event-details-card{
     background: var(--lm-panel);
     border: 1px solid var(--lm-border);
@@ -33,23 +31,23 @@
 }
 
 .event-details-card--time.pending{
-    outline: 2px solid #ef4444; /* slightly lighter red */
+    outline: 2px solid #ef4444; 
     border: none;
     box-shadow: none;
     border-radius: 0.375rem;
 }
 .event-details-card--time .event-details-value{ color:#111827; font-weight:500; }
 
-/* Make the time text red when pending or when explicitly empty */
+
 .event-details-card--time.pending .event-details-label,
 .event-details-card--time.time-empty .event-details-label,
 .event-details-card--time.pending .event-details-value,
 .event-details-card--time.time-empty .event-details-value{
-    color: #ef4444; /* a little lighter red */
+    color: #ef4444; 
     font-weight: 600;
 }
 
-/* Apply same lighter red styling when other detail fields are empty */
+
 .event-details-card--instructor.field-empty .event-details-label,
 .event-details-card--instructor.field-empty .event-details-value,
 .event-details-card--room.field-empty .event-details-label,
@@ -62,21 +60,21 @@
     font-weight: 600;
 }
 
-/* Ensure input values inside empty cards also appear with the empty styling */
+
 .event-details-card.field-empty input.form-control,
 .event-details-card.time-empty input.form-control {
     color: #ef4444 !important;
     font-weight: 600 !important;
 }
 
-/* Outline the entire card when empty to match time pending styling */
+
 .event-details-card.field-empty {
     outline: 2px solid #ef4444;
     border-color: transparent !important;
     box-shadow: none !important;
 }
 
-/* Color and emphasize the edit (pen) buttons when their card is empty */
+
 .event-details-card.field-empty .btn,
 .event-details-card.field-empty .btn-outline-secondary,
 .event-details-card--instructor.field-empty #eventDetailsInstructorEditButton,
@@ -87,21 +85,21 @@
     border-color: rgba(239,68,68,0.12) !important;
 }
 
-/* Make any SVG icon inside the edit buttons use the red color */
+
 .event-details-card.field-empty .btn svg,
 .event-details-card.field-empty button svg {
     fill: #ef4444 !important;
     stroke: #ef4444 !important;
 }
 
-/* Slightly enlarge the edit icon for emphasis when empty */
+
 .event-details-card.field-empty .btn svg,
 .event-details-card.field-empty button svg {
     width: 1.1em !important;
     height: 1.1em !important;
 }
 
-/* Remove any focus outline or ring from edit icon buttons when styled as empty */
+
 .event-details-card.field-empty .btn,
 .event-details-card.field-empty button,
 .event-details-card--instructor.field-empty #eventDetailsInstructorEditButton,
@@ -119,7 +117,7 @@
     box-shadow: none !important;
 }
 
-/* Ensure edit buttons remain clickable and visible above outlines */
+
 .event-details-card .event-details-edit-btn,
 .event-details-card .btn.event-details-edit-btn{
     pointer-events: auto !important;
@@ -128,8 +126,7 @@
     z-index: 2 !important;
 }
 
-/* Prevent the card outline from visually framing the edit button by
-   giving the button a matching panel background and removing its border */
+
 .event-details-card.field-empty .event-details-edit-btn,
 .event-details-card.field-empty .btn.event-details-edit-btn{
     background: var(--lm-panel) !important;
@@ -139,7 +136,7 @@
     box-shadow: none !important;
 }
 
-/* Wiggle animation for unselected values to draw attention */
+
 @keyframes wiggle {
     0% { transform: translateX(0); }
     25% { transform: translateX(-6px); }
@@ -154,14 +151,13 @@
     animation: wiggle 600ms ease;
 }
 
-/* Transient highlight applied during wiggle so the permanent empty
-     red styling remains while drawing attention. Uses a subtle glow. */
+
 .event-details-card.wiggle-highlight {
     outline: 2px solid rgba(239,68,68,0.9);
     box-shadow: 0 6px 18px rgba(239,68,68,0.12);
 }
 
-/* Buttons */
+
 .btn-primary{
     background: var(--lm-btn-bg) !important;
     border-color: var(--lm-btn-bg) !important;
@@ -174,7 +170,7 @@
     background: transparent !important;
 }
 
-/* Forms */
+
 .form-control{
     border: 1px solid var(--lm-border) !important;
     border-radius: 0.375rem !important;
@@ -185,7 +181,7 @@
     box-shadow: 0 0 0 0.15rem rgba(11,94,215,0.12) !important;
 }
 
-/* Badges & list items */
+
 .badge.bg-success{ background: #16a34a !important; }
 .badge.bg-danger{ background: #dc2626 !important; }
 .list-group-item{ border: 1px solid var(--lm-border) !important; }
@@ -195,10 +191,10 @@
     color: var(--lm-primary) !important;
 }
 
-/* Small accessibility and spacing niceties */
+
 .event-details-modal .modal-body{ color:#0f172a; }
 
-/* Dropdowns */
+
 .dropdown-menu{
     background: var(--lm-panel);
     border: 1px solid var(--lm-border);
@@ -238,14 +234,14 @@
     background: var(--lm-border);
 }
 
-/* Specific dropdowns used in the app for spacing and search area */
+
 .dropdown-term-options, .dropdown-schedule-by-options, .dropdown-schedule-value-options{
     max-height: 320px;
     overflow: auto;
 }
 .dropdown-schedule-value-menu .form-control{ margin-bottom: 0.5rem; }
 
-/* Details modal footer buttons */
+
 .event-details-modal .modal-footer{
     background: transparent;
     border-top: 1px solid rgba(14,20,29,0.04);
@@ -276,7 +272,7 @@
 }
 
 
-/* Apply same footer button styles to selector modals (instructor, location, days, duration) */
+
 #eventDetailsInstructorSelectModal .modal-footer .btn,
 #eventDetailsLocationSelectModal .modal-footer .btn,
 #eventDetailsDaysSelectModal .modal-footer .btn,
@@ -306,7 +302,7 @@
     box-shadow: 0 6px 18px rgba(11,94,215,0.12) !important;
 }
 
-/* Style the blockoff creation buttons similarly to details modal footer buttons */
+
 .blockoff-creation-modal .modal-body .btn{
     min-width: 110px;
     padding: 0.5rem 0.9rem;
@@ -328,7 +324,7 @@
     box-shadow: 0 6px 18px rgba(11,94,215,0.12) !important;
 }
 
-/* Options / Conflicts selector modal */
+
 #eventOptionsModal .modal-content{
     background: var(--lm-bg);
     border-radius: 0.5rem;
@@ -377,7 +373,7 @@
     line-height: 1.25;
 }
 
-/* conflict reasons list and dividers */
+
 .conflict-reasons{ padding-left: 0.15rem; }
 .conflict-reason{ margin: 0; }
 .conflict-reason-divider{
@@ -419,13 +415,13 @@
     font-weight: 600;
 }
 
-/* When the details modal is behind the selector, slightly dim it for focus */
+
 .event-details-modal-behind-selector{
     filter: brightness(0.93);
     transition: filter 120ms ease;
 }
 
-/* Pending-time button tweaks: remove outline and enlarge icon */
+
 #eventDetailsTimePendingButton {
     border: none !important;
     background: transparent !important;
@@ -434,9 +430,9 @@
     min-width: 0 !important;
     width: auto !important;
     height: auto !important;
-    font-size: 1.125rem !important; /* larger bang */
+    font-size: 1.125rem !important; 
     line-height: 1 !important;
-    color: #ef4444 !important; /* match lighter red */
+    color: #ef4444 !important; 
 }
 
 #eventDetailsTimePendingButton:focus,

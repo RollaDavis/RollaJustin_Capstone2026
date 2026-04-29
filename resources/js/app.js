@@ -303,27 +303,27 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }));
 
-    // On initial load, populate unscheduled pane for the currently-selected term
+    
     try {
         const termButton = document.getElementById('termDropdownButton');
         const initialTermId = Number(termButton?.dataset?.termId || '');
         if (Number.isInteger(initialTermId) && initialTermId > 0) {
-            // call renderSelectedCourses with empty courses but termId so the assignments
-            // fetch in renderSelectedCourses will populate unscheduled assignments for the term
+            
+            
             currentSelectionDetail = { termId: initialTermId, courses: [] };
             renderSelectedCourses(currentSelectionDetail);
         }
-    } catch (e) { /* ignore */ }
+    } catch (e) {  }
 
     
 
-    // allow short-lived suppression of clearing selection (used when opening details via context menus)
+    
     let _suppressClearUntil = 0;
     document.addEventListener('schedule:preserve-selection', () => {
-        _suppressClearUntil = Date.now() + 200; // ms
+        _suppressClearUntil = Date.now() + 200; 
     });
 
-    // override click handler to respect suppression
+    
     document.addEventListener('click', (event) => {
         const clickedInsideEvent = event.target instanceof Element
             && event.target.closest('.fc-timegrid-event, .fc-list-event');
@@ -331,7 +331,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const clickedInsideModal = event.target instanceof Element
             && event.target.closest('.modal, .modal-dialog, #eventDetailsModal, #eventOptionsModal');
 
-        // don't clear selection if clicking inside a calendar event or inside any modal
+        
         if (clickedInsideEvent || clickedInsideModal) {
             return;
         }
@@ -352,16 +352,16 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
-        // clear calendar and unscheduled pane, then render
+        
         calendar.removeAllEvents();
         unscheduledCourseDnd?.clear();
 
-        // add scheduled events to calendar
+        
         [...courseEvents, ...blockoffEvents].forEach((event) => {
             calendar.addEvent(event);
         });
 
-        // for any courses returned that lack a timeslot, add them to the unscheduled pane
+        
         try {
             const courses = Array.isArray(detail.courses) ? detail.courses : (Array.isArray(detail.courses?.data) ? detail.courses.data : []);
 
@@ -369,7 +369,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 const hasTimeslot = !!(course.relationships?.timeslot?.data?.id || course.timeslot || course.attributes?.start_time || course.attributes?.days);
 
                 if (!hasTimeslot) {
-                    // build a minimal unscheduled payload compatible with upsertUnscheduledItem
+                    
                     const assignmentId = course.id || course.assignment_id || (course.attributes && course.attributes.assignment_id) || null;
                     const title = course.attributes?.course_name || course.course_name || course.section_name || 'Untitled Course';
                     const paletteColor = DEFAULT_EVENT_COLOR_PALETTE[0] || { backgroundColor: 'rgba(147, 197, 253, 0.72)', borderColor: '#1d4ed8' };
@@ -400,8 +400,8 @@ document.addEventListener('DOMContentLoaded', () => {
             console.warn('Error while populating unscheduled pane from courses', e);
         }
 
-        // also fetch all assignments for the selected term and render any unscheduled
-        // assignments (timeslot_id = null) so unscheduled courses are visible in every view
+        
+        
         try {
             const termButton = document.getElementById('termDropdownButton');
             const termId = Number(termButton?.dataset?.termId || detail.termId || detail.selectedTermId || '');
@@ -436,14 +436,14 @@ document.addEventListener('DOMContentLoaded', () => {
                                     }
                                 };
 
-                                try { unscheduledCourseDnd?.addUnscheduledPayload(payload); } catch (e) { /* ignore */ }
+                                try { unscheduledCourseDnd?.addUnscheduledPayload(payload); } catch (e) {  }
                             }
                         });
-                    } catch (e) { /* ignore */ }
+                    } catch (e) {  }
                 })();
             }
         } catch (e) {
-            /* ignore */
+            
         }
     };
 
@@ -461,11 +461,11 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('schedule:open-event-details', (event) => {
         try {
             console.log('app: schedule:open-event-details received', event && event.detail && (event.detail.unscheduledPayload ? 'contains unscheduledPayload' : 'regular detail'));
-        } catch (e) { /* ignore */ }
+        } catch (e) {  }
         if (event.detail && event.detail.unscheduledPayload) {
             showRescheduleUnscheduledCourseModal(event.detail.unscheduledPayload, (rescheduleData) => {
-                // todo: integrate with backend to save reschedule
-                // example: send rescheduledata to api, then refresh calendar/events
+                
+                
                 console.log('Reschedule data to save:', rescheduleData);
             });
         } else {

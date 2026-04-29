@@ -17,7 +17,7 @@ const detailState = {
     actionsBound: false
 };
 
-// show a simple, temporary modal styled like the details modal for unscheduled reschedule
+
 const showLightweightDetailsModal = (unscheduledPayload = {}) => {
     try { console.log('details: showLightweightDetailsModal payload', unscheduledPayload); } catch (e) { }
 
@@ -89,7 +89,7 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
         console.error('details: creating/showing bsModal failed', err);
     }
 
-    // short fallback: if not visible, force visual display + backdrop
+    
     setTimeout(() => {
         try {
             const isShown = wrapper.classList.contains('show');
@@ -113,7 +113,7 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
         } catch (e) { }
     }, 40);
 
-    // initialize inputs to em-dash and wire focus/blur to clear/restore
+    
     const EMDASH = '\u2014';
     const instructorInput = wrapper.querySelector('#lwInstructorInput');
     const roomInput = wrapper.querySelector('#lwRoomInput');
@@ -123,7 +123,7 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
 
     const inputs = [instructorInput, roomInput, daysInput, durationInput, timeInput].filter(Boolean);
 
-    // helper to set initial visual em dash when value empty
+    
     inputs.forEach((inp) => {
         if (!inp) return;
         const initial = (inp === durationInput && durationHours) ? String(durationHours) : (inp === timeInput && startLabel) ? startLabel : '';
@@ -135,17 +135,17 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
 
         inp.addEventListener('focus', () => {
             if (inp.value === EMDASH) inp.value = '';
-            // update visual empty states immediately on focus
+            
             try { updateLWEmptyStates(); } catch (e) { }
         });
         inp.addEventListener('blur', () => {
             if (!String(inp.value || '').trim()) inp.value = EMDASH;
-            // update visual empty states after blur
+            
             try { updateLWEmptyStates(); } catch (e) { }
         });
     });
 
-    // update .field-empty classes for the lightweight modal based on input values
+    
     const updateLWEmptyStates = () => {
         const mappings = [
             { card: '.event-details-card--instructor', input: instructorInput },
@@ -163,14 +163,14 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
                 const isEmptyField = val === EMDASH || val === '';
                 cardEl.classList.toggle('field-empty', isEmptyField);
                 try { console.debug && console.debug('updateLWEmptyStates:', card, 'value:', val, 'field-empty:', isEmptyField); } catch (e) { }
-            } catch (e) { /* non-fatal */ }
+            } catch (e) {  }
         });
     };
 
-    // initial empty-state update
+    
     try { updateLWEmptyStates(); } catch (e) { }
 
-    // cleanup on hide
+    
     const removeAll = () => {
         try { bsModal.hide(); } catch (e) {}
         try { wrapper.remove(); } catch (e) {}
@@ -178,12 +178,12 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
         if (backdrop) backdrop.remove();
     };
 
-    // close buttons
+    
     wrapper.querySelectorAll('.btn-close, [data-bs-dismiss="modal"]').forEach((btn) => {
         btn.addEventListener('click', (e) => { e.preventDefault(); removeAll(); });
     });
 
-    // save handler: read values, treat em-dash as null
+    
     const saveBtn = wrapper.querySelector('#lightweightSaveBtn');
     if (saveBtn) saveBtn.addEventListener('click', () => {
         const read = (inp) => {
@@ -207,7 +207,7 @@ const showLightweightDetailsModal = (unscheduledPayload = {}) => {
     });
 };
 
-// small helper to escape html in inserted strings
+
 const escapeHtml = (str) => String(str || '').replace(/[&<>"']/g, (c) => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[c]);
 
 const formatClockTime = (date) => {
@@ -272,13 +272,13 @@ const getDetailElements = (root = null) => {
     };
 };
 
-// option rendering / selection helpers
+
 const clearOptionsList = (root = null) => {
     detailState.currentOptions = [];
     detailState.selectedOption = null;
     const listEl = document.getElementById('eventDetailsOptionsList');
     if (listEl) listEl.innerHTML = '';
-    // disable save when options cleared for the appropriate details modal
+    
     try { disableSaveButton(root); } catch (e) { }
 };
 
@@ -293,8 +293,8 @@ function disableSaveButton(root = null) {
 }
 
 const renderOptionsList = (payload, root = null) => {
-    // always populate the global options list used by the selector modal so
-    // the single options modal instance is reused for clones.
+    
+    
     const listEl = document.getElementById('eventDetailsOptionsList');
 
     if (!listEl) {
@@ -302,7 +302,7 @@ const renderOptionsList = (payload, root = null) => {
         return;
     }
 
-    // normalize payload
+    
     let options = [];
     if (Array.isArray(payload)) {
         options = payload;
@@ -314,7 +314,7 @@ const renderOptionsList = (payload, root = null) => {
     detailState.selectedOption = null;
     listEl.innerHTML = '';
 
-    // split into non-conflicting (selectable) and conflicting (not selectable)
+    
     const selectable = options.filter((o) => {
         const a = o.attributes || o;
         return !a.conflicting && !(Array.isArray(a.conflicts) && a.conflicts.length > 0);
@@ -391,18 +391,18 @@ const renderOptionsList = (payload, root = null) => {
                 item.classList.add('active');
                 detailState.selectedOption = opt;
                 console.log('Selected option:', opt);
-                try { applySelectedOptionToTime(opt, root); } catch (e) { /* ignore */ }
+                try { applySelectedOptionToTime(opt, root); } catch (e) {  }
             });
         }
 
         listEl.appendChild(item);
     };
 
-    // render selectable first
+    
     selectable.forEach((opt, i) => renderItem(opt, i, true));
 
     if (conflicts.length > 0) {
-        // separator
+        
         const separator = document.createElement('div');
         separator.className = 'list-group-item small text-muted';
         separator.textContent = 'Conflicts';
@@ -412,7 +412,7 @@ const renderOptionsList = (payload, root = null) => {
     }
 };
 
-// apply button handler for options modal
+
 document.addEventListener('DOMContentLoaded', () => {
     const applyBtn = document.getElementById('eventOptionsApplyButton');
     applyBtn?.addEventListener('click', () => {
@@ -423,7 +423,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // darken details modal when options modal is shown
+    
     const optionsModalEl = document.getElementById('eventOptionsModal');
     const detailsModalEl = document.getElementById('eventDetailsModal');
 
@@ -437,7 +437,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // pending time button opens options
+    
     const pendingBtn = document.getElementById('eventDetailsTimePendingButton');
     pendingBtn?.addEventListener('click', async () => {
         try {
@@ -446,15 +446,15 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch (err) { console.error(err); }
     });
 
-    // Delegated fallback: if for some reason individual edit buttons weren't
-    // bound (e.g., due to cloning or timing), handle clicks here and open
-    // the appropriate selector modal. Skip buttons that were already bound
-    // by `bindDetailActions` (they are marked with `data-detail-bound`).
+    
+    
+    
+    
     document.addEventListener('click', (ev) => {
         try {
             const btn = ev.target.closest && ev.target.closest('.event-details-edit-btn');
             if (!btn) return;
-            if (btn.dataset && btn.dataset.detailBound === 'true') return; // already handled
+            if (btn.dataset && btn.dataset.detailBound === 'true') return; 
 
             const id = btn.id || '';
             let modalId = null;
@@ -480,13 +480,13 @@ document.addEventListener('DOMContentLoaded', () => {
                 ev.stopPropagation();
                 Modal.getOrCreateInstance(modalEl).show();
             }
-        } catch (e) { /* ignore */ }
+        } catch (e) {  }
     });
 
-    // make the whole time card act as the options button only when pending
+    
     const timeCard = document.querySelector('.event-details-card--time');
     if (timeCard) {
-        // handlers always present but only active when the card has the 'pending' class
+        
         timeCard.addEventListener('click', async (e) => {
             if (!timeCard.classList.contains('pending')) return;
             if (animateMissingRequiredFields()) return;
@@ -524,7 +524,7 @@ const formatDurationLabel = (durationMinutes) => {
     return `${minutes}m`;
 };
 
-// parse various day formats (string like 'mwf', array of indexes, etc.) to day indexes
+
 const parseDaysToIndexes = (days) => {
     if (!days) return [];
     if (Array.isArray(days)) return toUniqueSortedDayIndexes(days.map((d) => Number(d)).filter((n) => Number.isInteger(n)));
@@ -617,17 +617,17 @@ const toUniqueValues = (values = []) => {
     return [...new Set(values.map((value) => String(value || '').trim()).filter(Boolean))];
 };
 
-// mark the details time as pending (em dash) and clear any options
+
 function markTimePending(root = null) {
     const els = getDetailElements(root);
     if (els.time) {
         els.time.textContent = '\u2014';
     }
     clearOptionsList(root);
-    // disable save while pending
+    
     try { disableSaveButton(root); } catch (e) { }
 
-    // show the pending button next to the time and outline the time card
+    
     const scope = root || document;
     const pendingBtn = scope.querySelector('#eventDetailsTimePendingButton');
     if (pendingBtn) {
@@ -639,12 +639,12 @@ function markTimePending(root = null) {
         timeCard.classList.add('pending');
         try { enableTimeCardInteraction(root); } catch (e) { }
     }
-    try { updateTimeEmptyState(root); } catch (e) { /* non-fatal */ }
-    try { updateEmptyFieldStates(root); } catch (e) { /* non-fatal */ }
-    try { updateEmptyFieldStates(root); } catch (e) { /* non-fatal */ }
+    try { updateTimeEmptyState(root); } catch (e) {  }
+    try { updateEmptyFieldStates(root); } catch (e) {  }
+    try { updateEmptyFieldStates(root); } catch (e) {  }
 }
 
-// helper to enable interactive affordances on the time card
+
 function enableTimeCardInteraction(root = null) {
     const scope = root || document;
     const timeCard = scope.querySelector('.event-details-card--time');
@@ -654,7 +654,7 @@ function enableTimeCardInteraction(root = null) {
     timeCard.style.cursor = 'pointer';
 }
 
-// helper to remove interactive affordances from the time card
+
 function disableTimeCardInteraction(root = null) {
     const scope = root || document;
     const timeCard = scope.querySelector('.event-details-card--time');
@@ -714,8 +714,8 @@ async function fetchAndShowOptions(root = null) {
         renderOptionsList(payload, root);
         const optsModal = document.getElementById('eventOptionsModal');
         if (optsModal) {
-            // if a cloned details modal is active (root provided), push it behind
-            // the selector modal by adjusting z-index similarly to setdetailmodalbehindselector.
+            
+            
             if (root) {
                 try {
                     root.classList.add('event-details-modal-behind-selector');
@@ -723,9 +723,9 @@ async function fetchAndShowOptions(root = null) {
                         root.dataset._prevZ = root.style.zIndex || '';
                         root.style.zIndex = '1040';
                     }
-                } catch (e) { /* non-fatal */ }
+                } catch (e) {  }
 
-                // when the options modal hides, restore the cloned modal z-index
+                
                 optsModal.addEventListener('hidden.bs.modal', () => {
                     try {
                         root.classList.remove('event-details-modal-behind-selector');
@@ -737,7 +737,7 @@ async function fetchAndShowOptions(root = null) {
                                 root.style.zIndex = '';
                             }
                         }
-                    } catch (e) { /* ignore */ }
+                    } catch (e) {  }
                 }, { once: true });
             }
 
@@ -779,21 +779,21 @@ function applySelectedOptionToTime(opt, root = null) {
     if (els.time) {
         els.time.textContent = (startLabel && endLabel) ? `${startLabel} - ${endLabel}` : '\u2014';
     }
-    // hide pending button if present and enable save; remove pending outline
+    
     const scope = root || document;
     const pendingBtn = scope.querySelector('#eventDetailsTimePendingButton');
     if (pendingBtn) pendingBtn.classList.add('d-none');
     const timeCard = scope.querySelector('.event-details-card--time');
     if (timeCard) timeCard.classList.remove('pending');
     try { enableSaveButton(root); } catch (e) { }
-    // update empty state (remove/add time-empty class based on current text)
-    try { updateTimeEmptyState(root); } catch (e) { /* non-fatal */ }
-    try { updateEmptyFieldStates(root); } catch (e) { /* non-fatal */ }
-    // remove interactive affordances when not pending
+    
+    try { updateTimeEmptyState(root); } catch (e) {  }
+    try { updateEmptyFieldStates(root); } catch (e) {  }
+    
     try { disableTimeCardInteraction(root); } catch (e) { }
 }
 
-// toggle a helper class when the time value is the em-dash so we can style it
+
 function updateTimeEmptyState(root = null) {
     const els = getDetailElements(root);
     const scope = root || document;
@@ -803,7 +803,7 @@ function updateTimeEmptyState(root = null) {
     timeCard.classList.toggle('time-empty', isEmpty);
 }
 
-// update empty state classes for other detail fields (instructor, room, days, duration)
+
 function updateEmptyFieldStates(root = null) {
     const els = getDetailElements(root);
     const scope = root || document;
@@ -824,7 +824,7 @@ function updateEmptyFieldStates(root = null) {
             const isEmptyField = txt === '\u2014' || txt === '' || /^(Not available)$/i.test(txt);
             cardEl.classList.toggle('field-empty', isEmptyField);
             try { console.debug && console.debug('updateEmptyFieldStates:', card, 'value:', txt, 'field-empty:', isEmptyField); } catch (e) { }
-            // ensure the edit button remains enabled and interactive
+            
             try {
                 const btn = cardEl.querySelector('.event-details-edit-btn');
                 if (btn) {
@@ -832,13 +832,13 @@ function updateEmptyFieldStates(root = null) {
                     btn.setAttribute('aria-disabled', 'false');
                     btn.tabIndex = 0;
                 }
-            } catch (e) { /* non-fatal */ }
-        } catch (e) { /* non-fatal */ }
+            } catch (e) {  }
+        } catch (e) {  }
     });
 }
 
-// Animate and highlight any missing required fields (instructor, room, days, duration).
-// Returns true if at least one required field was missing and animation was triggered.
+
+
 function animateMissingRequiredFields(root = null) {
     const els = getDetailElements(root);
     const scope = root || document;
@@ -859,7 +859,7 @@ function animateMissingRequiredFields(root = null) {
                 const isMissing = txt === '\u2014' || txt === '' || /^(Not available)$/i.test(txt);
                 if (isMissing) {
                     anyMissing = true;
-                    // add wiggle class to the visible value element
+                    
                     const animateEl = (el) => {
                         if (!el) return;
                         try {
@@ -867,14 +867,14 @@ function animateMissingRequiredFields(root = null) {
                             void el.offsetWidth;
                             el.classList.add('wiggle');
                             setTimeout(() => { try { el.classList.remove('wiggle'); } catch (e) {} }, 700);
-                        } catch (e) { /* non-fatal */ }
+                        } catch (e) {  }
                     };
                     animateEl(valueEl);
-                    // briefly add a transient highlight class so the permanent
-                    // `.field-empty` state (if present) is not removed
+                    
+                    
                     const card = valueEl.closest('.event-details-card');
                     if (card) {
-                        // ensure the permanent empty styling is applied so red styling stays
+                        
                         try { card.classList.add('field-empty'); } catch (e) { }
                         card.classList.add('wiggle-highlight');
                         setTimeout(() => {
@@ -882,7 +882,7 @@ function animateMissingRequiredFields(root = null) {
                         }, 800);
                     }
                 }
-            } catch (e) { /* non-fatal */ }
+            } catch (e) {  }
         });
 
     return anyMissing;
@@ -905,13 +905,13 @@ const setDetailSelectorValues = ({
 
     const uniqueValues = toUniqueValues(values);
     const normalizedPreferred = String(preferredValue || '').trim();
-    // prefer an explicit preferredValue when provided (keeps unscheduled labels visible)
+    
     const firstLabel = normalizedPreferred
         ? normalizedPreferred
         : (uniqueValues[0] || fallbackLabel);
 
     valueEl.textContent = firstLabel;
-    try { updateEmptyFieldStates(root); } catch (e) { /* non-fatal */ }
+    try { updateEmptyFieldStates(root); } catch (e) {  }
 
     const renderList = (query = '') => {
         const normalizedQuery = String(query).trim().toLowerCase();
@@ -934,14 +934,14 @@ const setDetailSelectorValues = ({
             item.textContent = value;
             item.addEventListener('click', () => {
                 valueEl.textContent = value;
-                // mark time pending when a selector value changes
-                try { markTimePending(root); } catch (e) { /* ignore */ }
-                try { updateEmptyFieldStates(root); } catch (e) { /* non-fatal */ }
+                
+                try { markTimePending(root); } catch (e) {  }
+                try { updateEmptyFieldStates(root); } catch (e) {  }
                 if (selectModalEl) {
                     try {
                         const canonical = (selectModalEl.id && document.getElementById(selectModalEl.id)) || selectModalEl;
                         Modal.getOrCreateInstance(canonical).hide();
-                    } catch (e) { /* ignore */ }
+                    } catch (e) {  }
                 }
             });
             listEl.append(item);
@@ -962,12 +962,12 @@ const setDetailSelectorValues = ({
 const bindDetailActions = (root = null) => {
     const scope = root || document;
 
-    // prevent double-binding for the main modal
+    
     if (!root && detailState.actionsBound) {
         return;
     }
 
-    // for cloned roots, mark on the element to avoid rebinding
+    
     if (root && root.__eventDetailsActionsBound) {
         return;
     }
@@ -982,8 +982,8 @@ const bindDetailActions = (root = null) => {
 
         detailModalRoot.classList.toggle('event-details-modal-behind-selector', behind);
 
-        // when using a cloned modal the css rule targeting #eventdetailsmodal won't match.
-        // for clones, apply a temporary inline z-index so the selector modal appears on top.
+        
+        
         try {
             if (detailModalRoot.id !== 'eventDetailsModal') {
                 if (behind) {
@@ -998,7 +998,7 @@ const bindDetailActions = (root = null) => {
                     }
                 }
             }
-        } catch (e) { /* non-fatal */ }
+        } catch (e) {  }
     };
 
     const openSelectorModal = async (selectorModalEl, type = null) => {
@@ -1008,7 +1008,7 @@ const bindDetailActions = (root = null) => {
 
         setDetailModalBehindSelector(true);
 
-        // ensure selector lists are populated with term-wide options when possible.
+        
         try {
             const termId = await resolveSelectedTermId();
             if (termId) {
@@ -1039,17 +1039,17 @@ const bindDetailActions = (root = null) => {
                 }
             }
         } catch (e) {
-            // non-fatal: fallback to existing values already rendered
+            
         }
 
-        // prefer the canonical modal element in the document (avoid showing a cloned modal fragment)
+        
         let targetModal = selectorModalEl;
         try {
             if (selectorModalEl && selectorModalEl.id) {
                 const byId = document.getElementById(selectorModalEl.id);
                 if (byId) targetModal = byId;
             }
-        } catch (e) { /* ignore */ }
+        } catch (e) {  }
 
         Modal.getOrCreateInstance(targetModal).show();
     };
@@ -1114,15 +1114,15 @@ const bindDetailActions = (root = null) => {
 
         setDaysValidationState(false);
 
-        // mark time pending when days change and open options to pick a new timeslot
-        try { markTimePending(root); } catch (e) { /* ignore */ }
+        
+        try { markTimePending(root); } catch (e) {  }
 
         if (detailEls.daysSelectModal) {
             Modal.getOrCreateInstance(detailEls.daysSelectModal).hide();
         }
 
-        // Do not auto-open the options modal; user can click the pending
-        // time button when ready. Keep time pending and visual state.
+        
+        
     });
 
     detailEls.durationApplyButton?.addEventListener('click', async () => {
@@ -1148,15 +1148,15 @@ const bindDetailActions = (root = null) => {
 
         setDurationValidationState(false);
 
-        // mark time pending when duration changes and open options to pick a new timeslot
-        try { markTimePending(root); } catch (e) { /* ignore */ }
+        
+        try { markTimePending(root); } catch (e) {  }
 
         if (detailEls.durationSelectModal) {
             Modal.getOrCreateInstance(detailEls.durationSelectModal).hide();
         }
 
-        // Do not auto-open the options modal; user can click the pending
-        // time button when ready. Keep time pending and visual state.
+        
+        
     });
 
     detailEls.instructorSelectModal?.addEventListener('hidden.bs.modal', () => {
@@ -1177,7 +1177,7 @@ const bindDetailActions = (root = null) => {
         setDurationValidationState(false);
     });
 
-    // pending time button and time card interactions should be scoped to the root when provided
+    
     if (root) {
         const pendingBtnScoped = scope.querySelector('#eventDetailsTimePendingButton');
         pendingBtnScoped?.addEventListener('click', async () => {
@@ -1205,7 +1205,7 @@ const bindDetailActions = (root = null) => {
         }
     }
 
-    // save changes button - request options and log them for now
+    
     const saveButton = scope.querySelector('#eventDetailsSaveChangesButton');
     saveButton?.addEventListener('click', async () => {
         const current = detailState.currentAssignment || {};
@@ -1217,14 +1217,14 @@ const bindDetailActions = (root = null) => {
             return;
         }
 
-        // only proceed if an option has been selected and applied to the details time
+        
         if (!detailState.selectedOption) {
             console.warn('No option selected. Click the red ! next to the time to choose an option first.');
             return;
         }
 
         const detailEls = getDetailElements(root);
-        // resolve instructor/room ids from cached term objects
+        
         let instructorId = null;
         let roomId = null;
 
@@ -1245,7 +1245,7 @@ const bindDetailActions = (root = null) => {
         }
 
         try {
-            // fetch current assignment to get required attributes
+            
             const getResp = await fetch(`/api/v1/terms/${termId}/assignments/${assignmentId}`, { headers: { 'Accept': 'application/json' } });
             if (!getResp.ok) throw new Error(`Failed to load assignment: ${getResp.status}`);
             const getPayload = await getResp.json();
@@ -1255,7 +1255,7 @@ const bindDetailActions = (root = null) => {
             const selected = detailState.selectedOption;
             const timeslotId = (selected?.relationships?.timeslot?.data?.id) || selected?.timeslot_id || selected?.attributes?.timeslot_id || null;
 
-            // build attributes but only include valid positive integer ids to avoid validation errors
+            
             const updateAttrs = {};
             updateAttrs.assignment_id = Number(existingAttrs.assignment_id || assignmentId);
             updateAttrs.term_id = Number(existingAttrs.term_id || termId);
@@ -1273,7 +1273,7 @@ const bindDetailActions = (root = null) => {
                 updateAttrs.user_id = resolvedUserId;
             }
 
-            // instructor: prefer explicit override from ui, fall back to existing attribute/relationship
+            
             const resolvedInstructorId = Number(instructorId || existingAttrs.instructor_id || existingAttrs.instructorId || existingRels?.instructor?.data?.id || 0);
             if (Number.isInteger(resolvedInstructorId) && resolvedInstructorId > 0) {
                 updateAttrs.instructor_id = resolvedInstructorId;
@@ -1316,7 +1316,7 @@ const bindDetailActions = (root = null) => {
 
             console.log('Assignment updated successfully');
 
-            // fetch the updated assignment from server for inspection
+            
             try {
                 const verifyResp = await fetch(`/api/v1/terms/${termId}/assignments/${assignmentId}`, { headers: { 'Accept': 'application/json' } });
                 const verifyText = await verifyResp.text();
@@ -1329,7 +1329,7 @@ const bindDetailActions = (root = null) => {
                 console.error('Failed to fetch updated assignment for verification', e);
             }
 
-            // show a transient banner with view action
+            
                 try {
                 const detailElsAfter = getDetailElements(root);
                 const existingInstructorId = Number(existingAttrs.instructor_id || existingAttrs.instructorId || existingRels?.instructor?.data?.id || 0);
@@ -1356,19 +1356,19 @@ const bindDetailActions = (root = null) => {
                     showChangeBanner({ message, target: changedTarget, id: changedId, name: changedName });
                 }
             } catch (e) {
-                // non-fatal
+                
             }
 
-            // close options and details modals
+            
             const optionsModalEl = document.getElementById('eventOptionsModal');
             try { if (optionsModalEl) Modal.getOrCreateInstance(optionsModalEl).hide(); } catch (e) {}
 
-            // hide the details modal. if we're working with a cloned modal (root provided)
-            // hide that instance; otherwise hide the canonical #eventdetailsmodal.
+            
+            
             const detailsTarget = root || document.getElementById('eventDetailsModal');
             try { if (detailsTarget) Modal.getOrCreateInstance(detailsTarget).hide(); } catch (e) {}
 
-            // trigger calendar refresh: re-fetch current selection and then re-render
+            
             document.dispatchEvent(new CustomEvent('schedule:refresh-selection'));
             document.dispatchEvent(new CustomEvent('schedule:blockoff-created'));
         } catch (err) {
@@ -1660,8 +1660,8 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
             detailEls.duration.textContent = '\u2014';
         }
         detailEls.time.textContent = '\u2014';
-        try { updateTimeEmptyState(root); } catch (e) { /* non-fatal */ }
-        // clear any previously rendered options
+        try { updateTimeEmptyState(root); } catch (e) {  }
+        
         clearOptionsList(root);
         if (detailEls.daysEditButton) {
             detailEls.daysEditButton.disabled = true;
@@ -1688,8 +1688,8 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
     const eventRooms = toUniqueValues(relatedCourses.map((course) => getLocationLabel(course)));
 
     if (isUnscheduled) {
-        // for unscheduled reschedules, autofill days/duration from the payload
-        // and show any known instructor/room labels from the payload.
+        
+        
         const primary = primaryCourse || {};
             const instructorLabel = getInstructorLabel(primary) || '\u2014';
             const locationLabel = getLocationLabel(primary) || '\u2014';
@@ -1716,7 +1716,7 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
             root: root
         });
 
-        // ensure visible values are set immediately
+        
         try { detailEls.instructorValue.textContent = instructorLabel; } catch (e) {}
         try { detailEls.locationValue.textContent = locationLabel; } catch (e) {}
         const rawDays = primary.days || primary.timeslot_days || primary.attributes?.days || primary.attributes?.timeslot_days || null;
@@ -1725,9 +1725,9 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
         const durationHours = Number(primary.duration || primary.timeslot_duration_hours || primary.attributes?.duration || 0);
         const durationMinutes = Number.isFinite(durationHours) && durationHours > 0 ? Math.round(durationHours * 60) : null;
 
-        // Do NOT auto-fill or persist days/duration when first creating an unscheduled
-        // reschedule. Use previously saved selections for this event group if present;
-        // otherwise leave empty so the user must choose.
+        
+        
+        
         const existingDaySelection = eventGroupKey ? detailState.daySelectionsByGroup.get(eventGroupKey) : null;
         const existingDurationSelection = eventGroupKey ? detailState.durationSelectionsByGroup.get(eventGroupKey) : null;
 
@@ -1749,9 +1749,9 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
             detailEls.duration.textContent = detailState.selectedDurationMinutes ? formatDurationLabel(detailState.selectedDurationMinutes) : '\u2014';
         }
 
-        // leave time blank/pending and allow user to fetch options
+        
         detailEls.time.textContent = '\u2014';
-        try { markTimePending(root); } catch (e) { /* non-fatal */ }
+        try { markTimePending(root); } catch (e) {  }
 
         if (detailEls.daysEditButton) detailEls.daysEditButton.disabled = false;
         if (detailEls.durationEditButton) detailEls.durationEditButton.disabled = false;
@@ -1798,32 +1798,32 @@ const populateEventDetails = ({ calendar, eventId, unscheduledPayload } = {}, ro
     if (detailEls.duration) {
         detailEls.duration.textContent = formatDurationLabel(detailState.selectedDurationMinutes);
     }
-    // for unscheduled flows always show em dash for days/duration
+    
     if (isUnscheduled) {
         try {
             detailEls.days.textContent = '\u2014';
             if (detailEls.duration) detailEls.duration.textContent = '\u2014';
-        } catch (e) { /* non-fatal */ }
+        } catch (e) {  }
     }
     detailEls.time.textContent = event ? getTimeLabel(event) : '\u2014';
-    try { updateTimeEmptyState(root); } catch (e) { /* non-fatal */ }
-    // store current assignment & term for use by save action
+    try { updateTimeEmptyState(root); } catch (e) {  }
+    
     detailState.currentAssignment = {
         assignmentId: Number(primaryCourse.assignment_id || primaryCourse.id || primaryCourse.assignmentId || ''),
         termId: Number(primaryCourse.term_id || primaryCourse.term?.id || detailState.selectedTermId || '')
     };
     try { console.log('details: currentAssignment set to', detailState.currentAssignment); } catch (e) { }
 
-    // enable save if a concrete time exists. for unscheduled reschedules
-    // treat the time as 'pending' (em dash) and leave the time card interactive
+    
+    
     const timeText = String(detailEls.time.textContent || '').trim();
     const scope = root || document;
     const pendingBtn = scope.querySelector('#eventDetailsTimePendingButton');
     const timeCard = scope.querySelector('.event-details-card--time');
 
     if (isUnscheduled) {
-        // ensure pending ui and interaction so user can click to fetch options
-        try { markTimePending(root); } catch (e) { /* non-fatal */ }
+        
+        try { markTimePending(root); } catch (e) {  }
     } else if (timeText && timeText !== '\u2014') {
         if (pendingBtn) pendingBtn.classList.add('d-none');
         if (timeCard) timeCard.classList.remove('pending');
@@ -1922,36 +1922,36 @@ export const showEventDetailsModal = (detail = {}, calendar = null) => {
 
     try {
         console.log('details: showEventDetailsModal called', !!detail, detail && (detail.unscheduledPayload ? 'has unscheduledPayload' : 'no unscheduledPayload'));
-    } catch (e) { /* ignore */ }
+    } catch (e) {  }
 
     if (detail && detail.unscheduledPayload) {
         try {
             console.log('details: unscheduledPayload contents:', detail.unscheduledPayload);
-        } catch (e) { /* ignore */ }
+        } catch (e) {  }
     }
 
-    // if this is an unscheduled reschedule, show a lightweight modal styled like the details modal
-    // unless the caller explicitly requests the full details modal via `forcefullmodal`.
+    
+    
     if (detail && detail.unscheduledPayload && !detail.forceFullModal) {
         try { console.log('details: showing lightweight styled modal for unscheduled reschedule'); } catch (e) { }
         showLightweightDetailsModal(detail.unscheduledPayload);
         return;
     }
 
-    // if caller requested the full details modal for an unscheduled payload, clone
-    // the existing details modal, bind actions scoped to the clone, populate it,
-    // show it, and remove the clone when closed.
+    
+    
+    
     if (detail && detail.unscheduledPayload && detail.forceFullModal) {
         try { console.log('details: opening a cloned full details modal for unscheduled reschedule'); } catch (e) {}
 
-        // clone modal markup
+        
         const clone = modalEl.cloneNode(true);
-        // ensure unique id so bootstrap and queries won't confuse instances
+        
         const cloneId = `eventDetailsModalClone_${Date.now()}`;
         clone.id = cloneId;
         document.body.appendChild(clone);
 
-        // bind actions scoped to clone and populate details into it
+        
         try {
             bindDetailActions(clone);
         } catch (e) { console.error('details: bindDetailActions(clone) failed', e); }
@@ -1967,7 +1967,7 @@ export const showEventDetailsModal = (detail = {}, calendar = null) => {
             console.error('details: showing cloned modal failed', e);
         }
 
-        // remove clone on hide
+        
         clone.addEventListener('hidden.bs.modal', () => {
             try { inst.hide(); } catch (e) {}
             try { clone.remove(); } catch (e) {}
@@ -1978,7 +1978,7 @@ export const showEventDetailsModal = (detail = {}, calendar = null) => {
         return;
     }
 
-    // normal (scheduled) flow uses the existing modal and binds actions once
+    
     bindDetailActions();
 
     populateEventDetails({
@@ -1999,7 +1999,7 @@ export const showEventDetailsModal = (detail = {}, calendar = null) => {
 
     try { console.log('details: modal show requested, immediate classList.contains("show")=', modalEl.classList.contains('show')); } catch (e) { }
 
-    // check again after a tick to see if bootstrap actually displayed it and apply a minimal fallback
+    
     setTimeout(() => {
         try {
             const isShown = modalEl.classList.contains('show');
@@ -2029,13 +2029,13 @@ export const showEventDetailsModal = (detail = {}, calendar = null) => {
     }, 50);
 };
 
-// show a transient banner in the global banner container
+
 function showChangeBanner({ message = 'Updated', target = 'instructor', id = null, name = null } = {}) {
     try {
-        // helper: update a dropdown button's visible label while preserving
-        // any child elements (icons, carets). This replaces direct use of
-        // `.textContent = ...` which can remove structural nodes and cause
-        // layout glyph glitches.
+        
+        
+        
+        
         const setDropdownButtonLabel = (button, text) => {
             if (!button) return;
             const safeText = String(text || '').trim();
@@ -2045,14 +2045,14 @@ function showChangeBanner({ message = 'Updated', target = 'instructor', id = nul
                 return;
             }
 
-            // find an existing text node to update
+            
             for (let node of Array.from(button.childNodes)) {
                 if (node.nodeType === Node.TEXT_NODE) {
                     node.nodeValue = safeText;
                     return;
                 }
             }
-            // no text node found — insert one at the start so icons remain after
+            
             const tn = document.createTextNode(safeText);
             button.insertBefore(tn, button.firstChild);
         };
@@ -2063,7 +2063,7 @@ function showChangeBanner({ message = 'Updated', target = 'instructor', id = nul
         const wrapper = document.createElement('div');
         wrapper.style.pointerEvents = 'auto';
         wrapper.className = 'toast align-items-center text-white bg-success border-0 show';
-        // make banner span the full available width of the container and be visually wider
+        
         wrapper.style.width = '100%';
         wrapper.style.maxWidth = '900px';
         wrapper.style.borderRadius = '0.25rem';
@@ -2102,9 +2102,9 @@ function showChangeBanner({ message = 'Updated', target = 'instructor', id = nul
                             ev.preventDefault();
                             try {
                                 Dropdown.getOrCreateInstance(scheduleValueDropdownButton).hide();
-                            } catch (inner) { /* ignore */ }
+                            } catch (inner) {  }
                         }
-                    } catch (e) { /* ignore */ }
+                    } catch (e) {  }
                 };
 
                 document.addEventListener('show.bs.dropdown', stopShowOnce, { capture: true, once: true });
@@ -2112,16 +2112,16 @@ function showChangeBanner({ message = 'Updated', target = 'instructor', id = nul
                 scheduleBySelect.value = target === 'room' ? 'room' : 'instructor';
                 scheduleBySelect.dispatchEvent(new Event('change'));
 
-                // helper to set the secondary selection once it's enabled
+                
                 const trySetSecondary = (attemptsLeft = 10) => {
                     try {
-                        // if enabled, set the selection and notify other modules
+                        
                         if (!scheduleValueDropdownButton.disabled) {
                             scheduleValueSelect.value = String(id || '');
 
-                            // Stronger suppression: hide the dropdown menu element and
-                            // disable pointer events on the button while we update the
-                            // label to avoid any repaint/layout showing a rectangle.
+                            
+                            
+                            
                             const menu = scheduleValueDropdownButton ? scheduleValueDropdownButton.nextElementSibling : null;
                             const prevMenuDisplay = menu ? menu.style.display : null;
                             const prevPointer = scheduleValueDropdownButton ? scheduleValueDropdownButton.style.pointerEvents : null;
@@ -2129,38 +2129,38 @@ function showChangeBanner({ message = 'Updated', target = 'instructor', id = nul
                             try {
                                 if (menu) menu.style.display = 'none';
                                 if (scheduleValueDropdownButton) scheduleValueDropdownButton.style.pointerEvents = 'none';
-                            } catch (e) { /* ignore */ }
+                            } catch (e) {  }
 
-                            // update visible label while preserving child nodes/icons
+                            
                             try {
                                 setDropdownButtonLabel(scheduleValueDropdownButton, name || String(scheduleValueDropdownButton.textContent || '').trim());
-                            } catch (e) { /* ignore */ }
+                            } catch (e) {  }
 
-                            // trigger a refresh so calendar picks up the new selection
+                            
                             document.dispatchEvent(new CustomEvent('schedule:refresh-selection'));
                             document.dispatchEvent(new CustomEvent('schedule:blockoff-created'));
 
-                            // ensure the secondary dropdown is closed via Bootstrap API
+                            
                             try {
                                 Dropdown.getOrCreateInstance(scheduleValueDropdownButton).hide();
                             } catch (inner) {
                                 try {
                                     scheduleValueDropdownButton.setAttribute('aria-expanded', 'false');
                                     if (menu && menu.classList.contains('show')) menu.classList.remove('show');
-                                } catch (e) { /* ignore */ }
+                                } catch (e) {  }
                             }
 
-                            // restore visuals on next frame
+                            
                             requestAnimationFrame(() => {
                                 try {
                                     if (menu) menu.style.display = prevMenuDisplay || '';
                                     if (scheduleValueDropdownButton) scheduleValueDropdownButton.style.pointerEvents = prevPointer || '';
-                                } catch (e) { /* ignore */ }
+                                } catch (e) {  }
                             });
 
                             return true;
                         }
-                    } catch (e) { /* ignore */ }
+                    } catch (e) {  }
 
                     if (attemptsLeft <= 0) return false;
                     setTimeout(() => trySetSecondary(attemptsLeft - 1), 120);
@@ -2187,7 +2187,7 @@ function showChangeBanner({ message = 'Updated', target = 'instructor', id = nul
         wrapper.appendChild(inner);
 
         container.appendChild(wrapper);
-        // add a bottom progress bar that shrinks leftwards over the lifetime
+        
         const lifeMs = 6000;
         const progressWrap = document.createElement('div');
         progressWrap.style.position = 'absolute';
@@ -2204,19 +2204,19 @@ function showChangeBanner({ message = 'Updated', target = 'instructor', id = nul
         progress.style.width = '100%';
         progress.style.background = 'linear-gradient(90deg, rgba(255,255,255,0.9), rgba(255,255,255,0.6))';
         progress.style.transition = `width ${lifeMs}ms linear`;
-        // transform-origin right so it appears to run leftwards
+        
         progress.style.transformOrigin = 'right';
 
         progressWrap.appendChild(progress);
         wrapper.style.position = 'relative';
         wrapper.appendChild(progressWrap);
 
-        // start the shrink on next tick
+        
         requestAnimationFrame(() => {
             progress.style.width = '0%';
         });
 
-        // fade + remove helper
+        
         function fadeOutAndRemove(el) {
             try {
                 el.style.transition = 'opacity 300ms ease, transform 300ms ease';
@@ -2228,7 +2228,7 @@ function showChangeBanner({ message = 'Updated', target = 'instructor', id = nul
             }
         }
 
-        // auto-remove after lifems with fade
+        
         setTimeout(() => {
             fadeOutAndRemove(wrapper);
         }, lifeMs);
