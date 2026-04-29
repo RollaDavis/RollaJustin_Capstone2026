@@ -17,7 +17,7 @@
 
 
     <!-- Scripts -->
-    @vite(['resources/sass/app.scss', 'resources/js/app.js'])
+    @vite(['resources/sass/app.scss', 'resources/css/light-mod.css', 'resources/js/app.js'])
     <link href="/css/light-mode.css" rel="stylesheet">
     <link href='https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css' rel='stylesheet'>
     <link href='https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css' rel='stylesheet'>
@@ -72,7 +72,7 @@
                                         <button id="scheduleValueDropdownButton"
                                             class="btn btn-outline-secondary dropdown-toggle" type="button"
                                             data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
-                                            Select an option
+                                            <span class="schedule-value-label">Select an option</span>
                                         </button>
                                         <div id="scheduleValueDropdownMenu" class="dropdown-menu p-2 dropdown-schedule-value-menu">
                                             <input id="scheduleValueSearch" type="search" class="form-control mb-2"

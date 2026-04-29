@@ -60,6 +60,13 @@ document.addEventListener('DOMContentLoaded', () => {
             return;
         }
 
+        const labelSpan = scheduleValueDropdownButton.querySelector('.schedule-value-label');
+        if (labelSpan) {
+            labelSpan.textContent = text;
+            return;
+        }
+
+        // fallback
         scheduleValueDropdownButton.textContent = text;
     };
 

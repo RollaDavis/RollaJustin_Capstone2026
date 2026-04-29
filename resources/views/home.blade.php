@@ -2,13 +2,7 @@
 
 @section('content')
     <style>
-        /* Highlight time card when pending */
-        .event-details-card--time.pending {
-            border: 1px solid #dc3545;
-            border-radius: 0.25rem;
-            padding: 0.5rem;
-        }
-
+        /* Inline tweaks kept minimal — pending/time visuals moved to light-mod.css */
         /* Make the pending button visually like the edit pen */
         #eventDetailsTimePendingButton.event-details-edit-btn {
             display: inline-flex;
@@ -73,7 +67,7 @@
                         <div class="event-details-card event-details-card--instructor">
                             <p class="event-details-label mb-1">Instructor</p>
                             <div class="event-details-value-row">
-                                <p class="event-details-value mb-0" id="eventDetailsInstructorValue">Not available</p>
+                                <p class="event-details-value mb-0" id="eventDetailsInstructorValue"></p>
                                 <button id="eventDetailsInstructorEditButton" type="button"
                                     class="btn btn-sm event-details-edit-btn"
                                     aria-label="Edit instructor" title="Edit instructor">
@@ -84,7 +78,7 @@
                         <div class="event-details-card event-details-card--room">
                             <p class="event-details-label mb-1">Room</p>
                             <div class="event-details-value-row">
-                                <p class="event-details-value mb-0" id="eventDetailsLocationValue">Not available</p>
+                                <p class="event-details-value mb-0" id="eventDetailsLocationValue"></p>
                                 <button id="eventDetailsLocationEditButton" type="button"
                                     class="btn btn-sm event-details-edit-btn"
                                     aria-label="Edit room" title="Edit room">
@@ -95,7 +89,7 @@
                         <div class="event-details-card event-details-card--days">
                             <p class="event-details-label mb-1">Days</p>
                             <div class="event-details-value-row">
-                                <p class="event-details-value mb-0" id="eventDetailsDays">Not available</p>
+                                <p class="event-details-value mb-0" id="eventDetailsDays"></p>
                                 <button id="eventDetailsDaysEditButton" type="button"
                                     class="btn btn-sm event-details-edit-btn"
                                     aria-label="Edit days" title="Edit days">
@@ -106,7 +100,7 @@
                         <div class="event-details-card event-details-card--duration">
                             <p class="event-details-label mb-1">Duration</p>
                             <div class="event-details-value-row">
-                                <p class="event-details-value mb-0" id="eventDetailsDuration">Not available</p>
+                                <p class="event-details-value mb-0" id="eventDetailsDuration"></p>
                                 <button id="eventDetailsDurationEditButton" type="button"
                                     class="btn btn-sm event-details-edit-btn"
                                     aria-label="Edit duration" title="Edit duration">
@@ -117,7 +111,7 @@
                         <div class="event-details-card event-details-card--time">
                             <p class="event-details-label">Time</p>
                             <div class="event-details-value-row">
-                                <p class="event-details-value" id="eventDetailsTime">Not available</p>
+                                <p class="event-details-value" id="eventDetailsTime"></p>
                                 <button id="eventDetailsTimePendingButton" type="button" class="btn btn-sm event-details-edit-btn d-none"
                                     aria-label="Select time option" title="Select option">!
                                 </button>
